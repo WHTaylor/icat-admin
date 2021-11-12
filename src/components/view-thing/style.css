@@ -1,0 +1,4 @@
+.viewContainer {
+    display: flex;
+    flex-direction: row;
+}

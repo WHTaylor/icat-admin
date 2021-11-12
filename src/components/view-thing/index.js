@@ -1,0 +1,27 @@
+import {useEffect, useState} from "preact/hooks";
+import style from './style.css';
+
+import {entityNames} from '../../icat.js';
+import EntityTable from '../../components/entity-table';
+
+const ViewThing = ({icatClient, sessionId}) => {
+    console.log("Render viewthing");
+    const [selectedEntity, setSelectedEntity] = useState(null);
+    return (
+        <div class={style.viewContainer}>
+            <ul>
+                {entityNames.map(en =>
+                    <li>
+                      <button onClick={() => setSelectedEntity(en)}>{en}</button>
+                    </li>) }
+            </ul>
+            { selectedEntity != null &&
+                <EntityTable
+                    icatClient={icatClient}
+                    sessionId={sessionId}
+                    table={selectedEntity} /> }
+        </div>
+    );
+}
+
+export default ViewThing;

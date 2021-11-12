@@ -8,10 +8,8 @@ function format(data) {
 
 const EntityTable = ({icatClient, sessionId, table}) => {
     const [data, setData] = useState(null);
-    console.log("Render entitytable");
 
     if (data === null) {
-        console.log("Getting data");
         useEffect(async() => {
             const d = await icatClient.getEntries(sessionId, table, 0, 50);
             setData(d);

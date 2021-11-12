@@ -12,7 +12,7 @@ class IcatClient {
     async login(plugin, username, password) {
         const creds = {
             "plugin": plugin, 
-             "credentials": [
+            "credentials": [
                 {"username": username},
                 {"password": password}]};
         const form = new FormData();
@@ -22,12 +22,12 @@ class IcatClient {
                 method: "POST",
                 body: new URLSearchParams(form),
             })
-        .then(res => {
-            if (res.ok) return res
-            else throw new Error(res)
-        })
-        .then(res => res.json())
-        .then(j => j["sessionId"]);
+            .then(res => {
+                if (res.ok) return res
+                else throw new Error(res)
+            })
+            .then(res => res.json())
+            .then(j => j["sessionId"]);
     }
 
     async getEntries(sessionId, table, offset, limit) {
@@ -38,11 +38,22 @@ class IcatClient {
         }
         const url = `${this.serviceUrl}/entityManager?${queryUrlClause(params)}`;
         return fetch(url)
-        .then(res => {
-            if (res.ok) return res
-            else throw new Error(res)
-        })
-        .then(res => res.json());
+            .then(res => {
+                if (res.ok) return res
+                else throw new Error(res)
+            })
+            .then(res => res.json());
+    }
+
+    async isValidSession(sessionId) {
+        const url = `${this.serviceUrl}/session/${sessionId}`;
+        return fetch(url)
+            .then(res => res.ok);
+    }
+
+    async logout(sessionId) {
+        fetch(`${this.serviceUrl}/session/${sessionId}`,
+            { method: "DELETE" });
     }
 }
 

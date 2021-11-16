@@ -1,4 +1,5 @@
 import {useEffect, useState} from "preact/hooks";
+import style from './style.css';
 
 import {entityNames} from '../../icat.js';
 
@@ -29,23 +30,35 @@ function format(data) {
 
 const EntityTable = ({icatClient, sessionId, table}) => {
     const [data, setData] = useState(null);
+    const [filter, setFilter] = useState(null);
+    const [errMsg, setErrMsg] = useState(null);
 
     useEffect(() => {
         setData(null);
+        setErrMsg(null);
         const controller = new AbortController();
         const signal = controller.signal;
         const getEntries = async () => {
-            const d = await icatClient.getEntries(sessionId, table, 0, 50, signal);
-            setData(d);
+            icatClient.getEntries(
+                    sessionId, table, 0, 50, filter, signal)
+                .then(d => setData(d))
+                .catch(err => {
+                    if (err instanceof DOMException) return;
+                    setErrMsg(err);});
         };
         getEntries();
         return () => controller.abort();
-    }, [table]);
+    }, [table, filter]);
 
     return (
         <div>
-            <h1>{table}</h1>
-            {data === null ? <p>Loading...</p> : format(data)}
+            <span>
+                <h1 class={style.tableHeader}>{table}</h1>
+                <input type="text" onChange={ev => setFilter(ev.target.value)}/>
+            </span>
+            {errMsg ? <p>{errMsg}</p>
+                : data === null ? <p>Loading...</p>
+                    : format(data)}
         </div>
     );
 }

@@ -8,9 +8,18 @@ import ViewThing from '../../components/view-thing';
 
 const client = new IcatClient("https://icat-dev.isis.stfc.ac.uk");
 
-const setCachedSessionId = s => localStorage.setItem("sessionId", s);
-const getCachedSessionId = () => localStorage.getItem("sessionId");
-const clearCachedSessionId = () => localStorage.removeItem("sessionId");
+// Hack around build error because localStorage not defined for node
+// No idea why this is a problem, but it is
+const isNode = typeof window === 'undefined';
+const setCachedSessionId = isNode
+    ? () => {}
+    : s => localStorage.setItem("sessionId", s);
+const getCachedSessionId = isNode
+    ? s => {}
+    : () => localStorage.getItem("sessionId");
+const clearCachedSessionId = isNode
+    ? () => {}
+    : () => localStorage.removeItem("sessionId");
 async function hasValidCachedSession() {
     var stored = getCachedSessionId();
     if (stored === null) return false;

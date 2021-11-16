@@ -5,7 +5,6 @@ import {entityNames} from '../../icat.js';
 import EntityTable from '../../components/entity-table';
 
 const ViewThing = ({icatClient, sessionId}) => {
-    console.log("Render viewthing");
     const [selectedEntity, setSelectedEntity] = useState(null);
     return (
         <div class={style.viewContainer}>

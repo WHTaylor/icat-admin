@@ -12,13 +12,17 @@ function format(data) {
     if (data.length === 0) return <p>No entries</p>;
 
     const unpacked = unpack(data);
-    const keys = Object.keys(unpacked[0]);
+    const keys = Object.keys(unpacked[0])
+        .filter(k => typeof unpacked[0][k] !== "object");
     return (
         <table>
-            <tr>
+            <tr onClick={() => console.log("head")}>
                 {keys.map(k => <th>{k}</th>)}
             </tr>
-            {unpacked.map(e => <tr>{keys.map(k => <td>{e[k]}</td>)}</tr>)}
+            {unpacked.map(e =>
+                <tr>
+                    {keys.map(k => <td>{e[k]}</td>)}
+                </tr>)}
         </table>
     );
 }

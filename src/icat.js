@@ -4,6 +4,12 @@ function queryUrlClause(args) {
         .join('&');
 }
 
+async function formatError(errResponse) {
+    const header = `${errResponse.status} ${errResponse.statusText}`;
+    return errResponse.json()
+        .then(r => `${header}: ${r["message"]}`);
+}
+
 class IcatClient {
     constructor(host) {
         this.serviceUrl = host + "/icat";
@@ -11,7 +17,7 @@ class IcatClient {
 
     async login(plugin, username, password) {
         const creds = {
-            "plugin": plugin, 
+            "plugin": plugin,
             "credentials": [
                 {"username": username},
                 {"password": password}]};
@@ -30,18 +36,21 @@ class IcatClient {
             .then(j => j["sessionId"]);
     }
 
-    async getEntries(sessionId, table, offset, limit, signal) {
-        const query = `select e from ${table} e limit ${offset}, ${limit}`;
+    async getEntries(sessionId, table, offset, limit, filter, signal) {
+        const where = (filter === null || filter.trim() === "") ? " "
+            : ` where e.${filter.trim()}`
+        const query = `select e from ${table} e` +
+            `${where} limit ${offset}, ${limit}`;
         const params = {
             "sessionId": sessionId,
             "query": query,
         }
         const url = `${this.serviceUrl}/entityManager?${queryUrlClause(params)}`;
         return fetch(url, {signal})
-            .then(res => {
-                if (res.ok) return res
-                else throw new Error(res)
-            })
+            .then(res => res.ok
+                ? res
+                : formatError(res)
+                    .then(msg => Promise.reject(msg)))
             .then(res => res.json());
     }
 

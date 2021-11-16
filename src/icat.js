@@ -30,14 +30,14 @@ class IcatClient {
             .then(j => j["sessionId"]);
     }
 
-    async getEntries(sessionId, table, offset, limit) {
+    async getEntries(sessionId, table, offset, limit, signal) {
         const query = `select e from ${table} e limit ${offset}, ${limit}`;
         const params = {
             "sessionId": sessionId,
             "query": query,
         }
         const url = `${this.serviceUrl}/entityManager?${queryUrlClause(params)}`;
-        return fetch(url)
+        return fetch(url, {signal})
             .then(res => {
                 if (res.ok) return res
                 else throw new Error(res)

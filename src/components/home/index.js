@@ -28,14 +28,19 @@ async function hasValidCachedSession() {
 
 const Home = () => {
     const [sessionId, setSessionId] = useState(null);
+    const [errMsg, setErrMsg] = useState(null);
+
     hasValidCachedSession()
         .then(setSessionId(getCachedSessionId()));
 
     const doLogin = async (plugin, username, password) => {
         const s = await client.login(plugin, username, password)
-            .catch(err => "oh no" );
-        setSessionId(s);
-        setCachedSessionId(s);
+            .catch(err => setErrMsg(err));
+        if (typeof s === "string") {
+            setSessionId(s);
+            setCachedSessionId(s);
+            setErrMsg(null);
+        }
     };
 
     const logout = sessionId => {
@@ -53,6 +58,7 @@ const Home = () => {
             {sessionId !== null && <button onClick={() => logout(sessionId)}>Logout</button> }
             <h1>Home</h1>
             {activeComponent}
+            <p>{errMsg}</p>
         </div>
     );
 };

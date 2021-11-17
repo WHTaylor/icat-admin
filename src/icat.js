@@ -28,10 +28,10 @@ class IcatClient {
                 method: "POST",
                 body: new URLSearchParams(form),
             })
-            .then(res => {
-                if (res.ok) return res
-                else throw new Error(res)
-            })
+            .then(res => res.ok
+                ? res
+                : formatError(res)
+                    .then(msg => Promise.reject(msg)))
             .then(res => res.json())
             .then(j => j["sessionId"]);
     }

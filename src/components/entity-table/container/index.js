@@ -26,6 +26,9 @@ const EntityTable = ({icatClient, sessionId, table}) => {
                     sessionId, table, 0, 50, filter, signal)
                 .then(d => setData(d))
                 .catch(err => {
+                    // DOMException gets throws if promise is aborted, which it is
+                    // during cleanup `controller.abort()` when table/filter changes
+                    // before request finishes
                     if (err instanceof DOMException) return;
                     setErrMsg(err);});
         };

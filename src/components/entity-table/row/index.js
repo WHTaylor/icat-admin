@@ -1,5 +1,11 @@
 import {useEffect, useState} from "preact/hooks";
 
+function format(cellContent) {
+    return cellContent === undefined || cellContent === null
+        ? ""
+        : cellContent.toString();
+}
+
 const EntityRow = ({entity, headers, showRelatedEntities, openContextMenu}) => {
     const relatedEntityCallbacks = Object.keys(entity)
         .filter(k => Array.isArray(entity[k]))
@@ -13,7 +19,7 @@ const EntityRow = ({entity, headers, showRelatedEntities, openContextMenu}) => {
     return (
         <>
             <tr onContextMenu={doOpenContextMenu}>
-                {headers.map(k => <td>{entity[k]}</td>)}
+                {headers.map(k => <td>{format(entity[k])}</td>)}
             </tr>
         </>
     );

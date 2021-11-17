@@ -16,12 +16,14 @@ function format(data) {
     const unpacked = unpack(data);
     const keys = Object.keys(unpacked[0])
         .filter(k => typeof unpacked[0][k] !== "object");
+    const f = (id, entityType) => {console.log(`Would switch to ${entityType} ${id}`)};
     return (
         <table>
             <tr onClick={() => console.log("head")}>
                 {keys.map(k => <th>{k}</th>)}
             </tr>
-            {unpacked.map(e => <EntityRow headers={keys} entity={e} />)}
+            {unpacked.map(e =>
+                <EntityRow headers={keys} entity={e} contextMenuFilter={f}/>)}
         </table>
     );
 }

@@ -1,0 +1,16 @@
+.contextMenu {
+    position: absolute;
+    background-color: #e8e8e8;
+    top: 200px;
+    left: 200px;
+}
+
+.contextMenuRow {
+    background-color: white;
+}
+
+.contextMenuRow:hover {
+    background-color: #ddd;
+}
+
+

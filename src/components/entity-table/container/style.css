@@ -1,3 +1,12 @@
-.tableHeader {
+.tableTitleBar {
+    display: flex;
+    align-items: center;
+}
+
+.tableNameHeader {
     display: inline;
+}
+
+.filterInput {
+    margin: 0 1em;
 }

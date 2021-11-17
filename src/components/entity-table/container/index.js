@@ -38,9 +38,13 @@ const EntityTable = ({icatClient, sessionId, table}) => {
 
     return (
         <div>
-            <span>
-                <h1 class={style.tableHeader}>{table}</h1>
-                <input type="text" onChange={ev => setFilter(ev.target.value)}/>
+            <span class={style.tableTitleBar}>
+                <h1 class={style.tableNameHeader}>{table}</h1>
+                <input
+                    type="text"
+                    class={style.filterInput}
+                    placeholder="Filter by (ie. id = 1234)"
+                    onChange={ev => setFilter(ev.target.value)}/>
             </span>
             {errMsg ? <p>{errMsg}</p>
                 : data === null ? <p>Loading...</p>

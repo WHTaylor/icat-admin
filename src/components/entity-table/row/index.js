@@ -6,7 +6,7 @@ function format(cellContent) {
         : cellContent.toString();
 }
 
-const EntityRow = ({entity, headers, showRelatedEntities, openContextMenu}) => {
+const EntityRow = ({entity, headers, showRelatedEntities, openContextMenu, rowClass}) => {
     const relatedEntityCallbacks = Object.keys(entity)
         .filter(k => Array.isArray(entity[k]))
         .map(k => [k, () => showRelatedEntities(entity.id, k.slice(0, -1))]);
@@ -17,11 +17,9 @@ const EntityRow = ({entity, headers, showRelatedEntities, openContextMenu}) => {
     }
 
     return (
-        <>
-            <tr onContextMenu={doOpenContextMenu}>
-                {headers.map(k => <td>{format(entity[k])}</td>)}
-            </tr>
-        </>
+        <tr onContextMenu={doOpenContextMenu} class={rowClass}>
+            {headers.map(k => <td>{format(entity[k])}</td>)}
+        </tr>
     );
 }
 

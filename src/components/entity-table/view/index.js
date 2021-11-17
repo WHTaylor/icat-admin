@@ -1,4 +1,5 @@
 import {useEffect, useState} from "preact/hooks";
+import style from './style.css';
 
 import EntityRow from '../row';
 import ContextMenu from '../../context-menu';
@@ -32,10 +33,11 @@ const EntityTableView = ({data}) => {
         <>
         <table>
             <tr>
-                {keys.map(k => <th>{k}</th>)}
+                {keys.map(k => <th class={style.tableHeader}>{k}</th>)}
             </tr>
             {data.map(e =>
                 <EntityRow
+                    rowClass={style.tableRow}
                     headers={keys}
                     entity={e}
                     showRelatedEntities={f}

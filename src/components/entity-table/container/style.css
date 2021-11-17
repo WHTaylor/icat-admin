@@ -10,3 +10,8 @@
 .filterInput {
     margin: 0 1em;
 }
+
+.tableTitleCount {
+    color: grey;
+    font-size: small;
+}

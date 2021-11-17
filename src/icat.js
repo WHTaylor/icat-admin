@@ -54,6 +54,23 @@ class IcatClient {
             .then(res => res.json());
     }
 
+    async getCount(sessionId, table, filter, signal) {
+        const where = (filter === null || filter.trim() === "") ? " "
+            : ` where e.${filter.trim()}`
+        const query = `select count(e) from ${table} e${where}`;
+        const params = {
+            "sessionId": sessionId,
+            "query": query,
+        }
+        const url = `${this.serviceUrl}/entityManager?${queryUrlClause(params)}`;
+        return fetch(url, {signal})
+            .then(res => res.ok
+                ? res
+                : formatError(res)
+                    .then(msg => Promise.reject(msg)))
+            .then(res => res.json());
+    }
+
     async isValidSession(sessionId) {
         const url = `${this.serviceUrl}/session/${sessionId}`;
         return fetch(url)

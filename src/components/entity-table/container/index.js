@@ -15,6 +15,7 @@ const EntityTable = ({icatClient, sessionId, table}) => {
     const [filter, setFilter] = useState(null);
     const [errMsg, setErrMsg] = useState(null);
     const [contextMenuPos, setContextMenuPos] = useState(null);
+    const [count, setCount] = useState(null);
 
     useEffect(() => {
         setData(null);
@@ -36,6 +37,21 @@ const EntityTable = ({icatClient, sessionId, table}) => {
         return () => controller.abort();
     }, [table, filter]);
 
+    useEffect(() => {
+        setCount(null);
+        const controller = new AbortController();
+        const signal = controller.signal;
+        const getCount = async () => {
+            icatClient.getCount(
+                    sessionId, table, filter, signal)
+                .then(d => setCount(d[0]))
+                // Silently ignore errors, this is only a nice to have
+                .catch(err => {});
+        };
+        getCount();
+        return () => controller.abort();
+    }, [table, filter]);
+
     return (
         <div>
             <span class={style.tableTitleBar}>
@@ -45,6 +61,8 @@ const EntityTable = ({icatClient, sessionId, table}) => {
                     class={style.filterInput}
                     placeholder="Filter by (ie. id = 1234)"
                     onChange={ev => setFilter(ev.target.value)}/>
+                {count !== null &&
+                    <p class={style.tableTitleCount}>{count} matches</p>}
             </span>
             {errMsg ? <p>{errMsg}</p>
                 : data === null ? <p>Loading...</p>

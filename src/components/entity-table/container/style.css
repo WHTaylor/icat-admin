@@ -1,0 +1,17 @@
+.tableTitleBar {
+    display: flex;
+    align-items: center;
+}
+
+.tableNameHeader {
+    display: inline;
+}
+
+.filterInput {
+    margin: 0 1em;
+}
+
+.tableTitleCount {
+    color: grey;
+    font-size: small;
+}

@@ -28,10 +28,10 @@ class IcatClient {
                 method: "POST",
                 body: new URLSearchParams(form),
             })
-            .then(res => {
-                if (res.ok) return res
-                else throw new Error(res)
-            })
+            .then(res => res.ok
+                ? res
+                : formatError(res)
+                    .then(msg => Promise.reject(msg)))
             .then(res => res.json())
             .then(j => j["sessionId"]);
     }
@@ -41,6 +41,23 @@ class IcatClient {
             : ` where e.${filter.trim()}`
         const query = `select e from ${table} e` +
             `${where} limit ${offset}, ${limit}`;
+        const params = {
+            "sessionId": sessionId,
+            "query": query,
+        }
+        const url = `${this.serviceUrl}/entityManager?${queryUrlClause(params)}`;
+        return fetch(url, {signal})
+            .then(res => res.ok
+                ? res
+                : formatError(res)
+                    .then(msg => Promise.reject(msg)))
+            .then(res => res.json());
+    }
+
+    async getCount(sessionId, table, filter, signal) {
+        const where = (filter === null || filter.trim() === "") ? " "
+            : ` where e.${filter.trim()}`
+        const query = `select count(e) from ${table} e${where}`;
         const params = {
             "sessionId": sessionId,
             "query": query,

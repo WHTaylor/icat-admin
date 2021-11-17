@@ -2,7 +2,7 @@ import {useEffect, useState} from "preact/hooks";
 import style from './style.css';
 
 import {entityNames} from '../../icat.js';
-import EntityTable from '../../components/entity-table';
+import EntityTable from '../../components/entity-table/container';
 
 const ViewThing = ({icatClient, sessionId}) => {
     const [selectedEntity, setSelectedEntity] = useState(null);

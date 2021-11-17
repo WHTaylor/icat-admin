@@ -1,26 +1,20 @@
 import {useEffect, useState} from "preact/hooks";
 
-import ContextMenu from '../../context-menu';
-
-const EntityRow = ({entity, headers, contextMenuFilter}) => {
-    const [contextMenuPos, setContextMenuPos] = useState(null);
+const EntityRow = ({entity, headers, showRelatedEntities, openContextMenu}) => {
     const relatedEntityCallbacks = Object.keys(entity)
         .filter(k => Array.isArray(entity[k]))
-        .map(k => [k, () => contextMenuFilter(entity.id, k.slice(0, -1))]);
+        .map(k => [k, () => showRelatedEntities(entity.id, k.slice(0, -1))]);
 
-    const showContextMenu = ev => {
+    const doOpenContextMenu = ev => {
         ev.preventDefault();
-        const pos = [ev.pageX, ev.pageY];
-        setContextMenuPos(pos);
-    };
+        openContextMenu(ev.pageX, ev.pageY, relatedEntityCallbacks);
+    }
 
     return (
         <>
-            <tr onContextMenu={showContextMenu}>
+            <tr onContextMenu={doOpenContextMenu}>
                 {headers.map(k => <td>{entity[k]}</td>)}
             </tr>
-            {contextMenuPos &&
-                <ContextMenu pos={contextMenuPos} items={relatedEntityCallbacks} />}
         </>
     );
 }

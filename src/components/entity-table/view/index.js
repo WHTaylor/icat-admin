@@ -4,13 +4,23 @@ import EntityRow from '../row';
 import ContextMenu from '../../context-menu';
 
 const EntityTableView = ({data}) => {
-    const [contextMenuPos, setcontextMenuPos] =  useState(null);
-    const [contextMenuItems, setcontextMenuItems] =  useState(null);
+    const [contextMenuPos, setContextMenuPos] =  useState(null);
+    const [contextMenuItems, setContextMenuItems] =  useState(null);
+
+    const clearContextMenu = () => {
+        setContextMenuPos(null);
+        setContextMenuItems(null);
+    };
 
     const openContextMenu = (x, y, callbacks) => {
-        setcontextMenuPos([x, y]);
-        setcontextMenuItems(callbacks);
-    }
+        setContextMenuPos([x, y]);
+        setContextMenuItems(callbacks);
+    };
+
+    useEffect(() => {
+        document.addEventListener("click", clearContextMenu);
+        return () => document.removeEventListener("click", clearContextMenu);
+    });
 
     // Note: early returns need to be after all hooks
     if (data.length === 0) return <p>No entries</p>;

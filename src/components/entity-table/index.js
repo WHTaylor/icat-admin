@@ -2,6 +2,7 @@ import {useEffect, useState} from "preact/hooks";
 import style from './style.css';
 
 import {entityNames} from '../../icat.js';
+import EntityRow from '../entity-row';
 
 // The API is returning data packed into an object for some reason
 function unpack(data) {
@@ -20,10 +21,7 @@ function format(data) {
             <tr onClick={() => console.log("head")}>
                 {keys.map(k => <th>{k}</th>)}
             </tr>
-            {unpacked.map(e =>
-                <tr>
-                    {keys.map(k => <td>{e[k]}</td>)}
-                </tr>)}
+            {unpacked.map(e => <EntityRow headers={keys} entity={e} />)}
         </table>
     );
 }

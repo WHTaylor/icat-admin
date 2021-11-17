@@ -1,6 +1,6 @@
 import {useEffect, useState} from "preact/hooks";
 
-import ContextMenu from '../context-menu';
+import ContextMenu from '../../context-menu';
 
 const EntityRow = ({entity, headers, contextMenuFilter}) => {
     const [contextMenuPos, setContextMenuPos] = useState(null);
@@ -13,7 +13,6 @@ const EntityRow = ({entity, headers, contextMenuFilter}) => {
         const pos = [ev.pageX, ev.pageY];
         setContextMenuPos(pos);
     };
-
 
     return (
         <>

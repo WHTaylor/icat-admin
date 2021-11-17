@@ -1,37 +1,20 @@
 import {useEffect, useState} from "preact/hooks";
 import style from './style.css';
 
-import {entityNames} from '../../icat.js';
-import EntityRow from '../entity-row';
+import EntityTableView from '../view';
 
 // The API is returning data packed into an object for some reason
 function unpack(data) {
+    if (data.length === 0) return [];
     const dataType = Object.keys(data[0]);
     return data.map(d => d[dataType]);
-}
-
-function format(data) {
-    if (data.length === 0) return <p>No entries</p>;
-
-    const unpacked = unpack(data);
-    const keys = Object.keys(unpacked[0])
-        .filter(k => typeof unpacked[0][k] !== "object");
-    const f = (id, entityType) => {console.log(`Would switch to ${entityType} ${id}`)};
-    return (
-        <table>
-            <tr onClick={() => console.log("head")}>
-                {keys.map(k => <th>{k}</th>)}
-            </tr>
-            {unpacked.map(e =>
-                <EntityRow headers={keys} entity={e} contextMenuFilter={f}/>)}
-        </table>
-    );
 }
 
 const EntityTable = ({icatClient, sessionId, table}) => {
     const [data, setData] = useState(null);
     const [filter, setFilter] = useState(null);
     const [errMsg, setErrMsg] = useState(null);
+    const [contextMenuPos, setContextMenuPos] = useState(null);
 
     useEffect(() => {
         setData(null);
@@ -58,7 +41,7 @@ const EntityTable = ({icatClient, sessionId, table}) => {
             </span>
             {errMsg ? <p>{errMsg}</p>
                 : data === null ? <p>Loading...</p>
-                    : format(data)}
+                    : <EntityTableView data={unpack(data)} />}
         </div>
     );
 }

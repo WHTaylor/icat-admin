@@ -10,6 +10,14 @@ const ViewThing = ({icatClient, sessionId}) => {
     const [selectedEntities, setSelectedEntities] = useState([]);
 
     const openTab = e => setSelectedEntities(selectedEntities.concat([e]));
+    const closeTab = n => {
+        setSelectedEntities(selectedEntities.filter((e, i) => i !== n));
+    };
+
+    // TODO: This doesn't really work, because closing any earlier tabs changes idx
+    const uniqueKey = (tabName, tabIdx) => {
+        return tabName + tabIdx;
+    };
 
     return (
         <div class={style.viewContainer}>
@@ -19,12 +27,13 @@ const ViewThing = ({icatClient, sessionId}) => {
                       <button onClick={() => openTab(en)}>{en}</button>
                     </li>) }
             </ul>
-            <TabWindow>
-                {selectedEntities.map(e =>
+            <TabWindow closeTab={closeTab}>
+                {selectedEntities.map((e, i) =>
                     [e, <EntityTable
-                        icatClient={icatClient}
-                        sessionId={sessionId}
-                        table={e} />]) }
+                            icatClient={icatClient}
+                            sessionId={sessionId}
+                            table={e}
+                            key={uniqueKey(e, i)} />])}
             </TabWindow>
         </div>
     );

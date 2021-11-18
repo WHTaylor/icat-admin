@@ -33,6 +33,7 @@ const ViewThing = ({icatClient, sessionId}) => {
                             icatClient={icatClient}
                             sessionId={sessionId}
                             table={e}
+                            openRelated={(e, id) => openTab(e)}
                             key={uniqueKey(e, i)} />])}
             </TabWindow>
         </div>

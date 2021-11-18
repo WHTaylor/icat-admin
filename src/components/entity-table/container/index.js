@@ -3,7 +3,7 @@ import style from './style.css';
 
 import EntityTableView from '../view';
 
-const EntityTable = ({icatClient, sessionId, table}) => {
+const EntityTable = ({icatClient, sessionId, table, openRelated}) => {
     const [data, setData] = useState(null);
     const [filter, setFilter] = useState(null);
     const [errMsg, setErrMsg] = useState(null);
@@ -59,7 +59,7 @@ const EntityTable = ({icatClient, sessionId, table}) => {
             </span>
             {errMsg ? <p>{errMsg}</p>
                 : data === null ? <p>Loading...</p>
-                    : <EntityTableView data={data} />}
+                    : <EntityTableView data={data} openRelated={openRelated} />}
         </div>
     );
 }

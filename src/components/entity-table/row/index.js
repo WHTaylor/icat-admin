@@ -1,5 +1,7 @@
 import {useEffect, useState} from "preact/hooks";
 
+import {icatAttributeToTableName} from '../../../utils.js';
+
 function format(cellContent) {
     return cellContent === undefined || cellContent === null
         ? ""
@@ -9,7 +11,7 @@ function format(cellContent) {
 const EntityRow = ({entity, headers, showRelatedEntities, openContextMenu, rowClass}) => {
     const relatedEntityCallbacks = Object.keys(entity)
         .filter(k => Array.isArray(entity[k]))
-        .map(k => [k, () => showRelatedEntities(entity.id, k.slice(0, -1))]);
+        .map(k => [k, () => showRelatedEntities(icatAttributeToTableName(k), entity.id)]);
 
     const doOpenContextMenu = ev => {
         ev.preventDefault();

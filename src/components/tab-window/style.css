@@ -1,0 +1,10 @@
+.tabSwitcher {
+    display: flex;
+    flex-direction: row;
+}
+
+.hidden {
+    display: none;
+}
+
+.shown {}

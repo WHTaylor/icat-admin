@@ -7,4 +7,6 @@
     display: none;
 }
 
-.shown {}
+.selectedTab {
+    background-color: #e1f9fb
+}

@@ -6,14 +6,14 @@ const TabWindow = props => {
     return (
         <div>
             <div class={style.tabSwitcher}>
-                {props.children.map((c, i) =>
+                {props.children.map(([name, c], i) =>
                     <button
                         onClick={() => setActiveTab(i)}
                         class={i === activeTab ? style.selectedTab : null}>
-                        {i + 1}
+                        {name}
                     </button>)}
             </div>
-            {props.children.map((c, i) =>
+            {props.children.map(([name, c], i) =>
                 <div class={i === activeTab ? null : style.hidden}>{c}</div>)}
         </div>
     );

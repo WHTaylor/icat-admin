@@ -21,10 +21,10 @@ const ViewThing = ({icatClient, sessionId}) => {
             </ul>
             <TabWindow>
                 {selectedEntities.map(e =>
-                    <EntityTable
+                    [e, <EntityTable
                         icatClient={icatClient}
                         sessionId={sessionId}
-                        table={e} />) }
+                        table={e} />]) }
             </TabWindow>
         </div>
     );

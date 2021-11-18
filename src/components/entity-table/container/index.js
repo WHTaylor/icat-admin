@@ -3,13 +3,6 @@ import style from './style.css';
 
 import EntityTableView from '../view';
 
-// The API is returning data packed into an object for some reason
-function unpack(data) {
-    if (data.length === 0) return [];
-    const dataType = Object.keys(data[0]);
-    return data.map(d => d[dataType]);
-}
-
 const EntityTable = ({icatClient, sessionId, table}) => {
     const [data, setData] = useState(null);
     const [filter, setFilter] = useState(null);
@@ -66,7 +59,7 @@ const EntityTable = ({icatClient, sessionId, table}) => {
             </span>
             {errMsg ? <p>{errMsg}</p>
                 : data === null ? <p>Loading...</p>
-                    : <EntityTableView data={unpack(data)} />}
+                    : <EntityTableView data={data} />}
         </div>
     );
 }

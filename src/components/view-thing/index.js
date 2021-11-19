@@ -8,6 +8,7 @@ import TabWindow from '../../components/tab-window';
 
 const ViewThing = ({icatClient, sessionId}) => {
     const [tabFilters, setTabFilters] = useState([]);
+    const [activeTab, setActiveTab] = useState(null);
 
     const changeTabWhere = (i, newWhere) => {
         const newFilter = { ...tabFilters[i], where: newWhere };
@@ -18,7 +19,9 @@ const ViewThing = ({icatClient, sessionId}) => {
     };
 
     const openTab = f => {
+        const numTabs = tabFilters.length;
         setTabFilters(tabFilters.concat([f]));
+        setActiveTab(numTabs);
     };
 
     const openRelated = (related, origin, originId) => {
@@ -29,8 +32,13 @@ const ViewThing = ({icatClient, sessionId}) => {
         openTab(filter);
     }
 
-    const closeTab = n => {
-        setTabFilters(tabFilters.filter((e, i) => i !== n));
+    const closeTab = closeIdx => {
+        setTabFilters(tabFilters.filter((e, i) => i !== closeIdx));
+        if (closeIdx < activeTab) {
+            setActiveTab(activeTab - 1);
+        } else if (closeIdx === activeTab && closeIdx === 0) {
+            setActiveTab(null);
+        }
     };
 
     // TODO: This doesn't really work, because closing any earlier tabs changes idx
@@ -47,7 +55,10 @@ const ViewThing = ({icatClient, sessionId}) => {
                          onClick={() => openTab({ table: en })}>{en}</button>
                     </li>)}
             </ul>
-            <TabWindow closeTab={closeTab}>
+            <TabWindow
+                activeTab={activeTab}
+                closeTab={closeTab}
+                handleChangeTab={setActiveTab}>
                 {tabFilters.map((f, i) =>
                     [f.table,
                         <EntityTable

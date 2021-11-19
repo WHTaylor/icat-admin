@@ -2,7 +2,7 @@ import {useState} from "preact/hooks";
 import style from './style.css';
 
 import {entityNames} from '../../icat.js';
-import {lowercaseFirst} from '../../utils.js';
+import {lowercaseFirst, tableFilter} from '../../utils.js';
 import EntityTable from '../../components/entity-table/container';
 import TabWindow from '../../components/tab-window';
 
@@ -24,26 +24,21 @@ const ViewThing = ({icatClient, sessionId}) => {
         setActiveTab(numTabs);
     };
 
-    const openRelated = (related, origin, originId) => {
-        const filter = {
-            table: related,
-            where: `${lowercaseFirst(origin)}.id = ${originId}`
-        };
-        openTab(filter);
-    }
+    const openRelated = (related, origin, originId) =>
+        openTab(
+            tableFilter(
+                related,
+                `${lowercaseFirst(origin)}.id = ${originId}`));
 
     const closeTab = closeIdx => {
+        const numTabs = tabFilters.length;
         setTabFilters(tabFilters.filter((e, i) => i !== closeIdx));
         if (closeIdx < activeTab) {
             setActiveTab(activeTab - 1);
-        } else if (closeIdx === activeTab && closeIdx === 0) {
-            setActiveTab(null);
+        } else if (closeIdx === activeTab) {
+            if  (closeIdx === 0) setActiveTab(null);
+            else if (closeIdx === numTabs - 1) setActiveTab(activeTab - 1);
         }
-    };
-
-    // TODO: This doesn't really work, because closing any earlier tabs changes idx
-    const uniqueKey = (tabName, tabIdx) => {
-        return tabName + tabIdx;
     };
 
     return (
@@ -52,7 +47,7 @@ const ViewThing = ({icatClient, sessionId}) => {
                 {entityNames.map(en =>
                     <li>
                       <button
-                         onClick={() => openTab({ table: en })}>{en}</button>
+                         onClick={() => openTab(tableFilter(en))}>{en}</button>
                     </li>)}
             </ul>
             <TabWindow
@@ -67,7 +62,7 @@ const ViewThing = ({icatClient, sessionId}) => {
                             filter={f}
                             handleFilterChange={w => changeTabWhere(i, w)}
                             openRelated={(e, id) => openRelated(e, f.table, id)}
-                            key={uniqueKey(f, i)} />])}
+                            key={f.key} />])}
             </TabWindow>
         </div>
     );

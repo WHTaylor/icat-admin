@@ -6,3 +6,12 @@ export function icatAttributeToTableName(a) {
 }
 
 export function lowercaseFirst(s) { return s.charAt(0).toLowerCase() + s.slice(1) };
+
+export function tableFilter(table, where) {
+    if (table === undefined) console.error("tableFilter called without args");
+    return {
+        key: Math.random(),
+        table: table,
+        where: where === undefined ? null : where,
+    }
+}

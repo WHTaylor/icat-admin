@@ -1,4 +1,5 @@
 import {useEffect, useState} from "preact/hooks";
+import style from './style.css';
 
 import {icatAttributeToTableName} from '../../../utils.js';
 
@@ -8,7 +9,7 @@ function format(cellContent) {
         : cellContent.toString();
 }
 
-const EntityRow = ({entity, headers, showRelatedEntities, openContextMenu, rowClass}) => {
+const EntityRow = ({entity, headers, showRelatedEntities, openContextMenu}) => {
     const relatedEntityCallbacks = Object.keys(entity)
         .filter(k => Array.isArray(entity[k]))
         .map(k => [k, () => showRelatedEntities(icatAttributeToTableName(k), entity.id)]);
@@ -19,7 +20,7 @@ const EntityRow = ({entity, headers, showRelatedEntities, openContextMenu, rowCl
     }
 
     return (
-        <tr onContextMenu={doOpenContextMenu} class={rowClass}>
+        <tr onContextMenu={doOpenContextMenu} class={style.entityRow}>
             {headers.map(k => <td>{format(entity[k])}</td>)}
         </tr>
     );

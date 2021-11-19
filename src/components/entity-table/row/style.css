@@ -1,0 +1,7 @@
+.entityRow:nth-child(even) {
+    background-color: #f3f3f3;
+}
+
+.entityRow:nth-child(odd) {
+    background-color: #fafafa;
+}

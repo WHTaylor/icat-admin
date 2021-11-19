@@ -36,7 +36,6 @@ const EntityTableView = ({data, openRelated}) => {
             </tr>
             {data.map(e =>
                 <EntityRow
-                    rowClass={style.tableRow}
                     headers={keys}
                     entity={e}
                     showRelatedEntities={openRelated}

@@ -6,12 +6,26 @@ import EntityTable from '../../components/entity-table/container';
 import TabWindow from '../../components/tab-window';
 
 const ViewThing = ({icatClient, sessionId}) => {
-    const [selectedEntity, setSelectedEntity] = useState(null);
-    const [selectedEntities, setSelectedEntities] = useState([]);
+    const [tabFilters, setTabFilters] = useState([]);
 
-    const openTab = e => setSelectedEntities(selectedEntities.concat([e]));
+    const changeTabWhere = (i, newWhere) => {
+        const newFilter = { ...tabFilters[i], where: newWhere };
+        setTabFilters(
+            tabFilters.slice(0, i)
+                .concat([newFilter])
+                .concat(tabFilters.slice(i + 1)));
+    };
+
+    const openTab = e => {
+        const newTabFilter = {
+            table: e,
+            where: null
+        }
+        setTabFilters(tabFilters.concat([newTabFilter]))
+    };
+
     const closeTab = n => {
-        setSelectedEntities(selectedEntities.filter((e, i) => i !== n));
+        setTabFilters(tabFilters.filter((e, i) => i !== n));
     };
 
     // TODO: This doesn't really work, because closing any earlier tabs changes idx
@@ -28,13 +42,15 @@ const ViewThing = ({icatClient, sessionId}) => {
                     </li>) }
             </ul>
             <TabWindow closeTab={closeTab}>
-                {selectedEntities.map((e, i) =>
-                    [e, <EntityTable
+                {tabFilters.map((f, i) =>
+                    [f.table,
+                        <EntityTable
                             icatClient={icatClient}
                             sessionId={sessionId}
-                            table={e}
+                            filter={f}
+                            handleFilterChange={w => changeTabWhere(i, w)}
                             openRelated={(e, id) => openTab(e)}
-                            key={uniqueKey(e, i)} />])}
+                            key={uniqueKey(f, i)} />])}
             </TabWindow>
         </div>
     );

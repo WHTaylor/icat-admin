@@ -2,6 +2,7 @@ import {useState} from "preact/hooks";
 import style from './style.css';
 
 import {entityNames} from '../../icat.js';
+import {lowercaseFirst} from '../../utils.js';
 import EntityTable from '../../components/entity-table/container';
 import TabWindow from '../../components/tab-window';
 
@@ -16,13 +17,17 @@ const ViewThing = ({icatClient, sessionId}) => {
                 .concat(tabFilters.slice(i + 1)));
     };
 
-    const openTab = e => {
-        const newTabFilter = {
-            table: e,
-            where: null
-        }
-        setTabFilters(tabFilters.concat([newTabFilter]))
+    const openTab = f => {
+        setTabFilters(tabFilters.concat([f]));
     };
+
+    const openRelated = (related, origin, originId) => {
+        const filter = {
+            table: related,
+            where: `${lowercaseFirst(origin)}.id = ${originId}`
+        };
+        openTab(filter);
+    }
 
     const closeTab = n => {
         setTabFilters(tabFilters.filter((e, i) => i !== n));
@@ -38,8 +43,9 @@ const ViewThing = ({icatClient, sessionId}) => {
             <ul>
                 {entityNames.map(en =>
                     <li>
-                      <button onClick={() => openTab(en)}>{en}</button>
-                    </li>) }
+                      <button
+                         onClick={() => openTab({ table: en })}>{en}</button>
+                    </li>)}
             </ul>
             <TabWindow closeTab={closeTab}>
                 {tabFilters.map((f, i) =>
@@ -49,7 +55,7 @@ const ViewThing = ({icatClient, sessionId}) => {
                             sessionId={sessionId}
                             filter={f}
                             handleFilterChange={w => changeTabWhere(i, w)}
-                            openRelated={(e, id) => openTab(e)}
+                            openRelated={(e, id) => openRelated(e, f.table, id)}
                             key={uniqueKey(f, i)} />])}
             </TabWindow>
         </div>

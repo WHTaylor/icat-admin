@@ -46,7 +46,11 @@ class IcatClient {
     }
 
     async getEntries(sessionId, table, offset, limit, filter, signal) {
-        const where = (filter === null || filter.trim() === "") ? " "
+        const where =
+            (filter === null
+            || filter === undefined
+            || filter.trim() === "")
+            ? " "
             : ` where e.${filter.trim()}`
         const query = `select e from ${table} e` +
             `${where} limit ${offset}, ${limit}`;

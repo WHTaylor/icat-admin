@@ -51,6 +51,7 @@ const EntityTable = ({icatClient, sessionId, filter, openRelated, handleFilterCh
                 <input
                     type="text"
                     class={style.filterInput}
+                    value={filter.where}
                     placeholder="Filter by (ie. id = 1234)"
                     onChange={ev => handleFilterChange(ev.target.value)}/>
                 {count !== null &&

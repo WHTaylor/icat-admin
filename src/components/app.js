@@ -20,7 +20,7 @@ const App = () => {
     const [errMsg, setErrMsg] = useState(null);
 
     hasValidCachedSession()
-        .then(setSessionId(getCachedSessionId()));
+        .then(res => {if (res) setSessionId(getCachedSessionId())});
 
     const doLogin = async (plugin, username, password) => {
         const s = await client.login(plugin, username, password)

@@ -32,10 +32,11 @@ export function saveLogin(serverName, sessionId) {
 function nextFreeServerNumber() {
     const serverNumbers = [...new Set(
         serverEntries()
-            .map(([n, k, v]) => n))]
+                .map(([n, k, v]) => n)
+                .map(n => Number.parseInt(n)))]
         .sort();
     if (Math.min(...serverNumbers) > 1) return 1;
-    for (n of serverNumbers) {
+    for (const n of serverNumbers) {
         if (!(n + 1 in serverNumbers)) return n + 1
     }
 }

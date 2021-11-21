@@ -5,25 +5,14 @@ import Header from './header';
 import LoginForm from './login-form';
 import ViewThing from './view-thing';
 import IcatClient from '../icat.js';
+import {invalidateLogin, getCachedSessionId, saveLogin} from '../servercache.js';
 
-const client = new IcatClient("https://icat-dev.isis.stfc.ac.uk");
-
-// Hack around build error because localStorage not defined for node
-// No idea why this is a problem, but it is
-const isNode = typeof window === 'undefined';
-const setCachedSessionId = isNode
-    ? () => {}
-    : s => localStorage.setItem("sessionId", s);
-const getCachedSessionId = isNode
-    ? s => {}
-    : () => localStorage.getItem("sessionId");
-const clearCachedSessionId = isNode
-    ? () => {}
-    : () => localStorage.removeItem("sessionId");
+const server = "https://icat-dev.isis.stfc.ac.uk";
+const client = new IcatClient(server);
 async function hasValidCachedSession() {
-    var stored = getCachedSessionId();
-    if (stored === null) return false;
-    return client.isValidSession(stored);
+    const sessionId = getCachedSessionId();
+    if (sessionId === null) return false;
+    return client.isValidSession(getCachedSessionId());
 }
 
 const App = () => {
@@ -38,14 +27,14 @@ const App = () => {
             .catch(err => setErrMsg(err));
         if (typeof s === "string") {
             setSessionId(s);
-            setCachedSessionId(s);
+            saveLogin(server, s);
             setErrMsg(null);
         }
     };
 
     const logout = sessionId => {
         client.logout(sessionId);
-        clearCachedSessionId()
+        invalidateLogin(server)
         setSessionId(null);
     }
 

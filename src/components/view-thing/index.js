@@ -1,7 +1,6 @@
-import {useState, useEffect} from "preact/hooks";
+import {useState} from "preact/hooks";
 import style from './style.css';
 
-import useWithHistory from '../../hooks/useWithHistory';
 import {entityNames} from '../../icat.js';
 import {lowercaseFirst, tableFilter} from '../../utils.js';
 import EntityTable from '../../components/entity-table/container';
@@ -9,13 +8,11 @@ import TabWindow from '../../components/tab-window';
 
 const ViewThing = ({icatClient, sessionId}) => {
     const [tabFilters, setTabFilters] = useState([]);
-    const [setTabFiltersWithHistory, undo, redo] =
-        useWithHistory(tabFilters, setTabFilters);
     const [activeTab, setActiveTab] = useState(null);
 
     const changeTabWhere = (i, newWhere) => {
         const newFilter = { ...tabFilters[i], where: newWhere };
-        setTabFiltersWithHistory(
+        setTabFilters(
             tabFilters.slice(0, i)
                 .concat([newFilter])
                 .concat(tabFilters.slice(i + 1)));
@@ -23,7 +20,7 @@ const ViewThing = ({icatClient, sessionId}) => {
 
     const openTab = f => {
         const numTabs = tabFilters.length;
-        setTabFiltersWithHistory(tabFilters.concat([f]));
+        setTabFilters(tabFilters.concat([f]));
         setActiveTab(numTabs);
     };
 
@@ -35,7 +32,7 @@ const ViewThing = ({icatClient, sessionId}) => {
 
     const closeTab = closeIdx => {
         const numTabs = tabFilters.length;
-        setTabFiltersWithHistory(tabFilters.filter((e, i) => i !== closeIdx));
+        setTabFilters(tabFilters.filter((e, i) => i !== closeIdx));
         if (closeIdx < activeTab) {
             setActiveTab(activeTab - 1);
         } else if (closeIdx === activeTab) {
@@ -43,30 +40,6 @@ const ViewThing = ({icatClient, sessionId}) => {
             else if (closeIdx === numTabs - 1) setActiveTab(activeTab - 1);
         }
     };
-
-    const undoKeyHandler = ev => {
-        if (!(ev.ctrlKey && ev.key === "z")) return;
-        // TODO: using the builtin undo where possible would be better
-        ev.preventDefault()
-        undo();
-    };
-
-    const redoKeyHandler = ev => {
-        if (!(ev.ctrlKey && ev.shiftKey && ev.key === "Z")) return;
-        // TODO: using the builtin redo where possible would be better
-        ev.preventDefault()
-        redo();
-    };
-
-    useEffect(() => {
-        document.addEventListener("keydown", undoKeyHandler);
-        return () => document.removeEventListener("keydown", undoKeyHandler);
-    });
-
-    useEffect(() => {
-        document.addEventListener("keydown", redoKeyHandler);
-        return () => document.removeEventListener("keydown", redoKeyHandler);
-    });
 
     return (
         <div class={style.viewContainer}>

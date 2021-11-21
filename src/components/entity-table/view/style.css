@@ -6,11 +6,3 @@ table {
     text-align: left;
     padding: 0.1em 0.1em;
 }
-
-.tableRow:nth-child(even) {
-    background-color: #f3f3f3;
-}
-
-.tableRow:nth-child(odd) {
-    background-color: #fafafa;
-}

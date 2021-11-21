@@ -1,0 +1,12 @@
+.tabSwitcher {
+    display: flex;
+    flex-direction: row;
+}
+
+.hidden {
+    display: none;
+}
+
+.selectedTab {
+    background-color: #e1f9fb
+}

@@ -4,7 +4,7 @@ import style from './style.css';
 import EntityRow from '../row';
 import ContextMenu from '../../context-menu';
 
-const EntityTableView = ({data}) => {
+const EntityTableView = ({data, openRelated}) => {
     const [contextMenuPos, setContextMenuPos] =  useState(null);
     const [contextMenuItems, setContextMenuItems] =  useState(null);
 
@@ -28,7 +28,6 @@ const EntityTableView = ({data}) => {
 
     const keys = Object.keys(data[0])
         .filter(k => typeof data[0][k] !== "object");
-    const f = (id, entityType) => {console.log(`Would switch to ${entityType} ${id}`)};
     return (
         <>
         <table>
@@ -37,10 +36,9 @@ const EntityTableView = ({data}) => {
             </tr>
             {data.map(e =>
                 <EntityRow
-                    rowClass={style.tableRow}
                     headers={keys}
                     entity={e}
-                    showRelatedEntities={f}
+                    showRelatedEntities={openRelated}
                     openContextMenu={openContextMenu}/>)}
         </table>
         {contextMenuPos !== null &&

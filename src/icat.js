@@ -1,3 +1,12 @@
+// Unpack the entries returned from the API, because they are formatted like
+// { 'Investigation': { 'id': 123...}}
+// Assumes all entites are the same type
+function unpack(data) {
+    if (data.length === 0) return [];
+    const dataType = Object.keys(data[0]);
+    return data.map(d => d[dataType]);
+}
+
 function queryUrlClause(args) {
     return Object.entries(args)
         .map(kv => kv.map(encodeURIComponent).join('='))
@@ -37,7 +46,11 @@ class IcatClient {
     }
 
     async getEntries(sessionId, table, offset, limit, filter, signal) {
-        const where = (filter === null || filter.trim() === "") ? " "
+        const where =
+            (filter === null
+            || filter === undefined
+            || filter.trim() === "")
+            ? " "
             : ` where e.${filter.trim()}`
         const query = `select e from ${table} e` +
             `${where} limit ${offset}, ${limit}`;
@@ -51,7 +64,8 @@ class IcatClient {
                 ? res
                 : formatError(res)
                     .then(msg => Promise.reject(msg)))
-            .then(res => res.json());
+            .then(res => res.json())
+            .then(unpack);
     }
 
     async getCount(sessionId, table, filter, signal) {

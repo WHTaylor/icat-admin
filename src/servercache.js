@@ -9,10 +9,14 @@
  * server the user last logged onto. We retry that server on the home page.
  */
 
-// Hack around build error because localStorage not defined for node
-// No idea why this is a problem, but it is
-const isNode = typeof window === 'undefined';
-if (!isNode) {
+if (typeof window === 'undefined') {
+  global.localStorage = {
+    _data       : {},
+    setItem     : function(id, val) { return this._data[id] = String(val); },
+    getItem     : function(id) { return this._data.hasOwnProperty(id) ? this._data[id] : undefined; },
+    removeItem  : function(id) { return delete this._data[id]; },
+    clear       : function() { return this._data = {}; }
+  };
 }
 
 export function saveLogin(serverName, sessionId) {

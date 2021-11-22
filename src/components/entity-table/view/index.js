@@ -28,8 +28,9 @@ const EntityTableView = ({data, openRelated}) => {
     if (data.length === 0) return <p>No entries</p>;
 
     const keys = defaultHeaderSort(
-        Object.keys(data[0])
-            .filter(k => typeof data[0][k] !== "object"));
+        [...new Set(data.map(d => Object.keys(d)
+                .filter(k => typeof data[0][k] !== "object"))
+                .reduce((dk1, dk2) => dk1.concat(dk2)))]);
     return (
         <>
         <table>

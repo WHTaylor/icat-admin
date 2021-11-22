@@ -21,8 +21,8 @@ export function tableFilter(table, offset, limit, where) {
 // By default, sort the common fields to the end
 const sortToEnd = ["createId", "createTime", "modId", "modTime"];
 export function defaultHeaderSort(headers) {
-    const end = headers.filter(h => sortToEnd.includes(h));
+    const end = headers.filter(h => sortToEnd.includes(h)).sort();
     const start = ["id"];
-    const middle = headers.filter(h => h !== "id" && !sortToEnd.includes(h));
+    const middle = headers.filter(h => h !== "id" && !sortToEnd.includes(h)).sort();
     return start.concat(middle).concat(end);
 }

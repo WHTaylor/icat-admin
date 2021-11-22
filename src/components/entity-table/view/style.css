@@ -4,5 +4,9 @@ table {
 
 .tableHeader {
     text-align: left;
-    padding: 0.1em 0.1em;
+    padding: 0.1em 0.25em;
+}
+
+td {
+    padding: 0 0.25em;
 }

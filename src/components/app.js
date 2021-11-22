@@ -40,7 +40,7 @@ const App = () => {
     };
 
     const loggedIn = sessionId !== null;
-    const logout = sessionId => {
+    const logout = () => {
         icatClient.logout(sessionId);
         invalidateLogin(server)
         setSessionId(null);
@@ -52,10 +52,10 @@ const App = () => {
 
 	return (
         <div id="app">
-            <Header server={loggedIn ? serverName : null}/>
+            <Header
+                server={loggedIn ? serverName : null}
+                doLogout={logout} />
             <div id="mainWindow">
-                {loggedIn &&
-                    <button onClick={() => logout(sessionId)}>Logout</button> }
                 <h1>Home</h1>
                 {activeComponent}
                 <p>{errMsg}</p>

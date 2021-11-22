@@ -50,7 +50,12 @@ const EntityTable = ({icatClient, sessionId, filter, openRelated, handleFilterCh
         const newOffset = Math.max(0, filter.offset + (filter.limit * change));
         if (newOffset === filter.offset) return;
         handleFilterChange({...filter, offset: newOffset});
-    }
+    };
+    const handleSetPage = n => {
+        const newOffset = Math.max(0, filter.limit * (n - 1));
+        if (newOffset === filter.offset) return;
+        handleFilterChange({...filter, offset: newOffset});
+    };
     const pageNumber = Math.floor(filter.offset / filter.limit) + 1;
 
     return (
@@ -65,6 +70,7 @@ const EntityTable = ({icatClient, sessionId, filter, openRelated, handleFilterCh
                     onChange={ev => changeWhere(ev.target.value)}/>
                 <PaginationControl
                     pageNumber={pageNumber}
+                    handleSetPage={handleSetPage}
                     handleLimitChange={changeLimit}
                     handlePageChange={changePage} />
                 {count !== null &&
@@ -77,7 +83,7 @@ const EntityTable = ({icatClient, sessionId, filter, openRelated, handleFilterCh
     );
 }
 
-const PaginationControl = ({pageNumber, handleLimitChange, handlePageChange}) => {
+const PaginationControl = ({pageNumber, handleSetPage, handleLimitChange, handlePageChange}) => {
     const decPage = () => handlePageChange(-1);
     const incPage = () => handlePageChange(1);
 
@@ -92,13 +98,13 @@ const PaginationControl = ({pageNumber, handleLimitChange, handlePageChange}) =>
             if (!focusOkForPageChange()) return;
             if (ev.key !== "ArrowLeft") return;
             ev.preventDefault();
-            decPage();
+            document.getElementById("previousPageBtn").click();
         };
         const right = ev => {
             if (!focusOkForPageChange()) return;
             if (ev.key !== "ArrowRight") return;
             ev.preventDefault();
-            incPage();
+            document.getElementById("nextPageBtn").click();
         };
         document.addEventListener("keydown", left);
         document.addEventListener("keydown", right);
@@ -111,7 +117,9 @@ const PaginationControl = ({pageNumber, handleLimitChange, handlePageChange}) =>
     return (
         <span>
             <button onClick={decPage} id="previousPageBtn">Previous</button>
-            {pageNumber}
+            <input type="number"
+                value={pageNumber}
+            onChange={ev => handleSetPage(ev.target.value)} />
             <button onClick={incPage} id="nextPageBtn">Next</button>
             <span>
                 <label for="pageSizeInput">Per page:</label>

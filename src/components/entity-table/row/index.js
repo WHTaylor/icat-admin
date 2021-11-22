@@ -6,7 +6,7 @@ import {icatAttributeToTableName} from '../../../utils.js';
 function format(cellContent) {
     return cellContent === undefined || cellContent === null
         ? ""
-        : cellContent.toString();
+        : <ReadMore text={cellContent.toString()}/>;
 }
 
 const EntityRow = ({entity, headers, showRelatedEntities, openContextMenu}) => {
@@ -23,6 +23,22 @@ const EntityRow = ({entity, headers, showRelatedEntities, openContextMenu}) => {
         <tr onContextMenu={doOpenContextMenu} class={style.entityRow}>
             {headers.map(k => <td>{format(entity[k])}</td>)}
         </tr>
+    );
+}
+
+const MAX_UNSUMMARISED_TEXT = 70;
+const ReadMore = ({text}) => {
+    const [open, setOpen] = useState(false);
+
+    if (text.length - 3 < MAX_UNSUMMARISED_TEXT) return text;
+    const shownText = open ? text : text.slice(0, MAX_UNSUMMARISED_TEXT - 3);
+    return (
+        <>
+        {shownText}{!open && "..."}
+        <button onClick={() => setOpen(!open)} class={style.readMoreBtn}>
+            {open ? "less" : "show more"}
+        </button>
+        </>
     );
 }
 

@@ -36,20 +36,24 @@ const ViewThing = ({icatClient, sessionId}) => {
         if (closeIdx < activeTab) {
             setActiveTab(activeTab - 1);
         } else if (closeIdx === activeTab) {
-            if  (closeIdx === 0) setActiveTab(null);
+            if (closeIdx === 0) setActiveTab(null);
             else if (closeIdx === numTabs - 1) setActiveTab(activeTab - 1);
         }
     };
 
     return (
         <div class={style.viewContainer}>
-            <ul>
-                {entityNames.map(en =>
-                    <li>
-                      <button
-                         onClick={() => openTab(tableFilter(en, 0, 50))}>{en}</button>
-                    </li>)}
-            </ul>
+            <div>
+                <h2>ICAT tables</h2>
+                <ul>
+                    {entityNames.map(en =>
+                        <li>
+                            <button onClick={() => openTab(tableFilter(en, 0, 50))}>
+                                {en}
+                            </button>
+                        </li>)}
+                </ul>
+            </div>
             <TabWindow
                 activeTab={activeTab}
                 closeTab={closeTab}

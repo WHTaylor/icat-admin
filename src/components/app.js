@@ -56,7 +56,6 @@ const App = () => {
                 server={loggedIn ? serverName : null}
                 doLogout={logout} />
             <div id="mainWindow">
-                <h1>Home</h1>
                 {activeComponent}
                 <p>{errMsg}</p>
             </div>

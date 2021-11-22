@@ -7,11 +7,13 @@ export function icatAttributeToTableName(a) {
 
 export function lowercaseFirst(s) { return s.charAt(0).toLowerCase() + s.slice(1) };
 
-export function tableFilter(table, where) {
+export function tableFilter(table, offset, limit, where) {
     if (table === undefined) console.error("tableFilter called without args");
     return {
         key: Math.random(),
         table: table,
+        offset: offset,
+        limit: limit,
         where: where === undefined ? null : where,
     }
 }

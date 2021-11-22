@@ -16,7 +16,7 @@ const EntityTable = ({icatClient, sessionId, filter, openRelated, handleFilterCh
         const signal = controller.signal;
         const getEntries = async () => {
             icatClient.getEntries(
-                    sessionId, filter.table, 0, 50, filter.where, signal)
+                    sessionId, filter, signal)
                 .then(d => setData(d))
                 .catch(err => {
                     // DOMException gets throws if promise is aborted, which it is

@@ -28,6 +28,8 @@ const ViewThing = ({icatClient, sessionId}) => {
         openTab(
             tableFilter(
                 related,
+                0,
+                50,
                 `${lowercaseFirst(origin)}.id = ${originId}`));
 
     const closeTab = closeIdx => {
@@ -47,7 +49,7 @@ const ViewThing = ({icatClient, sessionId}) => {
                 {entityNames.map(en =>
                     <li>
                       <button
-                         onClick={() => openTab(tableFilter(en))}>{en}</button>
+                         onClick={() => openTab(tableFilter(en, 0, 50))}>{en}</button>
                     </li>)}
             </ul>
             <TabWindow

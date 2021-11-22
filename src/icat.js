@@ -19,6 +19,20 @@ async function formatError(errResponse) {
         .then(r => `${header}: ${r["message"]}`);
 }
 
+function buildQuery(filter) {
+    const where =
+        (filter.where === null
+         || filter.where === undefined
+         || filter.where.trim() === "")
+        ? " "
+        : ` where e.${filter.where.trim()}`;
+    const limit =
+        (filter.limit === null || filter.limit === undefined)
+        ? ""
+        : ` limit ${filter.offset}, ${filter.limit}`;
+    return `select e from ${filter.table} e${where}${limit}`;
+}
+
 class IcatClient {
     constructor(host) {
         this.serviceUrl = host + "/icat";
@@ -45,15 +59,8 @@ class IcatClient {
             .then(j => j["sessionId"]);
     }
 
-    async getEntries(sessionId, table, offset, limit, filter, signal) {
-        const where =
-            (filter === null
-            || filter === undefined
-            || filter.trim() === "")
-            ? " "
-            : ` where e.${filter.trim()}`
-        const query = `select e from ${table} e` +
-            `${where} limit ${offset}, ${limit}`;
+    async getEntries(sessionId, filter, signal) {
+        const query = buildQuery(filter);
         const params = {
             "sessionId": sessionId,
             "query": query,

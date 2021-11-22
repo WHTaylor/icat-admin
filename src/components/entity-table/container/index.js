@@ -81,14 +81,21 @@ const PaginationControl = ({pageNumber, handleLimitChange, handlePageChange}) =>
     const decPage = () => handlePageChange(-1);
     const incPage = () => handlePageChange(1);
 
+    const focusOkForPageChange = () => {
+        return document.activeElement === document.body
+            || document.activeElement === document.getElementById("previousPageBtn")
+            || document.activeElement === document.getElementById("nextPageBtn");
+    };
+
     useEffect(() => {
         const left = ev => {
+            if (!focusOkForPageChange()) return;
             if (ev.key !== "ArrowLeft") return;
             ev.preventDefault();
             decPage();
         };
         const right = ev => {
-            console.log(ev);
+            if (!focusOkForPageChange()) return;
             if (ev.key !== "ArrowRight") return;
             ev.preventDefault();
             incPage();
@@ -103,9 +110,9 @@ const PaginationControl = ({pageNumber, handleLimitChange, handlePageChange}) =>
 
     return (
         <span>
-            <button onClick={decPage}>Previous</button>
+            <button onClick={decPage} id="previousPageBtn">Previous</button>
             {pageNumber}
-            <button onClick={incPage}>Next</button>
+            <button onClick={incPage} id="nextPageBtn">Next</button>
             <span>
                 <label for="pageSizeInput">Per page:</label>
                 <select name="pageSizeInput" onChange={

@@ -44,6 +44,14 @@ const EntityTable = ({icatClient, sessionId, filter, openRelated, handleFilterCh
         return () => controller.abort();
     }, [filter]);
 
+    const changeWhere = w => handleFilterChange({...filter, where: w});
+    const changeLimit = l => handleFilterChange({...filter, limit: l});
+    const changePage = change => {
+        const newOffset = Math.max(0, filter.offset + (filter.limit * change));
+        handleFilterChange({...filter, offset: newOffset});
+    }
+    const pageNumber = Math.floor(filter.offset / filter.limit) + 1;
+
     return (
         <div>
             <span class={style.tableTitleBar}>
@@ -53,7 +61,11 @@ const EntityTable = ({icatClient, sessionId, filter, openRelated, handleFilterCh
                     class={style.filterInput}
                     value={filter.where}
                     placeholder="Filter by (ie. id = 1234)"
-                    onChange={ev => handleFilterChange(ev.target.value)}/>
+                    onChange={ev => changeWhere(ev.target.value)}/>
+                <PaginationControl
+                    pageNumber={pageNumber}
+                    handleLimitChange={changeLimit}
+                    handlePageChange={changePage} />
                 {count !== null &&
                     <p class={style.tableTitleCount}>{count} matches</p>}
             </span>
@@ -61,6 +73,25 @@ const EntityTable = ({icatClient, sessionId, filter, openRelated, handleFilterCh
                 : data === null ? <p>Loading...</p>
                     : <EntityTableView data={data} openRelated={openRelated} />}
         </div>
+    );
+}
+
+const PaginationControl = ({pageNumber, handleLimitChange, handlePageChange}) => {
+    return (
+        <span>
+            <button onClick={() => handlePageChange(-1)}>Previous</button>
+            {pageNumber}
+            <button onClick={() => handlePageChange(1)}>Next</button>
+            <span>
+                <label for="pageSizeInput">Per page:</label>
+                <select name="pageSizeInput" onChange={
+                        ev => handleLimitChange(Number.parseInt(ev.target.value))}>
+                    <option value="20">20</option>
+                    <option value="50" selected>50</option>
+                    <option value="100">100</option>
+                </select>
+            </span>
+        </span>
     );
 }
 

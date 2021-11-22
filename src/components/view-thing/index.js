@@ -10,13 +10,11 @@ const ViewThing = ({icatClient, sessionId}) => {
     const [tabFilters, setTabFilters] = useState([]);
     const [activeTab, setActiveTab] = useState(null);
 
-    const changeTabWhere = (i, newWhere) => {
-        const newFilter = { ...tabFilters[i], where: newWhere };
+    const handleFilterChange = (i, newFilter) =>
         setTabFilters(
             tabFilters.slice(0, i)
                 .concat([newFilter])
                 .concat(tabFilters.slice(i + 1)));
-    };
 
     const openTab = f => {
         const numTabs = tabFilters.length;
@@ -62,7 +60,7 @@ const ViewThing = ({icatClient, sessionId}) => {
                             icatClient={icatClient}
                             sessionId={sessionId}
                             filter={f}
-                            handleFilterChange={w => changeTabWhere(i, w)}
+                            handleFilterChange={f => handleFilterChange(i, f)}
                             openRelated={(e, id) => openRelated(e, f.table, id)}
                             key={f.key} />])}
             </TabWindow>

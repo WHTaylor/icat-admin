@@ -1,11 +1,13 @@
 .header {
 	position: fixed;
+    display: flex;
+    align-items: center;
 	left: 0;
 	top: 0;
 	width: 100%;
-	height: 56px;
+	height: 52px;
 	padding: 0;
-	background: #673AB7;
+	background: #008fbb;
 	box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
 	z-index: 50;
 }
@@ -45,4 +47,23 @@
 
 .header nav a.active {
 	background: rgba(0,0,0,0.4);
+}
+
+.header button {
+  background-color: #fff;
+  border: 0 solid #e2e8f0;
+  border-radius: 0.5rem;
+  box-sizing: border-box;
+  display: inline-block;
+  font-weight: 600;
+  line-height: 1;
+  padding: 0.4rem 0.5rem;
+}
+
+.header button:hover {
+    background-color: #ddd;
+}
+
+.header button:active {
+    background-color: #ccc;
 }

@@ -3,6 +3,7 @@ import style from './style.css';
 
 import EntityRow from '../row';
 import ContextMenu from '../../context-menu';
+import {defaultHeaderSort} from '../../../utils.js';
 
 const EntityTableView = ({data, openRelated}) => {
     const [contextMenuPos, setContextMenuPos] =  useState(null);
@@ -26,8 +27,10 @@ const EntityTableView = ({data, openRelated}) => {
     // Note: early returns need to be after all hooks
     if (data.length === 0) return <p>No entries</p>;
 
-    const keys = Object.keys(data[0])
-        .filter(k => typeof data[0][k] !== "object");
+    const keys = defaultHeaderSort(
+        [...new Set(data.map(d => Object.keys(d)
+                .filter(k => typeof data[0][k] !== "object"))
+                .reduce((dk1, dk2) => dk1.concat(dk2)))]);
     return (
         <>
         <table>

@@ -5,3 +5,17 @@
 .entityRow:nth-child(odd) {
     background-color: #fafafa;
 }
+
+.readMoreBtn {
+    border: none;
+    font-decoration: underline;
+    font-size: x-small;
+    margin: 0.1em;
+    color: #222;
+    background-color: #ddd;
+    text-decoration: underline;
+}
+
+.readMoreBtn:hover {
+    background-color: #bbb;
+}

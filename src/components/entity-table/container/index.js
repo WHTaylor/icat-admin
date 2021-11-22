@@ -48,6 +48,7 @@ const EntityTable = ({icatClient, sessionId, filter, openRelated, handleFilterCh
     const changeLimit = l => handleFilterChange({...filter, limit: l});
     const changePage = change => {
         const newOffset = Math.max(0, filter.offset + (filter.limit * change));
+        if (newOffset === filter.offset) return;
         handleFilterChange({...filter, offset: newOffset});
     }
     const pageNumber = Math.floor(filter.offset / filter.limit) + 1;
@@ -77,11 +78,34 @@ const EntityTable = ({icatClient, sessionId, filter, openRelated, handleFilterCh
 }
 
 const PaginationControl = ({pageNumber, handleLimitChange, handlePageChange}) => {
+    const decPage = () => handlePageChange(-1);
+    const incPage = () => handlePageChange(1);
+
+    useEffect(() => {
+        const left = ev => {
+            if (ev.key !== "ArrowLeft") return;
+            ev.preventDefault();
+            decPage();
+        };
+        const right = ev => {
+            console.log(ev);
+            if (ev.key !== "ArrowRight") return;
+            ev.preventDefault();
+            incPage();
+        };
+        document.addEventListener("keydown", left);
+        document.addEventListener("keydown", right);
+        return () => {
+            document.removeEventListener("keydown", left);
+            document.removeEventListener("keydown", right);
+        }
+    });
+
     return (
         <span>
-            <button onClick={() => handlePageChange(-1)}>Previous</button>
+            <button onClick={decPage}>Previous</button>
             {pageNumber}
-            <button onClick={() => handlePageChange(1)}>Next</button>
+            <button onClick={incPage}>Next</button>
             <span>
                 <label for="pageSizeInput">Per page:</label>
                 <select name="pageSizeInput" onChange={

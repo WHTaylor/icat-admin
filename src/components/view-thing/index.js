@@ -49,34 +49,35 @@ const ViewThing = ({icatClient, sessionId}) => {
     }, [icatClient, sessionId]);
 
     return (
-        <div class={style.viewContainer}>
-            <div>
-                <h2>ICAT tables</h2>
-                <ul>
-                    {entityNames.map(en =>
-                        <li>
-                            <button onClick={() => openTab(tableFilter(en, 0, 50))}>
-                                {en}
-                            </button>
-                        </li>)}
-                </ul>
-            </div>
-            <TabWindow
-                activeTab={activeTab}
-                closeTab={closeTab}
-                handleChangeTab={setActiveTab}>
-                {tabFilters.map((f, i) =>
-                    [f.table,
-                        <EntityTable
-                            icatClient={icatClient}
-                            sessionId={sessionId}
-                            filter={f}
-                            handleFilterChange={f => handleFilterChange(i, f)}
-                            openRelated={(e, id) => openRelated(e, f.table, id)}
-                            isOpen={i === activeTab}
-                            key={f.key} />])}
-            </TabWindow>
+        <>
+        <div class="leftColumn">
+            <h2>ICAT tables</h2>
+            <ul>
+                {entityNames.map(en =>
+                    <li>
+                        <button onClick={() => openTab(tableFilter(en, 0, 50))}>
+                            {en}
+                        </button>
+                    </li>)}
+            </ul>
         </div>
+        <TabWindow
+            class={style.asdf}
+            activeTab={activeTab}
+            closeTab={closeTab}
+            handleChangeTab={setActiveTab}>
+            {tabFilters.map((f, i) =>
+                [f.table,
+                    <EntityTable
+                        icatClient={icatClient}
+                        sessionId={sessionId}
+                        filter={f}
+                        handleFilterChange={f => handleFilterChange(i, f)}
+                        openRelated={(e, id) => openRelated(e, f.table, id)}
+                        isOpen={i === activeTab}
+                        key={f.key} />])}
+        </TabWindow>
+        </>
     );
 }
 

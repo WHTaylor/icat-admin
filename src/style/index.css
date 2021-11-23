@@ -20,7 +20,25 @@ html, body {
 }
 
 .page {
+    display: grid;
+    grid-template-columns: 2fr 8fr 5fr;
+    grid-auto-rows: min-content;
 	padding: 72px 20px;
 	min-height: 100%;
 	width: 100%;
+}
+
+.leftColumn {
+    grid-column-start: 1;
+    grid-column-end: 2;
+}
+
+.mainContentAndRightColumn {
+    grid-column-start: 2;
+    grid-column-end: 4;
+}
+
+.mainContent {
+    grid-column-start: 2;
+    grid-column-end: 3;
 }

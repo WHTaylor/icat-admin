@@ -60,31 +60,31 @@ const EntityTable = ({icatClient, sessionId, filter, handleFilterChange, openRel
     const pageNumber = Math.floor(filter.offset / filter.limit) + 1;
 
     return (
-        <div>
-            <span class={style.tableTitleBar}>
-                <h1 class={style.tableNameHeader}>{filter.table}</h1>
-                <input
-                    type="text"
-                    class={style.filterInput}
-                    value={filter.where}
-                    placeholder="Filter by (ie. id = 1234)"
-                    onChange={ev => changeWhere(ev.target.value)}/>
-                <PaginationControl
-                    isActive={isOpen}
-                    pageNumber={pageNumber}
-                    handleSetPage={handleSetPage}
-                    handleLimitChange={changeLimit}
-                    handlePageChange={changePage} />
-                {count !== null &&
-                    <p class={style.tableTitleCount}>{count} matches</p>}
-            </span>
-            {errMsg ? <p>{errMsg}</p>
-                : data === null ? <p>Loading...</p>
-                    : <EntityTableView
-                        data={data}
-                        tableName={filter.table}
-                        openRelated={openRelated} />}
-        </div>
+        <>
+        <span class={style.tableTitleBar}>
+            <h1 class={style.tableNameHeader}>{filter.table}</h1>
+            <input
+                type="text"
+                class={style.filterInput}
+                value={filter.where}
+                placeholder="Filter by (ie. id = 1234)"
+                onChange={ev => changeWhere(ev.target.value)}/>
+            <PaginationControl
+                isActive={isOpen}
+                pageNumber={pageNumber}
+                handleSetPage={handleSetPage}
+                handleLimitChange={changeLimit}
+                handlePageChange={changePage} />
+            {count !== null &&
+                <p class={style.tableTitleCount}>{count} matches</p>}
+        </span>
+        {errMsg ? <p>{errMsg}</p>
+            : data === null ? <p>Loading...</p>
+                : <EntityTableView
+                    data={data}
+                    tableName={filter.table}
+                    openRelated={openRelated} />}
+        </>
     );
 }
 

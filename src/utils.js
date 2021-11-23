@@ -40,3 +40,6 @@ export function randomSuffix() {
     const b = Math.random().toString(36).slice(2);
     return (a + b).slice(0, 8);
 }
+
+const datePattern = /\d{4}-\d{2}-\d{2}T.+/
+export function isDatetime(s) { return s.search(datePattern) > -1 }

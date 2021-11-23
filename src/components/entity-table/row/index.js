@@ -1,12 +1,17 @@
 import {useEffect, useState} from "preact/hooks";
 import style from './style.css';
 
-import {icatAttributeToTableName} from '../../../utils.js';
+import { icatAttributeToTableName, isDatetime} from '../../../utils.js';
 
 function format(cellContent) {
-    return cellContent === undefined || cellContent === null
-        ? ""
-        : <ReadMore text={cellContent.toString()}/>;
+    if (cellContent === undefined || cellContent === null) return "";
+
+    const content = typeof cellContent !== "string"
+        ? cellContent.toString()
+        : isDatetime(cellContent)
+            ? new Date(cellContent).toLocaleString()
+            : cellContent;
+    return <ReadMore text={content}/>;
 }
 
 const EntityRow = ({tableName, entity, headers, showRelatedEntities, openContextMenu}) => {

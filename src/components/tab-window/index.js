@@ -10,7 +10,7 @@ const TabWindow = props => {
     }
 
     return (
-        <div>
+        <div class="mainContentAndRightColumn">
             <div class={style.tabSwitcher}>
                 {props.children.map(([name, c], i) =>
                     <button

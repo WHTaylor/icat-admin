@@ -1,18 +1,25 @@
 import {useEffect, useState} from "preact/hooks";
 import style from './style.css';
 
-import {icatAttributeToTableName} from '../../../utils.js';
+import { icatAttributeToTableName, isDatetime} from '../../../utils.js';
 
 function format(cellContent) {
-    return cellContent === undefined || cellContent === null
-        ? ""
-        : <ReadMore text={cellContent.toString()}/>;
+    if (cellContent === undefined || cellContent === null) return "";
+
+    const content = typeof cellContent !== "string"
+        ? cellContent.toString()
+        : isDatetime(cellContent)
+            ? new Date(cellContent).toLocaleString()
+            : cellContent;
+    return <ReadMore text={content}/>;
 }
 
-const EntityRow = ({entity, headers, showRelatedEntities, openContextMenu}) => {
+const EntityRow = ({tableName, entity, headers, showRelatedEntities, openContextMenu}) => {
     const relatedEntityCallbacks = Object.keys(entity)
         .filter(k => Array.isArray(entity[k]))
-        .map(k => [k, () => showRelatedEntities(icatAttributeToTableName(k), entity.id)]);
+        .map(k => [k, () =>
+            showRelatedEntities(
+                icatAttributeToTableName(tableName, k), entity.id)]);
 
     const doOpenContextMenu = ev => {
         ev.preventDefault();

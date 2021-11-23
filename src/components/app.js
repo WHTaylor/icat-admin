@@ -1,11 +1,14 @@
 import { h } from 'preact';
-import {useEffect, useState} from "preact/hooks";
+import { Router, route } from 'preact-router';
+import { useEffect, useState } from "preact/hooks";
 
-import Header from './header';
-import LoginForm from './login-form';
-import ViewThing from './view-thing';
+import Page from './page';
+import Login from '../routes/login';
+import About from '../routes/about';
 import IcatClient from '../icat.js';
 import {invalidateLogin, getCachedSessionId, saveLogin, getLastLogin} from '../servercache.js';
+import Header from '../components/header';
+import EntityViewer from '../components/entity-viewer';
 
 const App = () => {
     const [sessionId, setSessionId] = useState(null);
@@ -26,17 +29,19 @@ const App = () => {
             .then(res => {if (res) setSessionId(getCachedSessionId())})
     });
 
-
     const doLogin = async (server, plugin, username, password) => {
         const client = new IcatClient(server);
         setServer(server);
         const s = await client.login(plugin, username, password)
+            .then(s => {
+                if (typeof s === "string") {
+                    setSessionId(s);
+                    saveLogin(server, s);
+                    setErrMsg(null);
+                    route('/');
+                }
+            })
             .catch(err => setErrMsg(err));
-        if (typeof s === "string") {
-            setSessionId(s);
-            saveLogin(server, s);
-            setErrMsg(null);
-        }
     };
 
     const loggedIn = sessionId !== null;
@@ -46,19 +51,22 @@ const App = () => {
         setSessionId(null);
     }
 
-    const activeComponent = loggedIn
-        ? <ViewThing icatClient={icatClient} sessionId={sessionId} />
-        : <LoginForm doLogin={doLogin} />;
-
-	return (
+    return (
         <div id="app">
             <Header
                 server={loggedIn ? serverName : null}
                 doLogout={logout} />
-            <div id="mainWindow">
-                {activeComponent}
-                <p>{errMsg}</p>
-            </div>
+            <Router>
+                <Page path="/">
+                    <EntityViewer icatClient={icatClient} sessionId={sessionId} />
+                </Page>
+                <Page path="/login">
+                    <Login path="/login" doLogin={doLogin} errMsg={errMsg} />
+                </Page>
+                <Page path="/about">
+                    <About />
+                </Page>
+            </Router>
         </div>
     );
 }

@@ -66,6 +66,7 @@ const ViewThing = ({icatClient, sessionId}) => {
                             filter={f}
                             handleFilterChange={f => handleFilterChange(i, f)}
                             openRelated={(e, id) => openRelated(e, f.table, id)}
+                            isOpen={i === activeTab}
                             key={f.key} />])}
             </TabWindow>
         </div>

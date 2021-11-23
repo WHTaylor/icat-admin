@@ -2,8 +2,9 @@ import {useEffect, useState} from "preact/hooks";
 import style from './style.css';
 
 import EntityTableView from '../view';
+import {randomSuffix} from '../../../utils.js';
 
-const EntityTable = ({icatClient, sessionId, filter, openRelated, handleFilterChange}) => {
+const EntityTable = ({icatClient, sessionId, filter, handleFilterChange, openRelated, isOpen}) => {
     const [data, setData] = useState(null);
     const [errMsg, setErrMsg] = useState(null);
     const [contextMenuPos, setContextMenuPos] = useState(null);
@@ -69,6 +70,7 @@ const EntityTable = ({icatClient, sessionId, filter, openRelated, handleFilterCh
                     placeholder="Filter by (ie. id = 1234)"
                     onChange={ev => changeWhere(ev.target.value)}/>
                 <PaginationControl
+                    isActive={isOpen}
                     pageNumber={pageNumber}
                     handleSetPage={handleSetPage}
                     handleLimitChange={changeLimit}
@@ -86,14 +88,19 @@ const EntityTable = ({icatClient, sessionId, filter, openRelated, handleFilterCh
     );
 }
 
-const PaginationControl = ({pageNumber, handleSetPage, handleLimitChange, handlePageChange}) => {
+const PaginationControl = ({isActive, pageNumber, handleSetPage, handleLimitChange, handlePageChange}) => {
     const decPage = () => handlePageChange(-1);
     const incPage = () => handlePageChange(1);
 
+    const suffix = randomSuffix();
+    const prevId = `previousPageBtn_${suffix}`;
+    const nextId = `nextPageBtn_${suffix}`;
+
     const focusOkForPageChange = () => {
-        return document.activeElement === document.body
-            || document.activeElement === document.getElementById("previousPageBtn")
-            || document.activeElement === document.getElementById("nextPageBtn");
+        return isActive
+            && (document.activeElement === document.body
+                || document.activeElement === document.getElementById(prevId)
+                || document.activeElement === document.getElementById(nextId));
     };
 
     useEffect(() => {
@@ -101,13 +108,13 @@ const PaginationControl = ({pageNumber, handleSetPage, handleLimitChange, handle
             if (!focusOkForPageChange()) return;
             if (ev.key !== "ArrowLeft") return;
             ev.preventDefault();
-            document.getElementById("previousPageBtn").click();
+            document.getElementById(prevId).click();
         };
         const right = ev => {
             if (!focusOkForPageChange()) return;
             if (ev.key !== "ArrowRight") return;
             ev.preventDefault();
-            document.getElementById("nextPageBtn").click();
+            document.getElementById(nextId).click();
         };
         document.addEventListener("keydown", left);
         document.addEventListener("keydown", right);
@@ -119,11 +126,11 @@ const PaginationControl = ({pageNumber, handleSetPage, handleLimitChange, handle
 
     return (
         <span>
-            <button onClick={decPage} id="previousPageBtn">Previous</button>
+            <button onClick={decPage} id={prevId}>Previous</button>
             <input type="number"
                 value={pageNumber}
             onChange={ev => handleSetPage(ev.target.value)} />
-            <button onClick={incPage} id="nextPageBtn">Next</button>
+            <button onClick={incPage} id={nextId}>Next</button>
             <span>
                 <label for="pageSizeInput">Per page:</label>
                 <select name="pageSizeInput" onChange={

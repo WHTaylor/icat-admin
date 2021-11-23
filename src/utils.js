@@ -34,3 +34,9 @@ export function defaultHeaderSort(headers) {
     const middle = headers.filter(h => h !== "id" && !sortToEnd.includes(h)).sort();
     return start.concat(middle).concat(end);
 }
+
+export function randomSuffix() {
+    const a = Math.random().toString(36).slice(2);
+    const b = Math.random().toString(36).slice(2);
+    return (a + b).slice(0, 8);
+}

@@ -2,12 +2,13 @@ import { h } from 'preact';
 import { Router, route } from 'preact-router';
 import { useEffect, useState } from "preact/hooks";
 
+import Page from './page';
 import Login from '../routes/login';
-import Main from '../routes/main';
 import About from '../routes/about';
 import IcatClient from '../icat.js';
 import {invalidateLogin, getCachedSessionId, saveLogin, getLastLogin} from '../servercache.js';
 import Header from '../components/header';
+import ViewThing from '../components/view-thing';
 
 const App = () => {
     const [sessionId, setSessionId] = useState(null);
@@ -56,9 +57,15 @@ const App = () => {
                 server={loggedIn ? serverName : null}
                 doLogout={logout} />
             <Router>
-                <Main path="/" icatClient={icatClient} sessionId={sessionId} />
-                <Login path="/login" doLogin={doLogin} errMsg={errMsg} />
-                <About path="/about" />
+                <Page path="/">
+                    <ViewThing icatClient={icatClient} sessionId={sessionId} />
+                </Page>
+                <Page path="/login">
+                    <Login path="/login" doLogin={doLogin} errMsg={errMsg} />
+                </Page>
+                <Page path="/about">
+                    <About />
+                </Page>
             </Router>
         </div>
     );

@@ -1,8 +1,16 @@
 // On ICAT objects, attribute names for related entities are lowercase and pluralised.
 // Remove the 's' and uppercase the first letter to get the table name.
-export function icatAttributeToTableName(a) {
+//
+// Fields called 'parameters' link to a table specific to the table
+// ie. datafile.parameters are instances of DatafileParameter
+export function icatAttributeToTableName(tableName, a) {
     const singular = a.slice(0, -1);
-    return singular.charAt(0).toUpperCase() + singular.slice(1);
+    const capitalized = singular.charAt(0).toUpperCase() + singular.slice(1);
+    if (singular === "parameter") {
+        return tableName + capitalized;
+    } else {
+        return capitalized;
+    }
 }
 
 export function lowercaseFirst(s) { return s.charAt(0).toLowerCase() + s.slice(1) };

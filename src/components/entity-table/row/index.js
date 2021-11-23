@@ -9,10 +9,12 @@ function format(cellContent) {
         : <ReadMore text={cellContent.toString()}/>;
 }
 
-const EntityRow = ({entity, headers, showRelatedEntities, openContextMenu}) => {
+const EntityRow = ({tableName, entity, headers, showRelatedEntities, openContextMenu}) => {
     const relatedEntityCallbacks = Object.keys(entity)
         .filter(k => Array.isArray(entity[k]))
-        .map(k => [k, () => showRelatedEntities(icatAttributeToTableName(k), entity.id)]);
+        .map(k => [k, () =>
+            showRelatedEntities(
+                icatAttributeToTableName(tableName, k), entity.id)]);
 
     const doOpenContextMenu = ev => {
         ev.preventDefault();

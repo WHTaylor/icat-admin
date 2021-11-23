@@ -5,7 +5,7 @@ import EntityRow from '../row';
 import ContextMenu from '../../context-menu';
 import {defaultHeaderSort} from '../../../utils.js';
 
-const EntityTableView = ({data, openRelated}) => {
+const EntityTableView = ({data, tableName, openRelated}) => {
     const [contextMenuPos, setContextMenuPos] =  useState(null);
     const [contextMenuItems, setContextMenuItems] =  useState(null);
 
@@ -39,6 +39,7 @@ const EntityTableView = ({data, openRelated}) => {
             </tr>
             {data.map(e =>
                 <EntityRow
+                    tableName={tableName}
                     headers={keys}
                     entity={e}
                     showRelatedEntities={openRelated}

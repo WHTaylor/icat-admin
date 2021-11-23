@@ -78,7 +78,10 @@ const EntityTable = ({icatClient, sessionId, filter, openRelated, handleFilterCh
             </span>
             {errMsg ? <p>{errMsg}</p>
                 : data === null ? <p>Loading...</p>
-                    : <EntityTableView data={data} openRelated={openRelated} />}
+                    : <EntityTableView
+                        data={data}
+                        tableName={filter.table}
+                        openRelated={openRelated} />}
         </div>
     );
 }

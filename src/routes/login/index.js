@@ -5,9 +5,9 @@ function server(isDev) {
     return res;
 }
 
-const LoginForm = ({doLogin}) => {
+const Login = ({doLogin, errMsg}) => {
     return (
-        <div>
+        <div class="page">
             <div>
                 <label for="prodRadio">Prod</label>
                 <input type="radio" name="server" id="prodRadio" checked />
@@ -35,8 +35,10 @@ const LoginForm = ({doLogin}) => {
                 document.getElementById("passwordInput").value)}>
                 Login
             </button>
+            {errMsg !== null &&
+                <p>Error logging in: {errMsg}</p>}
         </div>
     );
 }
 
-export default LoginForm;
+export default Login;

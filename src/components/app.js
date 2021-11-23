@@ -8,7 +8,7 @@ import About from '../routes/about';
 import IcatClient from '../icat.js';
 import {invalidateLogin, getCachedSessionId, saveLogin, getLastLogin} from '../servercache.js';
 import Header from '../components/header';
-import ViewThing from '../components/view-thing';
+import EntityViewer from '../components/entity-viewer';
 
 const App = () => {
     const [sessionId, setSessionId] = useState(null);
@@ -58,7 +58,7 @@ const App = () => {
                 doLogout={logout} />
             <Router>
                 <Page path="/">
-                    <ViewThing icatClient={icatClient} sessionId={sessionId} />
+                    <EntityViewer icatClient={icatClient} sessionId={sessionId} />
                 </Page>
                 <Page path="/login">
                     <Login path="/login" doLogin={doLogin} errMsg={errMsg} />

@@ -6,7 +6,7 @@ import {lowercaseFirst, tableFilter} from '../../utils.js';
 import EntityTable from '../../components/entity-table/container';
 import TabWindow from '../../components/tab-window';
 
-const ViewThing = ({icatClient, sessionId}) => {
+const EntityViewer = ({icatClient, sessionId}) => {
     const [tabFilters, setTabFilters] = useState([]);
     const [activeTab, setActiveTab] = useState(null);
 
@@ -81,4 +81,4 @@ const ViewThing = ({icatClient, sessionId}) => {
     );
 }
 
-export default ViewThing;
+export default EntityViewer;

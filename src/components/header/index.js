@@ -12,10 +12,14 @@ const Header = ({server, doLogout}) => {
             <h1>ICAT admin{loggedIn && ` - ${stripProtocol(server)}`}</h1>
             <nav>
                 {loggedIn
-                    ? <Link href="/">Home</Link>
-                    : <Link href="/login">Login</Link>}
-                <Link href="/about">About</Link>
-                {loggedIn && <Link href="/login" onClick={doLogout}>Logout</Link> }
+                    ? <Link activeClassName={style.active} href="/">Home</Link>
+                    : <Link activeClassName={style.active} href="/login">Login</Link>}
+                <Link activeClassName={style.active} href="/about">About</Link>
+                {loggedIn &&
+                    <Link
+                        activeClassName={style.active}
+                        href="/login"
+                        onClick={doLogout}>Logout</Link> }
             </nav>
         </header>
     )

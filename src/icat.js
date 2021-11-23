@@ -59,6 +59,10 @@ class IcatClient {
             .then(j => j["sessionId"]);
     }
 
+    async refresh(sessionId) {
+        fetch(this.serviceUrl + '/session/' + sessionId, { method: "PUT" });
+    }
+
     async getEntries(sessionId, filter, signal) {
         const query = buildQuery(filter);
         const params = {

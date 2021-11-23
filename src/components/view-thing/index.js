@@ -1,4 +1,4 @@
-import {useState} from "preact/hooks";
+import {useState, useEffect} from "preact/hooks";
 import style from './style.css';
 
 import {entityNames} from '../../icat.js';
@@ -40,6 +40,13 @@ const ViewThing = ({icatClient, sessionId}) => {
             else if (closeIdx === numTabs - 1) setActiveTab(activeTab - 1);
         }
     };
+
+    useEffect(() => {
+        // Could base this on the icat/properties.lifetimeMinutes, but this is simpler
+        const twentyMinutes = 1000 * 60 * 20;
+        const id = setInterval(() => icatClient.refresh(sessionId), twentyMinutes);
+        return () => clearInterval(id);
+    }, [icatClient, sessionId]);
 
     return (
         <div class={style.viewContainer}>

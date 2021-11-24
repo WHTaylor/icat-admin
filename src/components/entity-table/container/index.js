@@ -4,7 +4,7 @@ import style from './style.css';
 import EntityTableView from '../view';
 import {randomSuffix} from '../../../utils.js';
 
-const EntityTable = ({icatClient, sessionId, filter, handleFilterChange, openRelated, isOpen}) => {
+const EntityTable = ({icatClient, sessionId, filter, handleFilterChange, openRelated, isOpen, changeSortField}) => {
     const [data, setData] = useState(null);
     const [errMsg, setErrMsg] = useState(null);
     const [contextMenuPos, setContextMenuPos] = useState(null);
@@ -83,7 +83,8 @@ const EntityTable = ({icatClient, sessionId, filter, handleFilterChange, openRel
                 : <EntityTableView
                     data={data}
                     tableName={filter.table}
-                    openRelated={openRelated} />}
+                    openRelated={openRelated}
+                    changeSortField={changeSortField} />}
         </>
     );
 }

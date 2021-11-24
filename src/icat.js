@@ -30,7 +30,10 @@ function buildQuery(filter) {
         (filter.limit === null || filter.limit === undefined)
         ? ""
         : ` limit ${filter.offset}, ${filter.limit}`;
-    return `select e from ${filter.table} e${where}${limit}`;
+    const order = filter.sortField === null
+        ? ""
+        : `order by e.${filter.sortField} ${filter.sortAsc ? "asc" : "desc"}`;
+    return `select e from ${filter.table} e ${where} ${order} ${limit}`;
 }
 
 class IcatClient {

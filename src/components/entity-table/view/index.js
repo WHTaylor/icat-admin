@@ -5,7 +5,7 @@ import EntityRow from '../row';
 import ContextMenu from '../../context-menu';
 import {defaultHeaderSort} from '../../../utils.js';
 
-const EntityTableView = ({data, tableName, openRelated}) => {
+const EntityTableView = ({data, tableName, openRelated, changeSortField}) => {
     const [contextMenuPos, setContextMenuPos] =  useState(null);
     const [contextMenuItems, setContextMenuItems] =  useState(null);
 
@@ -35,7 +35,9 @@ const EntityTableView = ({data, tableName, openRelated}) => {
         <>
         <table>
             <tr>
-                {keys.map(k => <th class={style.tableHeader}>{k}</th>)}
+                {keys.map(k => <th
+                    onClick={() => changeSortField(k)}
+                    class={style.tableHeader}>{k}</th>)}
             </tr>
             {data.map(e =>
                 <EntityRow

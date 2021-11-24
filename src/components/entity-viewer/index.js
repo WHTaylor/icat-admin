@@ -41,6 +41,16 @@ const EntityViewer = ({icatClient, sessionId}) => {
         }
     };
 
+    const changeSortField = (i, k) => {
+        const f = tabFilters[i];
+        const newFilter = f.sortField !== k
+            ? {...f, sortField: k, sortAsc: true }
+            : f.sortAsc
+                ? {...f, sortAsc: false}
+                : {...f, sortField: null};
+        handleFilterChange(i, newFilter);
+    };
+
     useEffect(() => {
         // Could base this on the icat/properties.lifetimeMinutes, but this is simpler
         const twentyMinutes = 1000 * 60 * 20;
@@ -74,6 +84,7 @@ const EntityViewer = ({icatClient, sessionId}) => {
                         filter={f}
                         handleFilterChange={f => handleFilterChange(i, f)}
                         openRelated={(e, id) => openRelated(e, f.table, id)}
+                        changeSortField={k => changeSortField(i, k)}
                         isOpen={i === activeTab}
                         key={f.key} />])}
         </TabWindow>

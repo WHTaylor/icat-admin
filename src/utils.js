@@ -15,7 +15,7 @@ export function icatAttributeToTableName(tableName, a) {
 
 export function lowercaseFirst(s) { return s.charAt(0).toLowerCase() + s.slice(1) };
 
-export function tableFilter(table, offset, limit, where) {
+export function tableFilter(table, offset, limit, where, sortField=null, sortAsc=true) {
     if (table === undefined) console.error("tableFilter called without args");
     return {
         key: Math.random(),
@@ -23,7 +23,9 @@ export function tableFilter(table, offset, limit, where) {
         offset: offset,
         limit: limit,
         where: where === undefined ? null : where,
-    }
+        sortField: sortField,
+        sortAsc: sortAsc,
+    };
 }
 
 // By default, sort the common fields to the end

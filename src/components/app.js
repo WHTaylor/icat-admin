@@ -1,6 +1,6 @@
 import { h } from 'preact';
 import { Router, route } from 'preact-router';
-import { useEffect, useState } from "preact/hooks";
+import { useLayoutEffect, useState } from "preact/hooks";
 
 import Page from './page';
 import Login from '../routes/login';
@@ -24,9 +24,12 @@ const App = () => {
         return icatClient.isValidSession(cached[1]);
     }
 
-    useEffect(() => {
+    useLayoutEffect(() => {
         hasValidCachedSession()
-            .then(res => {if (res) setSessionId(getCachedSessionId())})
+            .then(res => {
+                if (res) setSessionId(getCachedSessionId());
+                else route("/login");
+            });
     });
 
     const doLogin = async (server, plugin, username, password) => {

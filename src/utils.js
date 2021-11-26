@@ -1,3 +1,5 @@
+import {entityNames} from './icat.js';
+
 // On ICAT objects, attribute names for related entities are lowercase and pluralised.
 // Remove the 's' and uppercase the first letter to get the table name.
 //
@@ -5,17 +7,34 @@
 // ie. datafile.parameters are instances of DatafileParameter
 export function icatAttributeToTableName(tableName, a) {
     const singular = a.slice(0, -1);
-    const capitalized = singular.charAt(0).toUpperCase() + singular.slice(1);
+    const capitalizedSingular = capitalize(singular);
     if (singular === "parameter") {
-        return tableName + capitalized;
+        return tableName + capitalizedSingular;
     } else {
-        return capitalized;
+        return capitalizedSingular;
+    }
+}
+
+export function joinAttributeToTableName(originTable, attribute) {
+    if (attribute === "type") {
+        if (originTable.endsWith("Parameter")) return "ParameterType";
+        return originTable + "Type";
+    } else if (attribute === "facility") {
+        return "Facility";
+    } else if (attribute.endsWith("Datafile")) {
+        return "Datafile";
+    } else if (attribute.endsWith("DataCollection")) {
+        return "DataCollection";
+    } else if (entityNames.includes(capitalize(attribute))) {
+        return capitalize(attribute);
+    } else {
+        console.warn(`Unknown attribute in joinAttributeToTableName '${attribute}'`);
     }
 }
 
 export function lowercaseFirst(s) { return s.charAt(0).toLowerCase() + s.slice(1) };
 
-export function tableFilter(table, offset, limit, where) {
+export function tableFilter(table, offset, limit, where, sortField=null, sortAsc=true) {
     if (table === undefined) console.error("tableFilter called without args");
     return {
         key: Math.random(),
@@ -23,7 +42,9 @@ export function tableFilter(table, offset, limit, where) {
         offset: offset,
         limit: limit,
         where: where === undefined ? null : where,
-    }
+        sortField: sortField,
+        sortAsc: sortAsc,
+    };
 }
 
 // By default, sort the common fields to the end
@@ -43,3 +64,5 @@ export function randomSuffix() {
 
 const datePattern = /\d{4}-\d{2}-\d{2}T.+/
 export function isDatetime(s) { return s.search(datePattern) > -1 }
+
+function capitalize(s) { return s.charAt(0).toUpperCase() + s.slice(1);}

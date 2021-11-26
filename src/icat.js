@@ -30,7 +30,14 @@ function buildQuery(filter) {
         (filter.limit === null || filter.limit === undefined)
         ? ""
         : ` limit ${filter.offset}, ${filter.limit}`;
-    return `select e from ${filter.table} e${where}${limit}`;
+    const order = filter.sortField === null
+        ? ""
+        : `order by e.${filter.sortField} ${filter.sortAsc ? "asc" : "desc"}`;
+    const relatedEntities = oneToX[filter.table];
+    const includes = (relatedEntities === undefined || relatedEntities.length == 0)
+        ? ""
+        : `include ${relatedEntities.map(a => "e." + a).join(', ')}`;
+    return `select e from ${filter.table} e ${where} ${order} ${limit} ${includes}`;
 }
 
 class IcatClient {
@@ -110,4 +117,39 @@ class IcatClient {
 
 export const entityNames = ["Application", "DataCollection", "DataCollectionDatafile", "DataCollectionDataset", "DataCollectionParameter", "Datafile", "DatafileFormat", "DatafileParameter", "Dataset", "DatasetParameter", "DatasetType", "Facility", "FacilityCycle", "Grouping", "Instrument", "InstrumentScientist", "Investigation", "InvestigationGroup", "InvestigationInstrument", "InvestigationParameter", "InvestigationType", "InvestigationUser", "Job", "Keyword", "ParameterType", "PermissibleStringValue", "PublicStep", "Publication", "RelatedDatafile", "Rule", "Sample", "SampleParameter", "SampleType", "Shift", "Study", "StudyInvestigation", "User", "UserGroup"];
 
+export const oneToX = {
+    "Application": ["facility"],
+    "DataCollectionDatafile": ["dataCollection", "datafile"],
+    "DataCollectionDataset": ["dataCollection", "dataset"],
+    "DataCollectionParameter": ["dataCollection", "type"],
+    "Datafile": ["datafileFormat", "dataset"],
+    "DatafileFormat": ["facility"],
+    "DatafileParameter": ["type", "datafile"],
+    "Dataset": ["sample", "type", "investigation"],
+    "DatasetParameter": ["type", "dataset"],
+    "DatasetType": ["facility"],
+    "FacilityCycle": ["facility"],
+    "Instrument": ["facility"],
+    "InstrumentScientist": ["instrument", "user"],
+    "Investigation": ["type", "facility"],
+    "InvestigationGroup": ["grouping", "investigation"],
+    "InvestigationInstrument": ["instrument", "investigation"],
+    "InvestigationParameter": ["investigation", "type"],
+    "InvestigationType": ["facility"],
+    "InvestigationUser": ["user", "investigation"],
+    "Job": ["inputDataCollection", "outputDataCollection", "application"],
+    "Keyword": ["investigation"],
+    "ParameterType": ["facility"],
+    "PermissibleStringValue": ["type"],
+    "Publication": ["investigation"],
+    "RelatedDatafile": ["sourceDatafile", "destDatafile"],
+    "Rule": ["grouping"],
+    "Sample": ["investigation", "type"],
+    "SampleParameter": ["sample", "type"],
+    "SampleType": ["facility"],
+    "Shift": ["investigation", "instrument"],
+    "Study": ["user"],
+    "StudyInvestigation": ["study", "investigation"],
+    "UserGroup": ["user", "grouping"]
+};
 export default IcatClient;

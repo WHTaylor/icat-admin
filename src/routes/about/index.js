@@ -9,8 +9,6 @@ const About = () => (
         <p class="mainContent">To approximately reach feature parity with ICAT manager, the next set of features to add are:</p>
         <ul class="mainContent">
             <li>Editing entries (and autofill during editing)</li>
-            <li>Adding 'Show related' for many-one relationships</li>
-            <li>Changing sort order</li>
         </ul>
         <p class="mainContent">Additionally, I'm hoping to add:</p>
         <ul class="mainContent">

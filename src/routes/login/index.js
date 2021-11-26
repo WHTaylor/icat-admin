@@ -6,8 +6,19 @@ function server(isDev) {
 }
 
 const Login = ({doLogin, errMsg}) => {
+    const submit = ev => {
+        ev.preventDefault();
+        doLogin(
+            server(document.getElementById("devRadio").checked),
+            document.getElementById("pluginInput").value,
+            document.getElementById("usernameInput").value,
+            document.getElementById("passwordInput").value);
+    };
+
     return (
-        <div class="mainContent">
+        <form
+            class="mainContent"
+            onSubmit={submit}>
             <div>
                 <label for="prodRadio">Prod</label>
                 <input type="radio" name="server" id="prodRadio" checked />
@@ -28,16 +39,10 @@ const Login = ({doLogin, errMsg}) => {
                 <label for="password">Password:</label>
                 <input type="password" name="password" id="passwordInput" />
             </div>
-            <button onClick={() => doLogin(
-                server(document.getElementById("devRadio").checked),
-                document.getElementById("pluginInput").value,
-                document.getElementById("usernameInput").value,
-                document.getElementById("passwordInput").value)}>
-                Login
-            </button>
+            <input type="submit" value="Login" />
             {errMsg !== null &&
                 <p>Error logging in: {errMsg}</p>}
-        </div>);
+        </form>);
 }
 
 export default Login;

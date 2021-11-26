@@ -22,13 +22,20 @@ const EntityViewer = ({icatClient, sessionId}) => {
         setActiveTab(numTabs);
     };
 
-    const openRelated = (related, origin, originId) =>
-        openTab(
-            tableFilter(
-                related,
-                0,
-                50,
-                `${lowercaseFirst(origin)}.id = ${originId}`));
+    /* related    - the table to open
+     * origin     - the table we're coming from
+     * relationId - the id used in the where filter of the new table
+     *              If the origin-related entity is one-many, this is the id of the
+     *              entity in the origin table, otherwise it's the id of the related
+     *              entity
+     * oneToMany  - true if related-origin is one-many, otherwise false
+     */
+    const openRelated = (related, origin, relationId, oneToMany) => {
+        const where = oneToMany
+            ? `${lowercaseFirst(origin)}.id = ${relationId}`
+            : `id = ${relationId}`;
+        openTab(tableFilter(related, 0, 50, where));
+    }
 
     const closeTab = closeIdx => {
         const numTabs = tabFilters.length;
@@ -83,7 +90,8 @@ const EntityViewer = ({icatClient, sessionId}) => {
                         sessionId={sessionId}
                         filter={f}
                         handleFilterChange={f => handleFilterChange(i, f)}
-                        openRelated={(e, id) => openRelated(e, f.table, id)}
+                        openRelated={(e, id, isOneToMany) =>
+                            openRelated(e, f.table, id, isOneToMany)}
                         changeSortField={k => changeSortField(i, k)}
                         isOpen={i === activeTab}
                         key={f.key} />])}

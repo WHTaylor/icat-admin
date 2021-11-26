@@ -152,5 +152,4 @@ export const oneToX = {
     "StudyInvestigation": ["study", "investigation"],
     "UserGroup": ["user", "grouping"]
 };
-
 export default IcatClient;

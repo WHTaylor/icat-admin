@@ -29,7 +29,8 @@ const App = () => {
             .then(res => {
                 if (res) setSessionId(getCachedSessionId());
                 else route("/login");
-            });
+            })
+            .catch(err => route("/login"));
     });
 
     const doLogin = async (server, plugin, username, password) => {

@@ -113,6 +113,11 @@ class IcatClient {
         fetch(`${this.serviceUrl}/session/${sessionId}`,
             { method: "DELETE" });
     }
+
+    async getUserName(sessionId) {
+        return fetch(`${this.serviceUrl}/session/${sessionId}`)
+            .then(r => r.json());
+    }
 }
 
 export const entityNames = ["Application", "DataCollection", "DataCollectionDatafile", "DataCollectionDataset", "DataCollectionParameter", "Datafile", "DatafileFormat", "DatafileParameter", "Dataset", "DatasetParameter", "DatasetType", "Facility", "FacilityCycle", "Grouping", "Instrument", "InstrumentScientist", "Investigation", "InvestigationGroup", "InvestigationInstrument", "InvestigationParameter", "InvestigationType", "InvestigationUser", "Job", "Keyword", "ParameterType", "PermissibleStringValue", "PublicStep", "Publication", "RelatedDatafile", "Rule", "Sample", "SampleParameter", "SampleType", "Shift", "Study", "StudyInvestigation", "User", "UserGroup"];

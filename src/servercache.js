@@ -70,7 +70,7 @@ function getServerNumberByName(serverName) {
 export function getLastLogin() {
     const n = localStorage.getItem("lastServerAccessed");
     const info = getServer(n);
-    return info === null ? null : [info.name, info.sessionId];
+    return info === null ? [null, null] : [info.name, info.sessionId];
 }
 
 export function getCachedSessionId() {

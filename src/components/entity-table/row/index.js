@@ -7,10 +7,13 @@ function format(cellContent) {
     if (cellContent === undefined || cellContent === null) return "";
 
     const content = typeof cellContent !== "string"
-        ? cellContent.toString()
+        ? (typeof cellContent === "object"
+            ? cellContent.id.toString()
+            : cellContent.toString())
         : isDatetime(cellContent)
             ? new Date(cellContent).toLocaleString()
             : cellContent;
+
     return <ReadMore text={content}/>;
 }
 

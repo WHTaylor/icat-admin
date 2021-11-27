@@ -3,21 +3,22 @@ import style from './style.css';
 
 import {icatAttributeToTableName, joinAttributeToTableName, isDatetime} from '../../../utils.js';
 
-function format(cellContent) {
+function formatCellContent(cellContent) {
     if (cellContent === undefined || cellContent === null) return "";
 
-    const content = typeof cellContent !== "string"
+    return typeof cellContent !== "string"
         ? (typeof cellContent === "object"
             ? cellContent.id.toString()
             : cellContent.toString())
         : isDatetime(cellContent)
             ? new Date(cellContent).toLocaleString()
             : cellContent;
-
-    return <ReadMore text={content}/>;
 }
 
-const EntityRow = ({tableName, entity, headers, showRelatedEntities, openContextMenu}) => {
+const EntityRow = ({
+    tableName, entity, headers, editingField,
+    showRelatedEntities, openContextMenu, startEditing, makeEdit}) => {
+
     // Pairs of (relatedTable, openFunction) for all relatedTables which are
     // many-one with tableName (ie. investigation -> datasets)
     const relatedArrayCallbacks = Object.keys(entity)
@@ -46,7 +47,17 @@ const EntityRow = ({tableName, entity, headers, showRelatedEntities, openContext
 
     return (
         <tr onContextMenu={doOpenContextMenu} class={style.entityRow}>
-            {headers.map(k => <td>{format(entity[k])}</td>)}
+            {headers.map(k =>
+                k === editingField
+                    ? <td>
+                        <input type="text"
+                            value={formatCellContent(entity[k])}
+                            onChange={ev => makeEdit(editingField, ev.target.value)} />
+                      </td>
+                    : <td onClick={() => startEditing(k)}>
+                        <ReadMore text={formatCellContent(entity[k])} />
+                      </td>
+            )}
         </tr>
     );
 }

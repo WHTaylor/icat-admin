@@ -1,4 +1,4 @@
-import {useEffect, useState} from "preact/hooks";
+import {useEffect, useState, useRef} from "preact/hooks";
 import style from './style.css';
 
 import {icatAttributeToTableName, joinAttributeToTableName, isDatetime} from '../../../utils.js';
@@ -18,6 +18,8 @@ function formatCellContent(cellContent) {
 const EntityRow = ({
     tableName, entity, headers, editingField,
     showRelatedEntities, openContextMenu, startEditing, makeEdit}) => {
+
+    const inputEl = useRef(null);
 
     // Pairs of (relatedTable, openFunction) for all relatedTables which are
     // many-one with tableName (ie. investigation -> datasets)
@@ -43,7 +45,11 @@ const EntityRow = ({
     const doOpenContextMenu = ev => {
         ev.preventDefault();
         openContextMenu(ev.pageX, ev.pageY, relatedEntityCallbacks);
-    }
+    };
+
+    useEffect(() => {
+        if (inputEl.current !== null) inputEl.current.focus();
+    });
 
     return (
         <tr onContextMenu={doOpenContextMenu} class={style.entityRow}>
@@ -51,6 +57,7 @@ const EntityRow = ({
                 k === editingField
                     ? <td>
                         <input type="text"
+                            ref={inputEl}
                             value={formatCellContent(entity[k])}
                             onChange={ev => makeEdit(editingField, ev.target.value)} />
                       </td>

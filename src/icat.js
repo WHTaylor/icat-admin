@@ -118,6 +118,22 @@ class IcatClient {
         return fetch(`${this.serviceUrl}/session/${sessionId}`)
             .then(r => r.json());
     }
+
+    async writeEntity(sessionId, entityType, entity) {
+        const form = new FormData();
+        form.append('entities', JSON.stringify({[entityType]: entity}));
+        form.append('sessionId', sessionId);
+        return fetch(
+            this.serviceUrl + "/entityManager", {
+                method: "POST",
+                body: new URLSearchParams(form),
+            })
+            .then(res => res.ok
+                ? res
+                : formatError(res)
+                    .then(msg => Promise.reject(msg)))
+            .then(res => res.json());
+    }
 }
 
 export const entityNames = ["Application", "DataCollection", "DataCollectionDatafile", "DataCollectionDataset", "DataCollectionParameter", "Datafile", "DatafileFormat", "DatafileParameter", "Dataset", "DatasetParameter", "DatasetType", "Facility", "FacilityCycle", "Grouping", "Instrument", "InstrumentScientist", "Investigation", "InvestigationGroup", "InvestigationInstrument", "InvestigationParameter", "InvestigationType", "InvestigationUser", "Job", "Keyword", "ParameterType", "PermissibleStringValue", "PublicStep", "Publication", "RelatedDatafile", "Rule", "Sample", "SampleParameter", "SampleType", "Shift", "Study", "StudyInvestigation", "User", "UserGroup"];

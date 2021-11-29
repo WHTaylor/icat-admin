@@ -16,10 +16,14 @@ function formatCellContent(cellContent) {
 }
 
 const EntityRow = ({
-    tableName, entity, headers, editingField,
-    showRelatedEntities, openContextMenu, startEditing, makeEdit}) => {
-
+    tableName, entity, modifications, headers, editingField,
+    showRelatedEntities, openContextMenu,
+    startEditing, makeEdit, saveModifiedEntity, revertChanges}) =>
+{
     const inputEl = useRef(null);
+    const [isSaving, setIsSaving] = useState(false);
+    const [saveSuccess, setSaveSuccess] = useState(null);
+
 
     // Pairs of (relatedTable, openFunction) for all relatedTables which are
     // many-one with tableName (ie. investigation -> datasets)
@@ -51,18 +55,46 @@ const EntityRow = ({
         if (inputEl.current !== null) inputEl.current.focus();
     });
 
+    const saveChanges = () => {
+        setIsSaving(true);
+        saveModifiedEntity({...modifications})
+            .then(() => setSaveSuccess(true))
+            .catch(() => setSaveSuccess(false))
+            .finally(() => setIsSaving(false));
+    };
+
+    // If the entity has been modified, show save and revert buttons
+    const editedActions = <>
+            <button title="Revert changes" onClick={revertChanges}>↩️</button>
+            <button title="Save changes" onClick={saveChanges}>💾</button>
+        </>;
+    const savingActions = "🙃";
+        // check ✔️
+    const curEntityValue = field => {
+        const v = modifications === undefined || modifications[field] === undefined
+            ? entity[field]
+            : modifications[field];
+        return formatCellContent(v);
+    }
     return (
         <tr onContextMenu={doOpenContextMenu} class={style.entityRow}>
+            <td>
+                {modifications === undefined
+                    ? ""
+                    : isSaving
+                        ? savingActions
+                        : editedActions}
+            </td>
             {headers.map(k =>
                 k === editingField
                     ? <td>
                         <input type="text"
                             ref={inputEl}
-                            value={formatCellContent(entity[k])}
+                            value={curEntityValue(k)}
                             onChange={ev => makeEdit(editingField, ev.target.value)} />
                       </td>
                     : <td onClick={() => startEditing(k)}>
-                        <ReadMore text={formatCellContent(entity[k])} />
+                        <ReadMore text={curEntityValue(k)} />
                       </td>
             )}
         </tr>

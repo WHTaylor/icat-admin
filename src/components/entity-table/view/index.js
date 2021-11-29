@@ -5,10 +5,10 @@ import EntityRow from '../row';
 import ContextMenu from '../../context-menu';
 import {defaultHeaderSort} from '../../../utils.js';
 
-const EntityTableView = ({data, tableName, openRelated, changeSortField}) => {
+const EntityTableView = ({data, tableName, openRelated, changeSortField, saveModifiedEntity}) => {
     const [contextMenuPos, setContextMenuPos] =  useState(null);
     const [contextMenuItems, setContextMenuItems] =  useState(null);
-    const [modifiedEntities, setModifiedEntities] = useState({});
+    const [entityModifications, setEntityModifications] = useState({});
     const [fieldBeingEdited, setFieldBeingEdited] = useState([null, null]);
 
     const clearContextMenu = () => {
@@ -30,16 +30,17 @@ const EntityTableView = ({data, tableName, openRelated, changeSortField}) => {
     if (data.length === 0) return <p>No entries</p>;
 
     const editEntity = (id, field, value) => {
-        const cur = modifiedEntities[id] === undefined
-            ? data.filter(e => e.id === id)[0]
-            : modifiedEntities[id];
-        // Not sure if there's a proper way to do this.
-        // 'field' in {...cur, field: value} is taken as the literal value.
-        const edited = {...cur}; edited[field] = value
-        const newModified = {...modifiedEntities}; newModified[id] = edited;
-        setModifiedEntities(newModified);
+        const cur = entityModifications[id] === undefined
+            ? {id: id}
+            : entityModifications[id];
+        const edited = {...cur, [field]: value};
+        const newModified = {...entityModifications, [id]: edited};
+        setEntityModifications(newModified);
         setFieldBeingEdited([null, null]);
     };
+
+    const removeModifications = id =>
+        setEntityModifications({...entityModifications, [id]: undefined});
 
     const dataAttributes = data
         .map(d => Object.keys(d)
@@ -50,18 +51,19 @@ const EntityTableView = ({data, tableName, openRelated, changeSortField}) => {
         <>
         <table>
             <tr>
-                {keys.map(k => <th
-                    onClick={() => changeSortField(k)}
-                    class={style.tableHeader}>{k}</th>)}
+                <th></th>{ /* Empty row for action buttons (save/revert changes)*/ }
+                {keys.map(k =>
+                    <th onClick={() => changeSortField(k)} class={style.tableHeader}>
+                        {k}
+                    </th>)}
             </tr>
             {data.map(e =>
                 <EntityRow
                     key={e.id}
                     tableName={tableName}
                     headers={keys}
-                    entity={Object.keys(modifiedEntities).includes(e.id.toString())
-                        ? modifiedEntities[e.id]
-                        : e}
+                    entity={e}
+                    modifications={entityModifications[e.id]}
                     editingField={fieldBeingEdited[0] === e.id
                         ? fieldBeingEdited[1]
                         : null}
@@ -69,6 +71,8 @@ const EntityTableView = ({data, tableName, openRelated, changeSortField}) => {
                     openContextMenu={openContextMenu}
                     startEditing={field => setFieldBeingEdited([e.id, field])}
                     makeEdit={(k, v) => editEntity(e.id, k, v)}
+                    saveModifiedEntity={saveModifiedEntity}
+                    revertChanges={() => removeModifications(e.id)}
                 />)}
         </table>
         {contextMenuPos !== null &&

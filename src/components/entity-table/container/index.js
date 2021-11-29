@@ -84,7 +84,10 @@ const EntityTable = ({icatClient, sessionId, filter, handleFilterChange, openRel
                     data={data}
                     tableName={filter.table}
                     openRelated={openRelated}
-                    changeSortField={changeSortField} />}
+                    changeSortField={changeSortField}
+                    saveModifiedEntity={e =>
+                        icatClient.writeEntity(sessionId, filter.table, e)}
+                />}
         </>
     );
 }

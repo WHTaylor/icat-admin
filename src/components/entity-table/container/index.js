@@ -10,7 +10,7 @@ const EntityTable = ({icatClient, filter, handleFilterChange, openRelated, isOpe
     const [contextMenuPos, setContextMenuPos] = useState(null);
     const [count, setCount] = useState(null);
 
-    useEffect(() => {
+    const retrieveData = () => {
         setData(null);
         setErrMsg(null);
         const controller = new AbortController();
@@ -27,6 +27,10 @@ const EntityTable = ({icatClient, filter, handleFilterChange, openRelated, isOpe
         };
         getEntries();
         return () => controller.abort();
+    }
+
+    useEffect(() => {
+        return retrieveData();
     }, [filter]);
 
     useEffect(() => {
@@ -67,6 +71,7 @@ const EntityTable = ({icatClient, filter, handleFilterChange, openRelated, isOpe
                 value={filter.where}
                 placeholder="Filter by (ie. id = 1234)"
                 onChange={ev => changeWhere(ev.target.value)}/>
+            <button title="Refresh data" onClick={retrieveData}>↻</button>
             <PaginationControl
                 isActive={isOpen}
                 pageNumber={pageNumber}

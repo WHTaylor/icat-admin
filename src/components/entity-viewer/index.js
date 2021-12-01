@@ -1,9 +1,8 @@
 import {useState, useEffect} from "preact/hooks";
-import style from './style.css';
 
-import {entityNames} from '../../icat.js';
 import {lowercaseFirst, tableFilter} from '../../utils.js';
 import EntityTable from '../../components/entity-table/container';
+import TableList from '../../components/table-list';
 import TabWindow from '../../components/tab-window';
 
 const EntityViewer = ({icatClient}) => {
@@ -72,18 +71,8 @@ const EntityViewer = ({icatClient}) => {
 
     return (
         <>
-        <div class={`leftColumn ${style.tableListContainer}`}>
-            <h2>ICAT tables</h2>
-            <ul>
-                {entityNames.map(en =>
-                    <li>
-                        <button
-                            class="entityButton"
-                            onClick={() => openTab(tableFilter(en, 0, 50))}>
-                            {en}
-                        </button>
-                    </li>)}
-            </ul>
+        <div class={`leftColumn`}>
+            <TableList openTab={openTab}/>
         </div>
         <TabWindow
             activeTab={activeTab}

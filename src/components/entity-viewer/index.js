@@ -67,7 +67,7 @@ const EntityViewer = ({icatClient}) => {
 
     return (
         <>
-        <div class="leftColumn">
+        <div class={`leftColumn ${style.tableListContainer}`}>
             <h2>ICAT tables</h2>
             <ul>
                 {entityNames.map(en =>
@@ -79,7 +79,6 @@ const EntityViewer = ({icatClient}) => {
             </ul>
         </div>
         <TabWindow
-            class={style.asdf}
             activeTab={activeTab}
             closeTab={closeTab}
             handleChangeTab={setActiveTab}>

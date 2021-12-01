@@ -1,14 +1,15 @@
-.viewContainer ul {
+.tableListContainer ul {
     list-style: none;
-    margin-left: -1.6em;
+    margin-left: -1.8em;
     margin-right: 0.4em;
+    margin-top: -0.5em;
 }
 
-.viewContainer ul li {
+.tableListContainer ul li {
     margin: 0.1em 0;
 }
 
-.viewContainer ul li button {
+.tableListContainer ul li button {
     border: none;
-    padding: 0.05em 0.2em;
+    padding: 0.08em 0.3em;
 }

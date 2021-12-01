@@ -4,7 +4,7 @@ import style from './style.css';
 import EntityTableView from '../view';
 import {randomSuffix} from '../../../utils.js';
 
-const EntityTable = ({icatClient, sessionId, filter, handleFilterChange, openRelated, isOpen, changeSortField}) => {
+const EntityTable = ({icatClient, filter, handleFilterChange, openRelated, isOpen, changeSortField}) => {
     const [data, setData] = useState(null);
     const [errMsg, setErrMsg] = useState(null);
     const [contextMenuPos, setContextMenuPos] = useState(null);
@@ -16,8 +16,7 @@ const EntityTable = ({icatClient, sessionId, filter, handleFilterChange, openRel
         const controller = new AbortController();
         const signal = controller.signal;
         const getEntries = async () => {
-            icatClient.getEntries(
-                    sessionId, filter, signal)
+            icatClient.getEntries(filter, signal)
                 .then(d => setData(d))
                 .catch(err => {
                     // DOMException gets throws if promise is aborted, which it is
@@ -35,8 +34,7 @@ const EntityTable = ({icatClient, sessionId, filter, handleFilterChange, openRel
         const controller = new AbortController();
         const signal = controller.signal;
         const getCount = async () => {
-            icatClient.getCount(
-                    sessionId, filter.table, filter.where, signal)
+            icatClient.getCount(filter.table, filter.where, signal)
                 .then(d => setCount(d[0]))
                 // Silently ignore errors, this is only a nice to have
                 .catch(err => {});
@@ -86,7 +84,7 @@ const EntityTable = ({icatClient, sessionId, filter, handleFilterChange, openRel
                     openRelated={openRelated}
                     changeSortField={changeSortField}
                     saveModifiedEntity={e =>
-                        icatClient.writeEntity(sessionId, filter.table, e)}
+                        icatClient.writeEntity(filter.table, e)}
                 />}
         </>
     );

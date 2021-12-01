@@ -6,7 +6,7 @@ import {lowercaseFirst, tableFilter} from '../../utils.js';
 import EntityTable from '../../components/entity-table/container';
 import TabWindow from '../../components/tab-window';
 
-const EntityViewer = ({icatClient, sessionId}) => {
+const EntityViewer = ({icatClient}) => {
     const [tabFilters, setTabFilters] = useState([]);
     const [activeTab, setActiveTab] = useState(null);
 
@@ -61,9 +61,9 @@ const EntityViewer = ({icatClient, sessionId}) => {
     useEffect(() => {
         // Could base this on the icat/properties.lifetimeMinutes, but this is simpler
         const twentyMinutes = 1000 * 60 * 20;
-        const id = setInterval(() => icatClient.refresh(sessionId), twentyMinutes);
+        const id = setInterval(() => icatClient.refresh(), twentyMinutes);
         return () => clearInterval(id);
-    }, [icatClient, sessionId]);
+    }, [icatClient]);
 
     return (
         <>
@@ -87,7 +87,6 @@ const EntityViewer = ({icatClient, sessionId}) => {
                 [f.table,
                     <EntityTable
                         icatClient={icatClient}
-                        sessionId={sessionId}
                         filter={f}
                         handleFilterChange={f => handleFilterChange(i, f)}
                         openRelated={(e, id, isOneToMany) =>

@@ -11,47 +11,55 @@ import Header from '../components/header';
 import EntityViewer from '../components/entity-viewer';
 
 const App = () => {
-    const [sessionId, setSessionId] = useState(null);
-    const [errMsg, setErrMsg] = useState(null);
-
     const [cachedServer, cachedSessionId] = getLastLogin();
 
+    const [errMsg, setErrMsg] = useState(null);
     const [server, setServer] = useState(cachedServer);
+    const [icatClient, setIcatClient] =
+        useState(cachedServer === null ? null : new IcatClient(cachedServer));
     const [userName, setUserName] = useState(null);
-    const icatClient = cachedServer === null ? null : new IcatClient(cachedServer);
 
     useLayoutEffect(() => {
-        async function hasValidCachedSession() {
-            if (cachedServer === null || cachedSessionId === null) return false;
-            return icatClient.isValidSession(cachedSessionId);
-        }
+        const hasValidCachedSession = async () =>
+            new IcatClient(cachedServer).isValidSession(cachedSessionId);
 
-        hasValidCachedSession()
-            .then(res => {
-                if (res) setSessionId(cachedSessionId);
-                else route("/login");
-            })
-            .catch(err => route("/login"));
+        const sendToLogin = () => {
+            setIcatClient(null);
+            route("/login");
+        };
+
+        if (icatClient === null || cachedSessionId === null)
+            sendToLogin();
+        else if (!icatClient.loggedIn) {
+            hasValidCachedSession()
+                .then(res => {
+                    if (res) {
+                        setIcatClient(new IcatClient(server, cachedSessionId));
+                        route('/');
+                    } else sendToLogin();
+                })
+                .catch(err => sendToLogin());
+        }
     });
 
     useEffect(async () => {
         async function getUser() {
-            return await icatClient.getUserName(sessionId)
+            return await icatClient.getUserName()
                 .then(r => r.userName);
         }
 
-        if (sessionId !== null) {
+        if (icatClient !== null && icatClient.loggedIn) {
             getUser().then(u => setUserName(u));
         }
-    }, [sessionId]);
+    }, [icatClient]);
 
     const doLogin = async (server, plugin, username, password) => {
         const client = new IcatClient(server);
-        const s = await client.login(plugin, username, password)
+        await client.login(plugin, username, password)
             .then(s => {
                 if (typeof s === "string") {
                     setServer(server);
-                    setSessionId(s);
+                    setIcatClient(new IcatClient(server, s));
                     saveLogin(server, s);
                     setErrMsg(null);
                     route('/');
@@ -60,22 +68,21 @@ const App = () => {
             .catch(err => setErrMsg(err));
     };
 
-    const loggedIn = sessionId !== null;
     const logout = () => {
-        icatClient.logout(sessionId);
+        icatClient.logout();
         invalidateLogin(server)
-        setSessionId(null);
+        setIcatClient(null);
     }
 
     return (
         <div id="app">
             <Header
-                server={loggedIn ? cachedServer : null}
+                server={icatClient !== null && icatClient.loggedIn ? cachedServer : null}
                 userName={userName}
                 doLogout={logout} />
             <Router>
                 <Page path="/">
-                    <EntityViewer icatClient={icatClient} sessionId={sessionId} />
+                    <EntityViewer icatClient={icatClient} />
                 </Page>
                 <Page path="/login">
                     <Login path="/login" doLogin={doLogin} errMsg={errMsg} />

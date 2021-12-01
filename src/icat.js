@@ -41,8 +41,9 @@ function buildQuery(filter) {
 }
 
 class IcatClient {
-    constructor(host) {
+    constructor(host, sessionId) {
         this.serviceUrl = host + "/icat";
+        this.sessionId = sessionId;
     }
 
     async login(plugin, username, password) {
@@ -66,14 +67,14 @@ class IcatClient {
             .then(j => j["sessionId"]);
     }
 
-    async refresh(sessionId) {
-        fetch(this.serviceUrl + '/session/' + sessionId, { method: "PUT" });
+    async refresh() {
+        fetch(this.serviceUrl + '/session/' + this.sessionId, { method: "PUT" });
     }
 
-    async getEntries(sessionId, filter, signal) {
+    async getEntries(filter, signal) {
         const query = buildQuery(filter);
         const params = {
-            "sessionId": sessionId,
+            "sessionId": this.sessionId,
             "query": query,
         }
         const url = `${this.serviceUrl}/entityManager?${queryUrlClause(params)}`;
@@ -86,12 +87,12 @@ class IcatClient {
             .then(unpack);
     }
 
-    async getCount(sessionId, table, filter, signal) {
+    async getCount(table, filter, signal) {
         const where = (filter === null || filter.trim() === "") ? " "
             : ` where e.${filter.trim()}`
         const query = `select count(e) from ${table} e${where}`;
         const params = {
-            "sessionId": sessionId,
+            "sessionId": this.sessionId,
             "query": query,
         }
         const url = `${this.serviceUrl}/entityManager?${queryUrlClause(params)}`;
@@ -109,20 +110,21 @@ class IcatClient {
             .then(res => res.ok);
     }
 
-    async logout(sessionId) {
-        fetch(`${this.serviceUrl}/session/${sessionId}`,
+    async logout() {
+        fetch(`${this.serviceUrl}/session/${this.sessionId}`,
             { method: "DELETE" });
+        this.sessionId = undefined;
     }
 
-    async getUserName(sessionId) {
-        return fetch(`${this.serviceUrl}/session/${sessionId}`)
+    async getUserName() {
+        return fetch(`${this.serviceUrl}/session/${this.sessionId}`)
             .then(r => r.json());
     }
 
-    async writeEntity(sessionId, entityType, entity) {
+    async writeEntity(entityType, entity) {
         const form = new FormData();
         form.append('entities', JSON.stringify({[entityType]: entity}));
-        form.append('sessionId', sessionId);
+        form.append('sessionId', this.sessionId);
         return fetch(
             this.serviceUrl + "/entityManager", {
                 method: "POST",
@@ -133,6 +135,10 @@ class IcatClient {
                 : formatError(res)
                     .then(msg => Promise.reject(msg)))
             .then(res => res.json());
+    }
+
+    get loggedIn() {
+        return this.sessionId !== undefined;
     }
 }
 

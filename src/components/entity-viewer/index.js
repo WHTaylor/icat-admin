@@ -72,7 +72,9 @@ const EntityViewer = ({icatClient}) => {
             <ul>
                 {entityNames.map(en =>
                     <li>
-                        <button onClick={() => openTab(tableFilter(en, 0, 50))}>
+                        <button
+                            class="entityButton"
+                            onClick={() => openTab(tableFilter(en, 0, 50))}>
                             {en}
                         </button>
                     </li>)}

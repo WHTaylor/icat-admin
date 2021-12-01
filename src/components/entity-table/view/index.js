@@ -70,6 +70,7 @@ const EntityTableView = ({data, tableName, openRelated, changeSortField, saveMod
                     showRelatedEntities={openRelated}
                     openContextMenu={openContextMenu}
                     startEditing={field => setFieldBeingEdited([e.id, field])}
+                    stopEditing={() => setFieldBeingEdited([null, null])}
                     makeEdit={(k, v) => editEntity(e.id, k, v)}
                     saveModifiedEntity={saveModifiedEntity}
                     revertChanges={() => removeModifications(e.id)}

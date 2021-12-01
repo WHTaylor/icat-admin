@@ -18,7 +18,7 @@ function formatCellContent(cellContent) {
 const EntityRow = ({
     tableName, entity, modifications, headers, editingField,
     showRelatedEntities, openContextMenu,
-    startEditing, makeEdit, saveModifiedEntity, revertChanges}) =>
+    startEditing, stopEditing, makeEdit, saveModifiedEntity, revertChanges}) =>
 {
     const inputEl = useRef(null);
     const [isSaving, setIsSaving] = useState(false);
@@ -52,7 +52,16 @@ const EntityRow = ({
     };
 
     useEffect(() => {
-        if (inputEl.current !== null) inputEl.current.focus();
+        if (inputEl.current === null) return
+
+        const el = inputEl.current;
+        el.focus();
+
+        const cancelOnEsc = ev => {
+            if (ev.key === "Escape") stopEditing();
+        };
+        el.addEventListener("keydown", cancelOnEsc);
+        return () => el.removeEventListener("keydown", cancelOnEsc);
     });
 
     const saveChanges = () => {

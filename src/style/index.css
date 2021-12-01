@@ -42,3 +42,8 @@ html, body {
     grid-column-start: 2;
     grid-column-end: 3;
 }
+
+.entityButton {
+    border: none;
+    padding: 0.08em 0.3em;
+}

@@ -4,20 +4,19 @@ import style from './style.css';
 import EntityTableView from '../view';
 import {randomSuffix} from '../../../utils.js';
 
-const EntityTable = ({icatClient, sessionId, filter, handleFilterChange, openRelated, isOpen, changeSortField}) => {
+const EntityTable = ({icatClient, filter, handleFilterChange, openRelated, isOpen, changeSortField}) => {
     const [data, setData] = useState(null);
     const [errMsg, setErrMsg] = useState(null);
     const [contextMenuPos, setContextMenuPos] = useState(null);
     const [count, setCount] = useState(null);
 
-    useEffect(() => {
+    const retrieveData = () => {
         setData(null);
         setErrMsg(null);
         const controller = new AbortController();
         const signal = controller.signal;
         const getEntries = async () => {
-            icatClient.getEntries(
-                    sessionId, filter, signal)
+            icatClient.getEntries(filter, signal)
                 .then(d => setData(d))
                 .catch(err => {
                     // DOMException gets throws if promise is aborted, which it is
@@ -28,6 +27,10 @@ const EntityTable = ({icatClient, sessionId, filter, handleFilterChange, openRel
         };
         getEntries();
         return () => controller.abort();
+    }
+
+    useEffect(() => {
+        return retrieveData();
     }, [filter]);
 
     useEffect(() => {
@@ -35,8 +38,7 @@ const EntityTable = ({icatClient, sessionId, filter, handleFilterChange, openRel
         const controller = new AbortController();
         const signal = controller.signal;
         const getCount = async () => {
-            icatClient.getCount(
-                    sessionId, filter.table, filter.where, signal)
+            icatClient.getCount(filter.table, filter.where, signal)
                 .then(d => setCount(d[0]))
                 // Silently ignore errors, this is only a nice to have
                 .catch(err => {});
@@ -69,6 +71,7 @@ const EntityTable = ({icatClient, sessionId, filter, handleFilterChange, openRel
                 value={filter.where}
                 placeholder="Filter by (ie. id = 1234)"
                 onChange={ev => changeWhere(ev.target.value)}/>
+            <button title="Refresh data" onClick={retrieveData}>↻</button>
             <PaginationControl
                 isActive={isOpen}
                 pageNumber={pageNumber}
@@ -84,7 +87,10 @@ const EntityTable = ({icatClient, sessionId, filter, handleFilterChange, openRel
                     data={data}
                     tableName={filter.table}
                     openRelated={openRelated}
-                    changeSortField={changeSortField} />}
+                    changeSortField={changeSortField}
+                    saveModifiedEntity={e =>
+                        icatClient.writeEntity(filter.table, e)}
+                />}
         </>
     );
 }
@@ -126,11 +132,12 @@ const PaginationControl = ({isActive, pageNumber, handleSetPage, handleLimitChan
     });
 
     return (
-        <span>
+        <span class={style.paginationControl}>
             <button onClick={decPage} id={prevId}>Previous</button>
             <input type="number"
                 value={pageNumber}
-            onChange={ev => handleSetPage(ev.target.value)} />
+                class={style.pageInput}
+                onChange={ev => handleSetPage(ev.target.value)} />
             <button onClick={incPage} id={nextId}>Next</button>
             <span>
                 <label for="pageSizeInput">Per page:</label>

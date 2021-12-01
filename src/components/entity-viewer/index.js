@@ -1,12 +1,11 @@
 import {useState, useEffect} from "preact/hooks";
-import style from './style.css';
 
-import {entityNames} from '../../icat.js';
 import {lowercaseFirst, tableFilter} from '../../utils.js';
 import EntityTable from '../../components/entity-table/container';
+import TableList from '../../components/table-list';
 import TabWindow from '../../components/tab-window';
 
-const EntityViewer = ({icatClient, sessionId}) => {
+const EntityViewer = ({icatClient}) => {
     const [tabFilters, setTabFilters] = useState([]);
     const [activeTab, setActiveTab] = useState(null);
 
@@ -20,6 +19,9 @@ const EntityViewer = ({icatClient, sessionId}) => {
         const numTabs = tabFilters.length;
         setTabFilters(tabFilters.concat([f]));
         setActiveTab(numTabs);
+        // Timeout is used as a small hack to make sure scroll happens after component
+        // rerenders (or at least, that's what it appears to do).
+        setTimeout(() => window.scrollTo({top: 0, left: 0, behavior: "smooth"}), 1);
     };
 
     /* related    - the table to open
@@ -30,11 +32,13 @@ const EntityViewer = ({icatClient, sessionId}) => {
      *              entity
      * oneToMany  - true if related-origin is one-many, otherwise false
      */
-    const openRelated = (related, origin, relationId, oneToMany) => {
-        const where = oneToMany
-            ? `${lowercaseFirst(origin)}.id = ${relationId}`
-            : `id = ${relationId}`;
-        openTab(tableFilter(related, 0, 50, where));
+    const openRelated = (related, origin, relationId, oneToMany, fromType) => {
+        const searchFor = fromType
+            ? "type.id"
+            : oneToMany
+                ? `${lowercaseFirst(origin)}.id`
+                :"id";
+        openTab(tableFilter(related, 0, 50, `${searchFor} = ${relationId}`));
     }
 
     const closeTab = closeIdx => {
@@ -61,25 +65,16 @@ const EntityViewer = ({icatClient, sessionId}) => {
     useEffect(() => {
         // Could base this on the icat/properties.lifetimeMinutes, but this is simpler
         const twentyMinutes = 1000 * 60 * 20;
-        const id = setInterval(() => icatClient.refresh(sessionId), twentyMinutes);
+        const id = setInterval(() => icatClient.refresh(), twentyMinutes);
         return () => clearInterval(id);
-    }, [icatClient, sessionId]);
+    }, [icatClient]);
 
     return (
         <>
-        <div class="leftColumn">
-            <h2>ICAT tables</h2>
-            <ul>
-                {entityNames.map(en =>
-                    <li>
-                        <button onClick={() => openTab(tableFilter(en, 0, 50))}>
-                            {en}
-                        </button>
-                    </li>)}
-            </ul>
+        <div class={`leftColumn`}>
+            <TableList openTab={openTab}/>
         </div>
         <TabWindow
-            class={style.asdf}
             activeTab={activeTab}
             closeTab={closeTab}
             handleChangeTab={setActiveTab}>
@@ -87,11 +82,10 @@ const EntityViewer = ({icatClient, sessionId}) => {
                 [f.table,
                     <EntityTable
                         icatClient={icatClient}
-                        sessionId={sessionId}
                         filter={f}
                         handleFilterChange={f => handleFilterChange(i, f)}
-                        openRelated={(e, id, isOneToMany) =>
-                            openRelated(e, f.table, id, isOneToMany)}
+                        openRelated={(e, id, isOneToMany, fromType) =>
+                            openRelated(e, f.table, id, isOneToMany, fromType)}
                         changeSortField={k => changeSortField(i, k)}
                         isOpen={i === activeTab}
                         key={f.key} />])}

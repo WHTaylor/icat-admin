@@ -5,9 +5,11 @@ import EntityRow from '../row';
 import ContextMenu from '../../context-menu';
 import {defaultHeaderSort} from '../../../utils.js';
 
-const EntityTableView = ({data, tableName, openRelated, changeSortField}) => {
+const EntityTableView = ({data, tableName, openRelated, changeSortField, saveModifiedEntity}) => {
     const [contextMenuPos, setContextMenuPos] =  useState(null);
     const [contextMenuItems, setContextMenuItems] =  useState(null);
+    const [entityModifications, setEntityModifications] = useState({});
+    const [fieldBeingEdited, setFieldBeingEdited] = useState([null, null]);
 
     const clearContextMenu = () => {
         setContextMenuPos(null);
@@ -27,6 +29,19 @@ const EntityTableView = ({data, tableName, openRelated, changeSortField}) => {
     // Note: early returns need to be after all hooks
     if (data.length === 0) return <p>No entries</p>;
 
+    const editEntity = (id, field, value) => {
+        const cur = entityModifications[id] === undefined
+            ? {id: id}
+            : entityModifications[id];
+        const edited = {...cur, [field]: value};
+        const newModified = {...entityModifications, [id]: edited};
+        setEntityModifications(newModified);
+        setFieldBeingEdited([null, null]);
+    };
+
+    const removeModifications = id =>
+        setEntityModifications({...entityModifications, [id]: undefined});
+
     const dataAttributes = data
         .map(d => Object.keys(d)
             .filter(k => !Array.isArray(d[k])));
@@ -36,17 +51,30 @@ const EntityTableView = ({data, tableName, openRelated, changeSortField}) => {
         <>
         <table>
             <tr>
-                {keys.map(k => <th
-                    onClick={() => changeSortField(k)}
-                    class={style.tableHeader}>{k}</th>)}
+                <th></th>{ /* Empty row for action buttons (save/revert changes)*/ }
+                {keys.map(k =>
+                    <th onClick={() => changeSortField(k)} class={style.tableHeader}>
+                        {k}
+                    </th>)}
             </tr>
             {data.map(e =>
                 <EntityRow
+                    key={e.id}
                     tableName={tableName}
                     headers={keys}
                     entity={e}
+                    modifications={entityModifications[e.id]}
+                    editingField={fieldBeingEdited[0] === e.id
+                        ? fieldBeingEdited[1]
+                        : null}
                     showRelatedEntities={openRelated}
-                    openContextMenu={openContextMenu}/>)}
+                    openContextMenu={openContextMenu}
+                    startEditing={field => setFieldBeingEdited([e.id, field])}
+                    stopEditing={() => setFieldBeingEdited([null, null])}
+                    makeEdit={(k, v) => editEntity(e.id, k, v)}
+                    saveModifiedEntity={saveModifiedEntity}
+                    revertChanges={() => removeModifications(e.id)}
+                />)}
         </table>
         {contextMenuPos !== null &&
             <ContextMenu items={contextMenuItems} pos={contextMenuPos} />}

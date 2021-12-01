@@ -3,6 +3,10 @@
     flex-direction: row;
 }
 
+.tabSwitcher button {
+    margin: 0 0.1em;
+}
+
 .hidden {
     display: none;
 }

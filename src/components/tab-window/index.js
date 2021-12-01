@@ -16,7 +16,8 @@ const TabWindow = props => {
                     <button
                         onClick={() => props.handleChangeTab(i)}
                         onMouseDown={ev => handleMouseDown(ev, i)}
-                        class={i === props.activeTab ? style.selectedTab : null}>
+                        class={`entityButton
+                            ${i === props.activeTab ? style.selectedTab : ""}`}>
                         {name}
                     </button>)}
             </div>

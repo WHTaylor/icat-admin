@@ -132,11 +132,12 @@ const PaginationControl = ({isActive, pageNumber, handleSetPage, handleLimitChan
     });
 
     return (
-        <span>
+        <span class={style.paginationControl}>
             <button onClick={decPage} id={prevId}>Previous</button>
             <input type="number"
                 value={pageNumber}
-            onChange={ev => handleSetPage(ev.target.value)} />
+                class={style.pageInput}
+                onChange={ev => handleSetPage(ev.target.value)} />
             <button onClick={incPage} id={nextId}>Next</button>
             <span>
                 <label for="pageSizeInput">Per page:</label>

@@ -20,6 +20,9 @@ const EntityViewer = ({icatClient}) => {
         const numTabs = tabFilters.length;
         setTabFilters(tabFilters.concat([f]));
         setActiveTab(numTabs);
+        // Timeout is used as a small hack to make sure scroll happens after component
+        // rerenders (or at least, that's what it appears to do).
+        setTimeout(() => window.scrollTo({top: 0, left: 0, behavior: "smooth"}), 1);
     };
 
     /* related    - the table to open

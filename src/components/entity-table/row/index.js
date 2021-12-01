@@ -24,7 +24,6 @@ const EntityRow = ({
     const [isSaving, setIsSaving] = useState(false);
     const [saveSuccess, setSaveSuccess] = useState(null);
 
-
     // Pairs of (relatedTable, openFunction) for all relatedTables which are
     // many-one with tableName (ie. investigation -> datasets)
     const relatedArrayCallbacks = Object.keys(entity)
@@ -33,7 +32,8 @@ const EntityRow = ({
             showRelatedEntities(
                 icatAttributeToTableName(tableName, k),
                 entity.id,
-                true)]);
+                true,
+                tableName.endsWith("Type"))]);
 
     // Pairs of (relatedTable, openFunction) for all relatedTables which tableName is
     // one-X (ie. datafile -> dataset)
@@ -43,7 +43,7 @@ const EntityRow = ({
             showRelatedEntities(
                 joinAttributeToTableName(tableName, k),
                 entity[k].id,
-                false)]);
+                false, false)]);
 
     const relatedEntityCallbacks = relatedArrayCallbacks.concat(relatedSingleCallbacks);
     const doOpenContextMenu = ev => {

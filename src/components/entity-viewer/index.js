@@ -33,11 +33,13 @@ const EntityViewer = ({icatClient}) => {
      *              entity
      * oneToMany  - true if related-origin is one-many, otherwise false
      */
-    const openRelated = (related, origin, relationId, oneToMany) => {
-        const where = oneToMany
-            ? `${lowercaseFirst(origin)}.id = ${relationId}`
-            : `id = ${relationId}`;
-        openTab(tableFilter(related, 0, 50, where));
+    const openRelated = (related, origin, relationId, oneToMany, fromType) => {
+        const searchFor = fromType
+            ? "type.id"
+            : oneToMany
+                ? `${lowercaseFirst(origin)}.id`
+                :"id";
+        openTab(tableFilter(related, 0, 50, `${searchFor} = ${relationId}`));
     }
 
     const closeTab = closeIdx => {
@@ -93,8 +95,8 @@ const EntityViewer = ({icatClient}) => {
                         icatClient={icatClient}
                         filter={f}
                         handleFilterChange={f => handleFilterChange(i, f)}
-                        openRelated={(e, id, isOneToMany) =>
-                            openRelated(e, f.table, id, isOneToMany)}
+                        openRelated={(e, id, isOneToMany, fromType) =>
+                            openRelated(e, f.table, id, isOneToMany, fromType)}
                         changeSortField={k => changeSortField(i, k)}
                         isOpen={i === activeTab}
                         key={f.key} />])}

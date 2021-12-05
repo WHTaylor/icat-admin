@@ -20,6 +20,15 @@ const App = () => {
     };
 
     const disconnect = i => {
+        const c = connections[i];
+        invalidateLogin(c.server);
+        new IcatClient(c.server, c.sessionId).logout();
+        if (i < activeServer) {
+            setActiveServer(i - 1);
+        } else if (i === activeServer) {
+            if (i === 0) setActiveServer(null);
+            else if (i === connections.length - 1) setActiveServer(activeServer - 1);
+        }
         setConnections(connections.slice(0, i).concat(connections.slice(i + 1)));
     };
 
@@ -30,6 +39,14 @@ const App = () => {
         const client = new IcatClient(server);
         client.isValidSession(sessionId)
             .then(res => {if (res) createConnection(server, sessionId)});
+    });
+
+    useEffect(() => {
+        const logout = ev => {
+            if (ev.key === "q" && activeServer !== null) disconnect(activeServer);
+        };
+        document.addEventListener("keydown", logout);
+        return () => document.removeEventListener("keydown", logout);
     });
 
     return (

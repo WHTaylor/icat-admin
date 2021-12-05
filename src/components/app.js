@@ -54,7 +54,7 @@ const App = () => {
     return (
         <div id="app">
             <Header
-                servers={connections.map(c => c.server)}
+                servers={connections}
                 activePage={showAbout ? "about" : activeServer}
                 setActiveServer={i => {setShowAbout(false); setActiveServer(i)}}
                 showAbout={() => setShowAbout(true)}

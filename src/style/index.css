@@ -47,3 +47,7 @@ html, body {
     border: none;
     padding: 0.08em 0.3em;
 }
+
+.hidden {
+	display: none;
+}

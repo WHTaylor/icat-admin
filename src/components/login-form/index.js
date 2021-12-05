@@ -5,7 +5,7 @@ function server(isDev) {
     return res;
 }
 
-const Login = ({doLogin, errMsg}) => {
+const LoginForm = ({doLogin, errMsg}) => {
     const submit = ev => {
         ev.preventDefault();
         doLogin(
@@ -45,4 +45,4 @@ const Login = ({doLogin, errMsg}) => {
         </form>);
 }
 
-export default Login;
+export default LoginForm;

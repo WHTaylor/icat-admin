@@ -5,33 +5,29 @@ function stripProtocol(s) {
     return s.split("://").slice(-1);
 }
 
-const Header = ({server, userName, doLogout}) => {
-    const loggedIn = server !== null;
-    const serverInfo = server === null ? "" : stripProtocol(server);
-    const userInfo = userName === null || userName === undefined
-        ? ""
-        : userName.startsWith("anon")
-            ? "anon"
-            : userName;
-    const loginInfo = server === null
-        ? null
-        : userInfo === null
-            ? ` - ${serverInfo}`
-            : ` - ${userInfo}@${serverInfo}`;
+const Header = ({servers, activeServer, setActiveServer, showLoginForm}) => {
+    const serverNames = servers.map(stripProtocol);
 
 	return (
         <header class={style.header}>
-            <h1>ICAT admin{loginInfo !== null && `${loginInfo}`}</h1>
+            <h1>ICAT admin</h1>
             <nav>
-                {loggedIn
-                    ? <Link activeClassName={style.active} href="/">Home</Link>
-                    : <Link activeClassName={style.active} href="/login">Login</Link>}
-                <Link activeClassName={style.active} href="/about">About</Link>
-                {loggedIn &&
-                    <Link
-                        activeClassName={style.active}
-                        href="/login"
-                        onClick={doLogout}>Logout</Link> }
+                {serverNames.map((s, i) =>
+                    <a
+                        onClick={() => setActiveServer(i)}
+                        class={i === activeServer
+                            ? style.active
+                            : style.inactive} >
+                        {s}
+                    </a>)}
+                {servers.length > 0 &&
+                <a
+                    onClick={showLoginForm}
+                    className={activeServer === null
+                        ? style.active
+                        : style.inactive}>+</a>}
+
+                <Link  href="/about">About</Link>
             </nav>
         </header>
     )

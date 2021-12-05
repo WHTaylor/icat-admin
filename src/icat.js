@@ -1,3 +1,5 @@
+import {queryWhereFromInput} from './utils.js';
+
 // Unpack the entries returned from the API, because they are formatted like
 // { 'Investigation': { 'id': 123...}}
 // Assumes all entites are the same type
@@ -20,12 +22,7 @@ async function formatError(errResponse) {
 }
 
 function buildQuery(filter) {
-    const where =
-        (filter.where === null
-         || filter.where === undefined
-         || filter.where.trim() === "")
-        ? " "
-        : ` where e.${filter.where.trim()}`;
+    const where = queryWhereFromInput(filter.where);
     const limit =
         (filter.limit === null || filter.limit === undefined)
         ? ""
@@ -87,10 +84,9 @@ class IcatClient {
             .then(unpack);
     }
 
-    async getCount(table, filter, signal) {
-        const where = (filter === null || filter.trim() === "") ? " "
-            : ` where e.${filter.trim()}`
-        const query = `select count(e) from ${table} e${where}`;
+    async getCount(filter, signal) {
+        const where = queryWhereFromInput(filter.where);
+        const query = `select count(e) from ${filter.table} e ${where}`;
         const params = {
             "sessionId": this.sessionId,
             "query": query,

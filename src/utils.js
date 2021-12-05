@@ -32,6 +32,8 @@ export function joinAttributeToTableName(originTable, attribute) {
     }
 }
 
+function capitalize(s) { return s.charAt(0).toUpperCase() + s.slice(1);}
+
 export function lowercaseFirst(s) { return s.charAt(0).toLowerCase() + s.slice(1) };
 
 export function tableFilter(table, offset, limit, where, sortField=null, sortAsc=true) {
@@ -65,4 +67,29 @@ export function randomSuffix() {
 const datePattern = /\d{4}-\d{2}-\d{2}T.+/
 export function isDatetime(s) { return s.search(datePattern) > -1 }
 
-function capitalize(s) { return s.charAt(0).toUpperCase() + s.slice(1);}
+export function queryWhereFromInput(whereInput) {
+    if (whereInput === null || whereInput === undefined || whereInput.trim() === "")
+        return " ";
+
+    // Split into words on spaces and any suffixes consisting or (+
+    // ie. ((id > 3) and name like '%S') or name like 'M%'
+    // -> ["((", "id", ">", "3)", "and" "name", ...
+    const words = whereInput.split(/\s+/)
+        .map(w => [w, w.match(/([(]+)(.+)/)])
+        .flatMap(p => p[1] === null ? [p[0]] : [p[1][1], p[1][2]]);
+
+    // The first part of the filter and anything after an "and" or "or" are fields
+    // being filtered on, which need to have the entity identifier prepended
+    // Treat any words starting with parentheses as whitespace
+    const isFieldIdentifier = i => {
+        if (words[i].startsWith("(")) return false;
+        const wordsBefore = words.slice(0, i)
+            .filter(w => !(w.startsWith("(") || w.startsWith(")")))
+        if (wordsBefore.length === 0) return true;
+        const wordBefore = wordsBefore.slice(-1)[0].toUpperCase();
+        return wordBefore === "AND" || wordBefore === "OR";
+    };
+    const withEntityIdentifier = words.map((w, i) => isFieldIdentifier(i) ? `e.${w}` : w)
+        .join(" ");
+    return ` where ${withEntityIdentifier}`;
+}

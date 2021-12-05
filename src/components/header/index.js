@@ -24,15 +24,12 @@ const Header = ({
                 {(servers.length > 0 || activePage == "about") &&
                     <a
                         onClick={showLoginForm}
-                        className={activePage === null
-                            ? style.active
-                            : style.inactive}>+</a>}
+                        class={activePage === null && style.active}>+</a>}
 
                 <a
                     onClick={showAbout}
-                    className={activePage === "about"
-                        ? style.active
-                        : style.inactive}>
+                    id={style.aboutLink}
+                    class={activePage === "about" && style.active}>
                     About
                 </a>
             </nav>
@@ -53,7 +50,7 @@ const ServerLink = ({s, isActive, handleClick}) => {
         : userName.startsWith("anon") // will be anon/anon, which is unneccessary
             ? "anon@"
             : `${userName}@`;
-    return <a onClick={handleClick} class={isActive ? style.active : style.inactive}>
+    return <a onClick={handleClick} class={isActive && style.active}>
             {`${prefix}${stripProtocol(s.server)}`}
         </a>;
 }

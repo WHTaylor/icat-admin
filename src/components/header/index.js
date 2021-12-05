@@ -1,11 +1,13 @@
 import style from './style.css';
-import { Link } from 'preact-router/match';
 
 function stripProtocol(s) {
     return s.split("://").slice(-1);
 }
 
-const Header = ({servers, activeServer, setActiveServer, showLoginForm}) => {
+const Header = ({
+    servers, activePage,
+    setActiveServer, showLoginForm, showAbout}) =>
+{
     const serverNames = servers.map(stripProtocol);
 
 	return (
@@ -15,19 +17,25 @@ const Header = ({servers, activeServer, setActiveServer, showLoginForm}) => {
                 {serverNames.map((s, i) =>
                     <a
                         onClick={() => setActiveServer(i)}
-                        class={i === activeServer
+                        class={i === activePage
                             ? style.active
                             : style.inactive} >
                         {s}
                     </a>)}
-                {servers.length > 0 &&
-                <a
-                    onClick={showLoginForm}
-                    className={activeServer === null
-                        ? style.active
-                        : style.inactive}>+</a>}
+                {(servers.length > 0 || activePage == "about") &&
+                    <a
+                        onClick={showLoginForm}
+                        className={activePage === null
+                            ? style.active
+                            : style.inactive}>+</a>}
 
-                <Link  href="/about">About</Link>
+                <a
+                    onClick={showAbout}
+                    className={activePage === "about"
+                        ? style.active
+                        : style.inactive}>
+                    About
+                </a>
             </nav>
         </header>
     )

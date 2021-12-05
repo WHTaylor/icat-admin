@@ -2,6 +2,7 @@ import { h } from 'preact';
 import { useLayoutEffect, useEffect, useState } from "preact/hooks";
 
 import IcatClient from '../icat.js';
+import About from './about';
 import Header from './header';
 import EntityViewer from './entity-viewer';
 import ServerConnector from './server-connector';
@@ -10,6 +11,7 @@ import {getLastLogin, saveLogin, invalidateLogin} from '../servercache.js';
 const App = () => {
     const [connections, setConnections] = useState([]);
     const [activeServer, setActiveServer] = useState(null);
+    const [showAbout, setShowAbout] = useState(false);
 
     const createConnection = (server, sessionId) => {
         const numConnections = connections.length;
@@ -53,17 +55,18 @@ const App = () => {
         <div id="app">
             <Header
                 servers={connections.map(c => c.server)}
-                activeServer={activeServer}
-                setActiveServer={setActiveServer}
-                showLoginForm={() => setActiveServer(null)} />
+                activePage={showAbout ? "about" : activeServer}
+                setActiveServer={i => {setShowAbout(false); setActiveServer(i)}}
+                showAbout={() => setShowAbout(true)}
+                showLoginForm={() => {setShowAbout(false); setActiveServer(null)}} />
             {connections.map((c, i) =>
                 <EntityViewer
-                    path="/"
                     icatClient={new IcatClient(c.server, c.sessionId)}
-                    visible={i === activeServer} />)}
-            {activeServer === null &&
+                    visible={!showAbout && i === activeServer} />)}
+            {showAbout
+                ? <About />
+                : activeServer === null &&
                 <ServerConnector
-                    path="/"
                     createConnection={createConnection} />}
         </div>
     );

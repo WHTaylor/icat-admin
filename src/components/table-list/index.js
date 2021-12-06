@@ -5,6 +5,7 @@ import {entityNames} from '../../icat.js';
 import {tableFilter} from '../../utils.js';
 
 function getTable(t) {
+    if (!t) return null;
     const present = entityNames
         .map(e => [e, e.toLowerCase().indexOf(t.toLowerCase())])
         .filter(p => p[1] >= 0)
@@ -50,8 +51,32 @@ const TableList = ({openTab}) => {
                     </button>
                 </li>)}
         </ul>
+        <TypingPreview current={typed} match={getTable(typed)}/>
         </>
     );
+}
+
+const TypingPreview = ({current, match}) => {
+    const el = useRef(null);
+    useEffect(() => {
+        el.current.classList.add(style.active);
+        const n = setTimeout(() => el.current.classList.remove(style.active), 900);
+        return () => clearTimeout(n);
+    });
+
+    const matchLocation = match === null
+        ? null
+        : match.toLowerCase().indexOf(current.toLowerCase());
+    const prefix = match === null ? "" : match.slice(0, matchLocation);
+    const suffix = match === null ? "" : match.slice(matchLocation + current.length);
+    const typedStyle = match === null ? style.notMatched : style.matched;
+    return <div ref={el} class={`${style.typingPreview} ${style.active}`}>
+        <span>
+            <span class={style.suggestion}>{prefix}</span>
+            <span class={typedStyle}>{current}</span>
+            <span class={style.suggestion}>{suffix}</span>
+        </span>
+    </div>;
 }
 
 export default TableList

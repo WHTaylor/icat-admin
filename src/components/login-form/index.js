@@ -5,7 +5,7 @@ function server(isDev) {
     return res;
 }
 
-const Login = ({doLogin, errMsg}) => {
+const LoginForm = ({doLogin, errMsg}) => {
     const submit = ev => {
         ev.preventDefault();
         doLogin(
@@ -28,15 +28,15 @@ const Login = ({doLogin, errMsg}) => {
                 <input type="radio" name="server" id="devRadio" />
             </div>
             <div>
-                <label for="plugin">Auth plugin:</label>
+                <label for="pluginInput">Auth plugin:</label>
                 <input type="text" name="plugin" id="pluginInput" defaultValue="anon"/>
             </div>
             <div>
-                <label for="username">Username:</label>
+                <label for="usernameInput">Username:</label>
                 <input type="text" name="username" id="usernameInput" />
             </div>
             <div>
-                <label for="password">Password:</label>
+                <label for="passwordInput">Password:</label>
                 <input type="password" name="password" id="passwordInput" />
             </div>
             <input type="submit" value="Login" />
@@ -45,4 +45,4 @@ const Login = ({doLogin, errMsg}) => {
         </form>);
 }
 
-export default Login;
+export default LoginForm;

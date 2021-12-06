@@ -5,7 +5,7 @@ import EntityTable from '../../components/entity-table/container';
 import TableList from '../../components/table-list';
 import TabWindow from '../../components/tab-window';
 
-const EntityViewer = ({icatClient}) => {
+const EntityViewer = ({icatClient, visible}) => {
     const [tabFilters, setTabFilters] = useState([]);
     const [activeTab, setActiveTab] = useState(null);
 
@@ -70,27 +70,27 @@ const EntityViewer = ({icatClient}) => {
     }, [icatClient]);
 
     return (
-        <>
-        <div class={`leftColumn`}>
-            <TableList openTab={openTab}/>
+        <div class={visible ? "page" : "hidden"}>
+            <div class="leftColumn">
+                <TableList openTab={openTab}/>
+            </div>
+            <TabWindow
+                activeTab={activeTab}
+                closeTab={closeTab}
+                handleChangeTab={setActiveTab}>
+                {tabFilters.map((f, i) =>
+                    [f.table,
+                        <EntityTable
+                            icatClient={icatClient}
+                            filter={f}
+                            handleFilterChange={f => handleFilterChange(i, f)}
+                            openRelated={(e, id, isOneToMany, fromType) =>
+                                openRelated(e, f.table, id, isOneToMany, fromType)}
+                            changeSortField={k => changeSortField(i, k)}
+                            isOpen={i === activeTab}
+                            key={f.key} />])}
+            </TabWindow>
         </div>
-        <TabWindow
-            activeTab={activeTab}
-            closeTab={closeTab}
-            handleChangeTab={setActiveTab}>
-            {tabFilters.map((f, i) =>
-                [f.table,
-                    <EntityTable
-                        icatClient={icatClient}
-                        filter={f}
-                        handleFilterChange={f => handleFilterChange(i, f)}
-                        openRelated={(e, id, isOneToMany, fromType) =>
-                            openRelated(e, f.table, id, isOneToMany, fromType)}
-                        changeSortField={k => changeSortField(i, k)}
-                        isOpen={i === activeTab}
-                        key={f.key} />])}
-        </TabWindow>
-        </>
     );
 }
 

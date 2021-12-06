@@ -1,40 +1,58 @@
 import style from './style.css';
-import { Link } from 'preact-router/match';
+import { useEffect, useState } from "preact/hooks";
+
+import IcatClient from '../../icat.js';
 
 function stripProtocol(s) {
     return s.split("://").slice(-1);
 }
 
-const Header = ({server, userName, doLogout}) => {
-    const loggedIn = server !== null;
-    const serverInfo = server === null ? "" : stripProtocol(server);
-    const userInfo = userName === null || userName === undefined
-        ? ""
-        : userName.startsWith("anon")
-            ? "anon"
-            : userName;
-    const loginInfo = server === null
-        ? null
-        : userInfo === null
-            ? ` - ${serverInfo}`
-            : ` - ${userInfo}@${serverInfo}`;
-
+const Header = ({
+    servers, activePage,
+    setActiveServer, showLoginForm, showAbout}) =>
+{
 	return (
         <header class={style.header}>
-            <h1>ICAT admin{loginInfo !== null && `${loginInfo}`}</h1>
+            <h1>ICAT admin</h1>
             <nav>
-                {loggedIn
-                    ? <Link activeClassName={style.active} href="/">Home</Link>
-                    : <Link activeClassName={style.active} href="/login">Login</Link>}
-                <Link activeClassName={style.active} href="/about">About</Link>
-                {loggedIn &&
-                    <Link
-                        activeClassName={style.active}
-                        href="/login"
-                        onClick={doLogout}>Logout</Link> }
+                {servers.map((s, i) =>
+                    <ServerLink
+                        s={s}
+                        handleClick={() => setActiveServer(i)}
+                        isActive={activePage === i} />)}
+
+                {(servers.length > 0 || activePage == "about") &&
+                    <a
+                        onClick={showLoginForm}
+                        class={activePage === null && style.active}>+</a>}
+
+                <a
+                    onClick={showAbout}
+                    id={style.aboutLink}
+                    class={activePage === "about" && style.active}>
+                    About
+                </a>
             </nav>
         </header>
     )
 };
+
+const ServerLink = ({s, isActive, handleClick}) => {
+    const [userName, setUserName] = useState(null);
+    useEffect(() => {
+        const ps = new IcatClient(s.server, s.sessionId).getUserName()
+            .then(res => setUserName(res.userName))
+            .catch(console.error);
+    }, [s]);
+
+    const prefix = userName === null
+        ? ""
+        : userName.startsWith("anon") // will be anon/anon, which is unneccessary
+            ? "anon@"
+            : `${userName}@`;
+    return <a onClick={handleClick} class={isActive && style.active}>
+            {`${prefix}${stripProtocol(s.server)}`}
+        </a>;
+}
 
 export default Header;

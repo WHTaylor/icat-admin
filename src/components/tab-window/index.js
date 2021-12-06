@@ -22,7 +22,7 @@ const TabWindow = props => {
                     </button>)}
             </div>
             {props.children.map(([name, c], i) =>
-                <div class={i === props.activeTab ? null : style.hidden}>{c}</div>)}
+                <div class={i === props.activeTab ? "" : "hidden"}>{c}</div>)}
         </div>
     );
 }

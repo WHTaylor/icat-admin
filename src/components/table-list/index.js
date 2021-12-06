@@ -71,11 +71,9 @@ const TypingPreview = ({current, match}) => {
     const suffix = match === null ? "" : match.slice(matchLocation + current.length);
     const typedStyle = match === null ? style.notMatched : style.matched;
     return <div ref={el} class={`${style.typingPreview} ${style.active}`}>
-        <span>
-            <span class={style.suggestion}>{prefix}</span>
-            <span class={typedStyle}>{current}</span>
-            <span class={style.suggestion}>{suffix}</span>
-        </span>
+        <span class={style.suggestion}>{prefix}</span>
+        <span class={typedStyle}>{current}</span>
+        <span class={style.suggestion}>{suffix}</span>
     </div>;
 }
 

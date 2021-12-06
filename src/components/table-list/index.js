@@ -23,6 +23,8 @@ const TableList = ({openTab}) => {
                 setTyped("");
             } else if (ev.keyCode >= 65 && ev.keyCode <= 90) {
                 setTyped(typed + ev.key);
+            } else if(ev.key === "Backspace") {
+                setTyped(typed.slice(0, typed.length - 1));
             } else if (ev.key == "Enter" && typed !== "") {
                 const toOpen = getTable(typed);
                 if (toOpen !== null) {

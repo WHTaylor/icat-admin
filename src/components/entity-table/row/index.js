@@ -103,7 +103,7 @@ const EntityRow = ({
                             value={curEntityValue(k)}
                             onChange={ev => makeEdit(editingField, ev.target.value)} />
                       </td>
-                    : <td onClick={() => startEditing(k)}>
+                    : <td onClick={() => k != "id" && startEditing(k)}>
                         <ReadMore
                             text={curEntityValue(k)}
                             maxUnsummarizedLength="70" />

@@ -8,8 +8,12 @@ import {defaultHeaderSort} from '../../../utils.js';
 const EntityTableView = ({data, tableName, openRelated, changeSortField, saveModifiedEntity}) => {
     const [contextMenuPos, setContextMenuPos] =  useState(null);
     const [contextMenuItems, setContextMenuItems] =  useState(null);
+    // Locally saved changes to entities
     const [entityModifications, setEntityModifications] = useState({});
+    // [Entity id, field key] being edited. [null, null] for nothing
     const [fieldBeingEdited, setFieldBeingEdited] = useState([null, null]);
+    // Field to show for each related entity in table
+    const [relatedDisplayFields, setRelatedDisplayFields] = useState({});
 
     const clearContextMenu = () => {
         setContextMenuPos(null);
@@ -47,14 +51,34 @@ const EntityTableView = ({data, tableName, openRelated, changeSortField, saveMod
             .filter(k => !Array.isArray(d[k])));
     const keys = defaultHeaderSort(
         [...new Set(dataAttributes.reduce((dk1, dk2) => dk1.concat(dk2)))]);
+
+    const showRelatedFieldDisplayOptions = k => {
+        const v = data[0][k];
+        return typeof v === "object" && !Array.isArray(v)
+    };
+
+    const relatedFieldDisplaySelect = k => {
+        const setDisplayField = v =>
+            setRelatedDisplayFields({...relatedDisplayFields, [k]: v});
+        const v = data[0][k];
+        return (<select onChange={ev => setDisplayField(ev.target.value)}>
+            {Object.keys(v)
+                    .filter(vk => typeof v[vk] !== "object")
+                    .map(vk =>
+                <option value={vk}>{vk}</option>)}
+        </select>);
+    };
+
     return (
         <>
         <table>
             <tr>
                 <th></th>{ /* Empty row for action buttons (save/revert changes)*/ }
                 {keys.map(k =>
-                    <th onClick={() => changeSortField(k)} class={style.tableHeader}>
-                        {k}
+                    <th class={style.tableHeader}>
+                        <p onClick={() => changeSortField(k)}>{k}</p>
+                        {showRelatedFieldDisplayOptions(k) &&
+                                relatedFieldDisplaySelect(k)}
                     </th>)}
             </tr>
             {data.map(e =>
@@ -67,6 +91,7 @@ const EntityTableView = ({data, tableName, openRelated, changeSortField, saveMod
                     editingField={fieldBeingEdited[0] === e.id
                         ? fieldBeingEdited[1]
                         : null}
+                    relatedEntityDisplayField={relatedDisplayFields}
                     showRelatedEntities={openRelated}
                     openContextMenu={openContextMenu}
                     startEditing={field => setFieldBeingEdited([e.id, field])}

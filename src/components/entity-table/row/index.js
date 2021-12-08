@@ -2,6 +2,7 @@ import {useEffect, useState, useRef} from "preact/hooks";
 import style from './style.css';
 
 import {icatAttributeToTableName, joinAttributeToTableName, isDatetime} from '../../../utils.js';
+import ReadMore from '../../generic/read-more';
 
 function formatCellContent(cellContent) {
     if (cellContent === undefined || cellContent === null) return "";
@@ -16,7 +17,7 @@ function formatCellContent(cellContent) {
 }
 
 const EntityRow = ({
-    tableName, entity, modifications, headers, editingField,
+    tableName, entity, modifications, headers, editingField, relatedEntityDisplayField,
     showRelatedEntities, openContextMenu,
     startEditing, stopEditing, makeEdit, saveModifiedEntity, revertChanges}) =>
 {
@@ -78,13 +79,21 @@ const EntityRow = ({
             <button title="Save changes" onClick={saveChanges}>💾</button>
         </>;
     const savingActions = "🙃";
-        // check ✔️
+    // check ✔️
     const curEntityValue = field => {
-        const v = modifications === undefined || modifications[field] === undefined
-            ? entity[field]
-            : modifications[field];
-        return formatCellContent(v);
+        const source = modifications === undefined || modifications[field] === undefined
+            ? entity
+            : modifications;
+
+        // If the display field has been defined for the given field, it must be a
+        // related entity.
+        // If so, reach through to the entity and get _that_ value to display
+        // If not given, defaults to id (in formatCellContent)
+        return relatedEntityDisplayField[field] === undefined
+            ? formatCellContent(source[field])
+            : source[field][relatedEntityDisplayField[field]];
     }
+
     return (
         <tr onContextMenu={doOpenContextMenu} class={style.entityRow}>
             <td>
@@ -102,27 +111,13 @@ const EntityRow = ({
                             value={curEntityValue(k)}
                             onChange={ev => makeEdit(editingField, ev.target.value)} />
                       </td>
-                    : <td onClick={() => startEditing(k)}>
-                        <ReadMore text={curEntityValue(k)} />
+                    : <td onClick={() => k != "id" && startEditing(k)}>
+                        <ReadMore
+                            text={curEntityValue(k)}
+                            maxUnsummarizedLength="70" />
                       </td>
             )}
         </tr>
-    );
-}
-
-const MAX_UNSUMMARISED_TEXT = 70;
-const ReadMore = ({text}) => {
-    const [open, setOpen] = useState(false);
-
-    if (text.length - 3 < MAX_UNSUMMARISED_TEXT) return text;
-    const shownText = open ? text : text.slice(0, MAX_UNSUMMARISED_TEXT - 3);
-    return (
-        <>
-        {shownText}{!open && "..."}
-        <button onClick={() => setOpen(!open)} class={style.readMoreBtn}>
-            {open ? "less" : "show more"}
-        </button>
-        </>
     );
 }
 

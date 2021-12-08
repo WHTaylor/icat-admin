@@ -5,6 +5,9 @@ table {
 .tableHeader {
     text-align: left;
     padding: 0.1em 0.25em;
+}
+
+.tableHeader p {
     user-select: none;
     cursor: pointer;
 }

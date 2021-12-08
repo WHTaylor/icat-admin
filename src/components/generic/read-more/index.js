@@ -8,10 +8,11 @@ const ReadMore = ({text, maxUnsummarizedLength}) => {
 
     if (text.length - 3 < maxUnsummarizedLength) return text;
     const shownText = open ? text : text.slice(0, maxUnsummarizedLength - 3);
+
     return (
         <>
         {shownText}{!open && "..."}
-        <button onClick={() => setOpen(!open)} class={style.readMoreBtn}>
+        <button onClick={ev => {ev.stopPropagation(); setOpen(!open)}} class={style.readMoreBtn}>
             {open ? "less" : "show more"}
         </button>
         </>

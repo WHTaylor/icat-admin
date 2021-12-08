@@ -1,6 +1,6 @@
 # icat-admin
 
-A web application for convenient browsing and editing of ICAT data. See it in action [here](https://vigorous-lamarr-7b3487.netlify.app/login). Designed as an alternative to [ICAT Manager](https://github.com/icatproject/manager.icat-manager).
+A web application for convenient browsing and editing of ICAT data. See it in action [here](https://vigorous-lamarr-7b3487.netlify.app). Designed as an alternative to [ICAT Manager](https://github.com/icatproject/manager.icat-manager).
 
 Still a WIP, but closing in on feature parity with ICAT Manager. Incoming things:
 

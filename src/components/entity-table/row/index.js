@@ -17,7 +17,7 @@ function formatCellContent(cellContent) {
 }
 
 const EntityRow = ({
-    tableName, entity, modifications, headers, editingField,
+    tableName, entity, modifications, headers, editingField, relatedEntityDisplayField,
     showRelatedEntities, openContextMenu,
     startEditing, stopEditing, makeEdit, saveModifiedEntity, revertChanges}) =>
 {
@@ -79,13 +79,21 @@ const EntityRow = ({
             <button title="Save changes" onClick={saveChanges}>💾</button>
         </>;
     const savingActions = "🙃";
-        // check ✔️
+    // check ✔️
     const curEntityValue = field => {
-        const v = modifications === undefined || modifications[field] === undefined
-            ? entity[field]
-            : modifications[field];
-        return formatCellContent(v);
+        const source = modifications === undefined || modifications[field] === undefined
+            ? entity
+            : modifications;
+
+        // If the display field has been defined for the given field, it must be a
+        // related entity.
+        // If so, reach through to the entity and get _that_ value to display
+        // If not given, defaults to id (in formatCellContent)
+        return relatedEntityDisplayField[field] === undefined
+            ? formatCellContent(source[field])
+            : source[field][relatedEntityDisplayField[field]];
     }
+
     return (
         <tr onContextMenu={doOpenContextMenu} class={style.entityRow}>
             <td>

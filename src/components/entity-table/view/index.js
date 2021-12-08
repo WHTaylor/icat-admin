@@ -53,8 +53,8 @@ const EntityTableView = ({data, tableName, openRelated, changeSortField, saveMod
             <tr>
                 <th></th>{ /* Empty row for action buttons (save/revert changes)*/ }
                 {keys.map(k =>
-                    <th onClick={() => changeSortField(k)} class={style.tableHeader}>
-                        {k}
+                    <th class={style.tableHeader}>
+                        <p onClick={() => changeSortField(k)}>{k}</p>
                     </th>)}
             </tr>
             {data.map(e =>

@@ -24,6 +24,22 @@ const EntityViewer = ({icatClient, visible}) => {
         setTimeout(() => window.scrollTo({top: 0, left: 0, behavior: "smooth"}), 1);
     };
 
+    const swapTabs = (a, b) => {
+        if (a === b) return;
+        else if (a < b) {
+            const left = tabFilters.slice(0, a)
+            const middle = tabFilters.slice(a + 1, b + 1);
+            const right = tabFilters.slice(b + 1);
+            setTabFilters([...left, ...middle, tabFilters[a], ...right]);
+        } else {
+            const rearranged = [...tabFilters];
+            const temp = rearranged[a];
+            rearranged[a] = rearranged[b];
+            rearranged[b] = temp;
+            setTabFilters(rearranged);
+        };
+    };
+
     /* related    - the table to open
      * origin     - the table we're coming from
      * relationId - the id used in the where filter of the new table
@@ -77,7 +93,8 @@ const EntityViewer = ({icatClient, visible}) => {
             <TabWindow
                 activeTab={activeTab}
                 closeTab={closeTab}
-                handleChangeTab={setActiveTab}>
+                handleChangeTab={setActiveTab}
+                swapTabs={swapTabs}>
                 {tabFilters.map((f, i) =>
                     [f.table,
                         <EntityTable

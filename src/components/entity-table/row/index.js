@@ -2,6 +2,7 @@ import {useEffect, useState, useRef} from "preact/hooks";
 import style from './style.css';
 
 import {icatAttributeToTableName, joinAttributeToTableName, isDatetime} from '../../../utils.js';
+import ReadMore from '../../generic/read-more';
 
 function formatCellContent(cellContent) {
     if (cellContent === undefined || cellContent === null) return "";
@@ -103,26 +104,12 @@ const EntityRow = ({
                             onChange={ev => makeEdit(editingField, ev.target.value)} />
                       </td>
                     : <td onClick={() => startEditing(k)}>
-                        <ReadMore text={curEntityValue(k)} />
+                        <ReadMore
+                            text={curEntityValue(k)}
+                            maxUnsummarizedLength="70" />
                       </td>
             )}
         </tr>
-    );
-}
-
-const MAX_UNSUMMARISED_TEXT = 70;
-const ReadMore = ({text}) => {
-    const [open, setOpen] = useState(false);
-
-    if (text.length - 3 < MAX_UNSUMMARISED_TEXT) return text;
-    const shownText = open ? text : text.slice(0, MAX_UNSUMMARISED_TEXT - 3);
-    return (
-        <>
-        {shownText}{!open && "..."}
-        <button onClick={() => setOpen(!open)} class={style.readMoreBtn}>
-            {open ? "less" : "show more"}
-        </button>
-        </>
     );
 }
 

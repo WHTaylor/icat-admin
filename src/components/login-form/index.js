@@ -5,7 +5,7 @@ function server(isDev) {
     return res;
 }
 
-const LoginForm = ({doLogin, errMsg}) => {
+const LoginForm = ({doLogin, errMsg, isLoggingIn}) => {
     const submit = ev => {
         ev.preventDefault();
         doLogin(
@@ -42,6 +42,7 @@ const LoginForm = ({doLogin, errMsg}) => {
             <input type="submit" value="Login" />
             {errMsg !== null &&
                 <p>Error logging in: {errMsg}</p>}
+            {isLoggingIn && <p>Logging in...</p>}
         </form>);
 }
 

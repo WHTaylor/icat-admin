@@ -19,7 +19,7 @@ function formatCellContent(cellContent) {
 const EntityRow = ({
     tableName, entity, modifications, headers, editingField, relatedEntityDisplayField,
     showRelatedEntities, openContextMenu,
-    startEditing, stopEditing, makeEdit, saveModifiedEntity, revertChanges}) =>
+    startEditing, stopEditing, makeEdit, saveEntityModifications, revertChanges, syncModifications}) =>
 {
     const inputEl = useRef(null);
     const [isSaving, setIsSaving] = useState(false);
@@ -67,19 +67,20 @@ const EntityRow = ({
 
     const saveChanges = () => {
         setIsSaving(true);
-        saveModifiedEntity({...modifications})
-            .then(() => setSaveSuccess(true))
+        saveEntityModifications({...modifications})
+            .then(() => {setSaveSuccess(true); syncModifications()})
             .catch(() => setSaveSuccess(false))
             .finally(() => setIsSaving(false));
     };
 
+    // Clear save success after some time
+    useEffect(() => {
+        if (saveSuccess === null) return;
+        const id = setTimeout(() => setSaveSuccess(null), 2000);
+        return () => clearTimeout(id);
+    }, [saveSuccess]);
+
     // If the entity has been modified, show save and revert buttons
-    const editedActions = <>
-            <button title="Revert changes" onClick={revertChanges}>↩️</button>
-            <button title="Save changes" onClick={saveChanges}>💾</button>
-        </>;
-    const savingActions = "🙃";
-    // check ✔️
     const curEntityValue = field => {
         const source = modifications === undefined || modifications[field] === undefined
             ? entity
@@ -94,14 +95,28 @@ const EntityRow = ({
             : source[field][relatedEntityDisplayField[field]];
     }
 
+    const actions = saveSuccess !== null
+        // We just saved, show whether it was successful
+        ? saveSuccess
+            ? "✔️"
+            : "❌"
+        : isSaving
+            // Currently saving, may succeed or fail
+            ? "..."
+            // Haven't just saved
+            : modifications === undefined
+                // No changes made locally
+                ?  ""
+                // Changes made locally, give action options
+                : (<>
+                    <button title="Revert changes" onClick={revertChanges}>↩️</button>
+                    <button title="Save changes" onClick={saveChanges}>💾</button>
+                </>);
+
     return (
         <tr onContextMenu={doOpenContextMenu} class={style.entityRow}>
             <td>
-                {modifications === undefined
-                    ? ""
-                    : isSaving
-                        ? savingActions
-                        : editedActions}
+                {actions}
             </td>
             {headers.map(k =>
                 k === editingField

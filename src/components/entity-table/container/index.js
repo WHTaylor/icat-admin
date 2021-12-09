@@ -61,6 +61,12 @@ const EntityTable = ({icatClient, filter, handleFilterChange, openRelated, isOpe
     };
     const pageNumber = Math.floor(filter.offset / filter.limit) + 1;
 
+    const changeData = (i, changes) => {
+        const changed = [...data];
+        changed[i] = {...changed[i], ...changes};
+        setData(changed);
+    };
+
     return (
         <>
         <span class={style.tableTitleBar}>
@@ -88,8 +94,9 @@ const EntityTable = ({icatClient, filter, handleFilterChange, openRelated, isOpe
                     tableName={filter.table}
                     openRelated={openRelated}
                     changeSortField={changeSortField}
-                    saveModifiedEntity={e =>
+                    saveEntityModifications={e =>
                         icatClient.writeEntity(filter.table, e)}
+                    modifyDataRow={changeData}
                 />}
         </>
     );

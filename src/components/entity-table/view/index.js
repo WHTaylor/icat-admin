@@ -5,7 +5,10 @@ import EntityRow from '../row';
 import ContextMenu from '../../context-menu';
 import {defaultHeaderSort} from '../../../utils.js';
 
-const EntityTableView = ({data, tableName, openRelated, changeSortField, saveModifiedEntity}) => {
+const EntityTableView = ({
+    data, tableName,
+    openRelated, changeSortField, saveEntityModifications, modifyDataRow}) =>
+{
     const [contextMenuPos, setContextMenuPos] =  useState(null);
     const [contextMenuItems, setContextMenuItems] =  useState(null);
     // Locally saved changes to entities
@@ -81,7 +84,7 @@ const EntityTableView = ({data, tableName, openRelated, changeSortField, saveMod
                                 relatedFieldDisplaySelect(k)}
                     </th>)}
             </tr>
-            {data.map(e =>
+            {data.map((e, i) =>
                 <EntityRow
                     key={e.id}
                     tableName={tableName}
@@ -97,8 +100,12 @@ const EntityTableView = ({data, tableName, openRelated, changeSortField, saveMod
                     startEditing={field => setFieldBeingEdited([e.id, field])}
                     stopEditing={() => setFieldBeingEdited([null, null])}
                     makeEdit={(k, v) => editEntity(e.id, k, v)}
-                    saveModifiedEntity={saveModifiedEntity}
+                    saveEntityModifications={saveEntityModifications}
                     revertChanges={() => removeModifications(e.id)}
+                    syncModifications={() => {
+                        modifyDataRow(i, entityModifications[e.id])
+                        removeModifications(e.id);
+                    }}
                 />)}
         </table>
         {contextMenuPos !== null &&

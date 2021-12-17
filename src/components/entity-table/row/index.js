@@ -131,6 +131,7 @@ const EntityRow = ({
                         <input type="text"
                             ref={inputEl}
                             value={curEntityValue(k)}
+                            class={style.editInput}
                             // Stop propagation to avoid stop editing event bound to
                             // document.onClick
                             onClick={ev => ev.stopPropagation()}

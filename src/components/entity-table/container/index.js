@@ -88,16 +88,15 @@ const EntityTable = ({icatClient, filter, handleFilterChange, openRelated, isOpe
                 <p class={style.tableTitleCount}>{count} matches</p>}
         </span>
         {errMsg ? <p>{errMsg}</p>
-            : data === null ? <p>Loading...</p>
-                : <EntityTableView
-                    data={data}
-                    tableName={filter.table}
-                    openRelated={openRelated}
-                    changeSortField={changeSortField}
-                    saveEntityModifications={e =>
-                        icatClient.writeEntity(filter.table, e)}
-                    modifyDataRow={changeData}
-                />}
+            : <EntityTableView
+                data={data}
+                tableName={filter.table}
+                openRelated={openRelated}
+                changeSortField={changeSortField}
+                saveEntityModifications={e =>
+                    icatClient.writeEntity(filter.table, e)}
+                modifyDataRow={changeData}
+            />}
         </>
     );
 }

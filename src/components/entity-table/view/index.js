@@ -34,6 +34,7 @@ const EntityTableView = ({
     });
 
     // Note: early returns need to be after all hooks
+    if (data === null) return <p>Loading...</p>;
     if (data.length === 0) return <p>No entries</p>;
 
     const editEntity = (id, field, value) => {
@@ -68,7 +69,9 @@ const EntityTableView = ({
             {Object.keys(v)
                     .filter(vk => typeof v[vk] !== "object")
                     .map(vk =>
-                <option value={vk}>{vk}</option>)}
+                <option
+                    value={vk}
+                    selected={relatedDisplayFields[k] === vk}>{vk}</option>)}
         </select>);
     };
 

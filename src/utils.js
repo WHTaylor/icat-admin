@@ -57,6 +57,7 @@ export function defaultHeaderSort(headers) {
     const middle = headers.filter(h => h !== "id" && !sortToEnd.includes(h)).sort();
     return start.concat(middle).concat(end);
 }
+export const commonFields = ["id", ...sortToEnd];
 
 export function randomSuffix() {
     const a = Math.random().toString(36).slice(2);

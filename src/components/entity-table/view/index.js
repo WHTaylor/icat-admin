@@ -5,13 +5,17 @@ import EntityRow from '../row';
 import ContextMenu from '../../context-menu';
 import {defaultHeaderSort} from '../../../utils.js';
 
-const EntityTableView = ({data, tableName, openRelated, changeSortField, saveModifiedEntity}) => {
+const EntityTableView = ({
+    data, tableName,
+    openRelated, changeSortField, saveEntityModifications, modifyDataRow}) =>
+{
     const [contextMenuPos, setContextMenuPos] =  useState(null);
     const [contextMenuItems, setContextMenuItems] =  useState(null);
     // Locally saved changes to entities
     const [entityModifications, setEntityModifications] = useState({});
     // [Entity id, field key] being edited. [null, null] for nothing
     const [fieldBeingEdited, setFieldBeingEdited] = useState([null, null]);
+    const stopEditing = () => setFieldBeingEdited([null, null]);
     // Field to show for each related entity in table
     const [relatedDisplayFields, setRelatedDisplayFields] = useState({});
 
@@ -23,14 +27,20 @@ const EntityTableView = ({data, tableName, openRelated, changeSortField, saveMod
     const openContextMenu = (x, y, callbacks) => {
         setContextMenuPos([x, y]);
         setContextMenuItems(callbacks);
+        stopEditing();
     };
 
     useEffect(() => {
-        document.addEventListener("click", clearContextMenu);
-        return () => document.removeEventListener("click", clearContextMenu);
+        const cancelInteractions = () => {
+            clearContextMenu();
+            stopEditing();
+        };
+        document.addEventListener("click", cancelInteractions);
+        return () => document.removeEventListener("click", cancelInteractions);
     });
 
     // Note: early returns need to be after all hooks
+    if (data === null) return <p>Loading...</p>;
     if (data.length === 0) return <p>No entries</p>;
 
     const editEntity = (id, field, value) => {
@@ -40,7 +50,7 @@ const EntityTableView = ({data, tableName, openRelated, changeSortField, saveMod
         const edited = {...cur, [field]: value};
         const newModified = {...entityModifications, [id]: edited};
         setEntityModifications(newModified);
-        setFieldBeingEdited([null, null]);
+        stopEditing();
     };
 
     const removeModifications = id =>
@@ -65,7 +75,9 @@ const EntityTableView = ({data, tableName, openRelated, changeSortField, saveMod
             {Object.keys(v)
                     .filter(vk => typeof v[vk] !== "object")
                     .map(vk =>
-                <option value={vk}>{vk}</option>)}
+                <option
+                    value={vk}
+                    selected={relatedDisplayFields[k] === vk}>{vk}</option>)}
         </select>);
     };
 
@@ -81,7 +93,7 @@ const EntityTableView = ({data, tableName, openRelated, changeSortField, saveMod
                                 relatedFieldDisplaySelect(k)}
                     </th>)}
             </tr>
-            {data.map(e =>
+            {data.map((e, i) =>
                 <EntityRow
                     key={e.id}
                     tableName={tableName}
@@ -91,14 +103,21 @@ const EntityTableView = ({data, tableName, openRelated, changeSortField, saveMod
                     editingField={fieldBeingEdited[0] === e.id
                         ? fieldBeingEdited[1]
                         : null}
-                    relatedEntityDisplayField={relatedDisplayFields}
+                    relatedEntityDisplayFields={relatedDisplayFields}
                     showRelatedEntities={openRelated}
                     openContextMenu={openContextMenu}
-                    startEditing={field => setFieldBeingEdited([e.id, field])}
-                    stopEditing={() => setFieldBeingEdited([null, null])}
+                    startEditing={field => {
+                        clearContextMenu();
+                        setFieldBeingEdited([e.id, field]);
+                    }}
+                    stopEditing={stopEditing}
                     makeEdit={(k, v) => editEntity(e.id, k, v)}
-                    saveModifiedEntity={saveModifiedEntity}
+                    saveEntityModifications={saveEntityModifications}
                     revertChanges={() => removeModifications(e.id)}
+                    syncModifications={() => {
+                        modifyDataRow(i, entityModifications[e.id])
+                        removeModifications(e.id);
+                    }}
                 />)}
         </table>
         {contextMenuPos !== null &&

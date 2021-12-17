@@ -5,3 +5,7 @@
 .entityRow:nth-child(odd) {
     background-color: #fafafa;
 }
+
+.editInput {
+    width: 95%;
+}

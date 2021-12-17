@@ -61,6 +61,12 @@ const EntityTable = ({icatClient, filter, handleFilterChange, openRelated, isOpe
     };
     const pageNumber = Math.floor(filter.offset / filter.limit) + 1;
 
+    const changeData = (i, changes) => {
+        const changed = [...data];
+        changed[i] = {...changed[i], ...changes};
+        setData(changed);
+    };
+
     return (
         <>
         <span class={style.tableTitleBar}>
@@ -82,15 +88,15 @@ const EntityTable = ({icatClient, filter, handleFilterChange, openRelated, isOpe
                 <p class={style.tableTitleCount}>{count} matches</p>}
         </span>
         {errMsg ? <p>{errMsg}</p>
-            : data === null ? <p>Loading...</p>
-                : <EntityTableView
-                    data={data}
-                    tableName={filter.table}
-                    openRelated={openRelated}
-                    changeSortField={changeSortField}
-                    saveModifiedEntity={e =>
-                        icatClient.writeEntity(filter.table, e)}
-                />}
+            : <EntityTableView
+                data={data}
+                tableName={filter.table}
+                openRelated={openRelated}
+                changeSortField={changeSortField}
+                saveEntityModifications={e =>
+                    icatClient.writeEntity(filter.table, e)}
+                modifyDataRow={changeData}
+            />}
         </>
     );
 }

@@ -9,23 +9,28 @@ function stripProtocol(s) {
 
 const Header = ({
     servers, activePage,
-    setActiveServer, showLoginForm, showAbout}) =>
+    setActiveServer, closeServer, showLoginForm, showAbout}) =>
 {
-	return (
+    const onClickServerLink = (ev, i) => {
+        // Middle click to close, left click to activate
+        if (ev.buttons !== 4 && ev.buttons !== 1) return
+        ev.preventDefault();
+        if (ev.buttons === 4) closeServer(i)
+        else setActiveServer(i);
+    };
+
+    return (
         <header class={style.header}>
             <h1>ICAT admin</h1>
             <nav>
                 {servers.map((s, i) =>
                     <ServerLink
                         s={s}
-                        handleClick={() => setActiveServer(i)}
+                        handleClick={ev => onClickServerLink(ev, i)}
                         isActive={activePage === i} />)}
-
-                {(servers.length > 0 || activePage == "about") &&
-                    <a
-                        onClick={showLoginForm}
-                        class={activePage === null && style.active}>+</a>}
-
+                <a
+                    onClick={showLoginForm}
+                    class={activePage === null && style.active}>+</a>
                 <a
                     onClick={showAbout}
                     id={style.aboutLink}
@@ -50,7 +55,7 @@ const ServerLink = ({s, isActive, handleClick}) => {
         : userName.startsWith("anon") // will be anon/anon, which is unneccessary
             ? "anon@"
             : `${userName}@`;
-    return <a onClick={handleClick} class={isActive && style.active}>
+    return <a onMouseDown={handleClick} class={isActive && style.active}>
             {`${prefix}${stripProtocol(s.server)}`}
         </a>;
 }

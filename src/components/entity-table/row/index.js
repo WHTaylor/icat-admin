@@ -17,7 +17,7 @@ function formatCellContent(cellContent) {
 }
 
 const EntityRow = ({
-    tableName, entity, modifications, headers, editingField, relatedEntityDisplayField,
+    tableName, entity, modifications, headers, editingField, relatedEntityDisplayFields,
     showRelatedEntities, openContextMenu,
     startEditing, stopEditing, makeEdit, saveEntityModifications, revertChanges, syncModifications}) =>
 {
@@ -90,9 +90,9 @@ const EntityRow = ({
         // related entity.
         // If so, reach through to the entity and get _that_ value to display
         // If not given, defaults to id (in formatCellContent)
-        return relatedEntityDisplayField[field] === undefined
+        return relatedEntityDisplayFields[field] === undefined
             ? formatCellContent(source[field])
-            : source[field][relatedEntityDisplayField[field]];
+            : source[field][relatedEntityDisplayFields[field]];
     }
 
     const actions = saveSuccess !== null

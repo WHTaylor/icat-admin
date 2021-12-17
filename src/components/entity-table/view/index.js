@@ -94,7 +94,7 @@ const EntityTableView = ({
                     editingField={fieldBeingEdited[0] === e.id
                         ? fieldBeingEdited[1]
                         : null}
-                    relatedEntityDisplayField={relatedDisplayFields}
+                    relatedEntityDisplayFields={relatedDisplayFields}
                     showRelatedEntities={openRelated}
                     openContextMenu={openContextMenu}
                     startEditing={field => setFieldBeingEdited([e.id, field])}

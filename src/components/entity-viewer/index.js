@@ -87,9 +87,14 @@ const EntityViewer = ({icatClient, visible}) => {
 
     return (
         <div class={visible ? "page" : "hidden"}>
-            <div class="leftColumn">
+            { /*
+                Only render the TableList if visible.
+                This is because TableList binds a keydown event we only want for
+                the active server.
+            */}
+            {visible && <div class="leftColumn">
                 <TableList openTab={openTab}/>
-            </div>
+            </div>}
             <TabWindow
                 activeTab={activeTab}
                 closeTab={closeTab}

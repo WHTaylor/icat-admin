@@ -61,6 +61,7 @@ const App = () => {
                 showLoginForm={() => {setShowAbout(false); setActiveServer(null)}} />
             {connections.map((c, i) =>
                 <EntityViewer
+                    key={c.sessionId}
                     icatClient={new IcatClient(c.server, c.sessionId)}
                     visible={!showAbout && i === activeServer} />)}
             {showAbout

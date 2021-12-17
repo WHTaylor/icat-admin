@@ -1,7 +1,7 @@
 import {useEffect, useState, useRef} from "preact/hooks";
 import style from './style.css';
 
-import {icatAttributeToTableName, joinAttributeToTableName, isDatetime} from '../../../utils.js';
+import {icatAttributeToTableName, joinAttributeToTableName, isDatetime, commonFields} from '../../../utils.js';
 import ReadMore from '../../generic/read-more';
 
 function formatCellContent(cellContent) {
@@ -126,7 +126,7 @@ const EntityRow = ({
                             value={curEntityValue(k)}
                             onChange={ev => makeEdit(editingField, ev.target.value)} />
                       </td>
-                    : <td onClick={() => k != "id" && startEditing(k)}>
+                    : <td onClick={() => !commonFields.includes(k) && startEditing(k)}>
                         <ReadMore
                             text={curEntityValue(k)}
                             maxUnsummarizedLength="70" />

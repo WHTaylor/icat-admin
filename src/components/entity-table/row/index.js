@@ -61,6 +61,7 @@ const EntityRow = ({
         const cancelOnEsc = ev => {
             if (ev.key === "Escape") stopEditing();
         };
+
         el.addEventListener("keydown", cancelOnEsc);
         return () => el.removeEventListener("keydown", cancelOnEsc);
     });
@@ -113,6 +114,12 @@ const EntityRow = ({
                     <button title="Save changes" onClick={saveChanges}>💾</button>
                 </>);
 
+    const handleFieldClick = (ev, k) => {
+        if (commonFields.includes(k)) return;
+        ev.stopPropagation();
+        startEditing(k);
+    };
+
     return (
         <tr onContextMenu={doOpenContextMenu} class={style.entityRow}>
             <td>
@@ -124,9 +131,12 @@ const EntityRow = ({
                         <input type="text"
                             ref={inputEl}
                             value={curEntityValue(k)}
+                            // Stop propagation to avoid stop editing event bound to
+                            // document.onClick
+                            onClick={ev => ev.stopPropagation()}
                             onChange={ev => makeEdit(editingField, ev.target.value)} />
                       </td>
-                    : <td onClick={() => !commonFields.includes(k) && startEditing(k)}>
+                    : <td onClick={ev => handleFieldClick(ev, k)}>
                         <ReadMore
                             text={curEntityValue(k)}
                             maxUnsummarizedLength="70" />

@@ -15,6 +15,7 @@ const EntityTableView = ({
     const [entityModifications, setEntityModifications] = useState({});
     // [Entity id, field key] being edited. [null, null] for nothing
     const [fieldBeingEdited, setFieldBeingEdited] = useState([null, null]);
+    const stopEditing = () => setFieldBeingEdited([null, null]);
     // Field to show for each related entity in table
     const [relatedDisplayFields, setRelatedDisplayFields] = useState({});
 
@@ -26,11 +27,16 @@ const EntityTableView = ({
     const openContextMenu = (x, y, callbacks) => {
         setContextMenuPos([x, y]);
         setContextMenuItems(callbacks);
+        stopEditing();
     };
 
     useEffect(() => {
-        document.addEventListener("click", clearContextMenu);
-        return () => document.removeEventListener("click", clearContextMenu);
+        const cancelInteractions = () => {
+            clearContextMenu();
+            stopEditing();
+        };
+        document.addEventListener("click", cancelInteractions);
+        return () => document.removeEventListener("click", cancelInteractions);
     });
 
     // Note: early returns need to be after all hooks
@@ -44,7 +50,7 @@ const EntityTableView = ({
         const edited = {...cur, [field]: value};
         const newModified = {...entityModifications, [id]: edited};
         setEntityModifications(newModified);
-        setFieldBeingEdited([null, null]);
+        stopEditing();
     };
 
     const removeModifications = id =>
@@ -100,8 +106,11 @@ const EntityTableView = ({
                     relatedEntityDisplayFields={relatedDisplayFields}
                     showRelatedEntities={openRelated}
                     openContextMenu={openContextMenu}
-                    startEditing={field => setFieldBeingEdited([e.id, field])}
-                    stopEditing={() => setFieldBeingEdited([null, null])}
+                    startEditing={field => {
+                        clearContextMenu();
+                        setFieldBeingEdited([e.id, field]);
+                    }}
+                    stopEditing={stopEditing}
                     makeEdit={(k, v) => editEntity(e.id, k, v)}
                     saveEntityModifications={saveEntityModifications}
                     revertChanges={() => removeModifications(e.id)}

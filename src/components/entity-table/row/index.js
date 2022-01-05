@@ -82,18 +82,20 @@ const EntityRow = ({
     }, [saveSuccess]);
 
     // If the entity has been modified, show save and revert buttons
-    const curEntityValue = field => {
+    const getFieldValue = field => {
         const source = modifications === undefined || modifications[field] === undefined
             ? entity
             : modifications;
 
-        // If the display field has been defined for the given field, it must be a
-        // related entity.
-        // If so, reach through to the entity and get _that_ value to display
-        // If not given, defaults to id (in formatCellContent)
         return relatedEntityDisplayFields[field] === undefined
             ? formatCellContent(source[field])
-            : source[field][relatedEntityDisplayFields[field]];
+            // If the display field has been defined for the given field, it's a
+            // related entity.
+            // If the entity doesn't have a related entity, stay blank
+            // Otherwise, reach through to the entity and get _that_ value to display
+            : source[field] === null || source[field] === undefined
+                ? ""
+                : source[field][relatedEntityDisplayFields[field]];
     }
 
     const actions = saveSuccess !== null
@@ -130,7 +132,7 @@ const EntityRow = ({
                     ? <td>
                         <input type="text"
                             ref={inputEl}
-                            value={curEntityValue(k)}
+                            value={getFieldValue(k)}
                             class={style.editInput}
                             // Stop propagation to avoid stop editing event bound to
                             // document.onClick
@@ -139,7 +141,7 @@ const EntityRow = ({
                       </td>
                     : <td onClick={ev => handleFieldClick(ev, k)}>
                         <ReadMore
-                            text={curEntityValue(k)}
+                            text={getFieldValue(k)}
                             maxUnsummarizedLength="70" />
                       </td>
             )}

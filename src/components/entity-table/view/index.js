@@ -70,7 +70,7 @@ const EntityTableView = ({
     const relatedFieldDisplaySelect = k => {
         const setDisplayField = v =>
             setRelatedDisplayFields({...relatedDisplayFields, [k]: v});
-        const v = data[0][k];
+        const v = data.find(e => e[k] !== undefined && e[k] !== null)[k];
         return (<select onChange={ev => setDisplayField(ev.target.value)}>
             {Object.keys(v)
                     .filter(vk => typeof v[vk] !== "object")

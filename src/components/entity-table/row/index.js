@@ -8,9 +8,9 @@ function formatCellContent(cellContent) {
     if (cellContent === undefined || cellContent === null) return "";
 
     return typeof cellContent !== "string"
-        ? (typeof cellContent === "object"
+        ? typeof cellContent === "object"
             ? cellContent.id.toString()
-            : cellContent.toString())
+            : cellContent.toString()
         : isDatetime(cellContent)
             ? new Date(cellContent).toLocaleString()
             : cellContent;

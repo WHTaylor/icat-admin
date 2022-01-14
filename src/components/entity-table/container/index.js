@@ -101,6 +101,7 @@ const EntityTable = ({icatClient, filter, handleFilterChange, openRelated, isOpe
                 removedDescending.forEach(i => newData.splice(i, 1))
                 setData(newData);
             })
+            .then(setCount(count - rowsToDelete.size))
             .then(setRowsToDelete(new Set()));
     };
 

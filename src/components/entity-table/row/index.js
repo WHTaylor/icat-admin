@@ -81,29 +81,44 @@ const EntityRow = ({
         return () => clearTimeout(id);
     }, [saveSuccess]);
 
-    // If the entity has been modified, show the modified values
-    const getFieldValue = field => {
+    const getCurrentValue = field => {
         const isModified = modifications !== undefined
                          && modifications[field] !== undefined;
         const source = isModified
             ? modifications
             : entity;
+        return source[field];
+    };
+
+    const getFieldValue = field => {
+        const value = getCurrentValue(field);
+        const isModified = modifications !== undefined
+                         && modifications[field] !== undefined;
 
         // Always show id for modified related entities
-        if (isModified && typeof(source[field]) === "object") {
-            return source[field].id
+        if (isModified && typeof(value) === "object") {
+            return value.id
         }
 
         return relatedEntityDisplayFields[field] === undefined
-            ? formatCellContent(source[field])
+            ? formatCellContent(value)
             // If the display field has been defined for the given field, it's a
             // related entity.
             // If the entity doesn't have a related entity, stay blank
             // Otherwise, reach through to the entity and get _that_ value to display
-            : source[field] === null || source[field] === undefined
+            : value === null || value === undefined
                 ? ""
-                : source[field][relatedEntityDisplayFields[field]];
-    }
+                : value[relatedEntityDisplayFields[field]];
+    };
+
+    // Start from the id when editing a related entity, otherwise the current value
+    const getInitialEditValue = field => {
+        const value = getCurrentValue(field);
+
+        return typeof(value) === "object"
+            ? value.id
+            : getFieldValue(field);
+    };
 
     const actions = saveSuccess !== null
         // We just saved, show whether it was successful
@@ -139,7 +154,7 @@ const EntityRow = ({
                     ? <td>
                         <input type="text"
                             ref={inputEl}
-                            value={getFieldValue(k)}
+                            value={getInitialEditValue(k)}
                             class={style.editInput}
                             // Stop propagation to avoid stop editing event bound to
                             // document.onClick

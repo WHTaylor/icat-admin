@@ -3,11 +3,11 @@ import style from './style.css';
 
 import EntityRow from '../row';
 import ContextMenu from '../../context-menu';
-import {defaultHeaderSort} from '../../../utils.js';
+import {defaultHeaderSort, joinAttributeToTableName} from '../../../utils.js';
 
 const EntityTableView = ({
-    data, tableName,
-    openRelated, changeSortField, saveEntityModifications, modifyDataRow}) =>
+    data, tableName, deletions,
+    openRelated, changeSortField, saveEntityModifications, modifyDataRow, markToDelete, cancelDeletion}) =>
 {
     const [contextMenuPos, setContextMenuPos] =  useState(null);
     const [contextMenuItems, setContextMenuItems] =  useState(null);
@@ -47,7 +47,12 @@ const EntityTableView = ({
         const cur = entityModifications[id] === undefined
             ? {id: id}
             : entityModifications[id];
-        const edited = {...cur, [field]: value};
+        var fieldIsEntity = joinAttributeToTableName(tableName, field) !== null;
+        const newValue = fieldIsEntity
+            // TODO: Don't hardcode this to set id, and should probably validate it
+            ? { id: Number.parseInt(value) }
+            : value;
+        const edited = {...cur, [field]: newValue};
         const newModified = {...entityModifications, [id]: edited};
         setEntityModifications(newModified);
         stopEditing();
@@ -70,7 +75,7 @@ const EntityTableView = ({
     const relatedFieldDisplaySelect = k => {
         const setDisplayField = v =>
             setRelatedDisplayFields({...relatedDisplayFields, [k]: v});
-        const v = data[0][k];
+        const v = data.find(e => e[k] !== undefined && e[k] !== null)[k];
         return (<select onChange={ev => setDisplayField(ev.target.value)}>
             {Object.keys(v)
                     .filter(vk => typeof v[vk] !== "object")
@@ -114,10 +119,12 @@ const EntityTableView = ({
                     makeEdit={(k, v) => editEntity(e.id, k, v)}
                     saveEntityModifications={saveEntityModifications}
                     revertChanges={() => removeModifications(e.id)}
-                    syncModifications={() => {
-                        modifyDataRow(i, entityModifications[e.id])
-                        removeModifications(e.id);
-                    }}
+                    syncModifications={async () =>
+                        await modifyDataRow(i, entityModifications[e.id])
+                            .then(() => removeModifications(e.id))}
+                    markToDelete={() => markToDelete(i)}
+                    cancelDeletion={() => cancelDeletion(i)}
+                    markedForDeletion={deletions.has(i)}
                 />)}
         </table>
         {contextMenuPos !== null &&

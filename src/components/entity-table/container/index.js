@@ -2,13 +2,14 @@ import {useEffect, useState} from "preact/hooks";
 import style from './style.css';
 
 import EntityTableView from '../view';
-import {randomSuffix} from '../../../utils.js';
+import {randomSuffix, joinAttributeToTableName} from '../../../utils.js';
 
 const EntityTable = ({icatClient, filter, handleFilterChange, openRelated, isOpen, changeSortField}) => {
     const [data, setData] = useState(null);
     const [errMsg, setErrMsg] = useState(null);
     const [contextMenuPos, setContextMenuPos] = useState(null);
     const [count, setCount] = useState(null);
+    const [rowsToDelete, setRowsToDelete] = useState(new Set());
 
     const retrieveData = () => {
         setData(null);
@@ -61,10 +62,47 @@ const EntityTable = ({icatClient, filter, handleFilterChange, openRelated, isOpe
     };
     const pageNumber = Math.floor(filter.offset / filter.limit) + 1;
 
-    const changeData = (i, changes) => {
+    const changeData = async (i, changes) => {
         const changed = [...data];
-        changed[i] = {...changed[i], ...changes};
-        setData(changed);
+
+        // For related entity changes, we need to lookup the new entity in ICAT
+        const resolve = async (field, value) => {
+            if (typeof(value) !== "object") return [field, value];
+
+            const entityType = joinAttributeToTableName(filter.table, field);
+            return [field, await icatClient.getById(entityType, value.id)];
+        }
+
+        const toResolve = Promise.all(Object.entries(changes)
+            .map(([k, v]) => resolve(k, v)));
+
+        await toResolve.then(changes => {
+            const changeObj = Object.fromEntries(changes);
+            changed[i] = {...changed[i], ...changeObj};
+            setData(changed);
+        });
+    };
+
+    const markToDelete = i =>
+        setRowsToDelete(new Set([...rowsToDelete.add(i)]));
+
+    const cancelDeletion = i => {
+        rowsToDelete.delete(i);
+        setRowsToDelete(new Set([...rowsToDelete]));
+    }
+
+    const doDeletions = async () => {
+        let ids = [...rowsToDelete].map(i => data[i].id);
+        return icatClient.deleteEntities(filter.table, ids)
+            .then(() => {
+                const removedDescending = [...rowsToDelete]
+                    .sort((a, b) => b - a);
+                const newData = [...data];
+                removedDescending.forEach(i => newData.splice(i, 1))
+                setData(newData);
+            })
+            .then(setCount(count - rowsToDelete.size))
+            .then(setRowsToDelete(new Set()));
     };
 
     return (
@@ -86,16 +124,23 @@ const EntityTable = ({icatClient, filter, handleFilterChange, openRelated, isOpe
                 handlePageChange={changePage} />
             {count !== null &&
                 <p class={style.tableTitleCount}>{count} matches</p>}
+            <TableActions
+                deletions={rowsToDelete}
+                clearDeletions={() => setRowsToDelete(new Set())}
+                doDeletions={doDeletions} />
         </span>
         {errMsg ? <p>{errMsg}</p>
             : <EntityTableView
                 data={data}
                 tableName={filter.table}
+                deletions={rowsToDelete}
                 openRelated={openRelated}
                 changeSortField={changeSortField}
                 saveEntityModifications={e =>
                     icatClient.writeEntity(filter.table, e)}
                 modifyDataRow={changeData}
+                markToDelete={markToDelete}
+                cancelDeletion={cancelDeletion}
             />}
         </>
     );
@@ -157,5 +202,13 @@ const PaginationControl = ({isActive, pageNumber, handleSetPage, handleLimitChan
         </span>
     );
 }
+
+const TableActions = ({deletions, clearDeletions, doDeletions}) => {
+    if (deletions.size === 0) return;
+    return (<>
+        <button onClick={clearDeletions}>Cancel deletions</button>
+        <button onClick={doDeletions}>Delete {deletions.size} rows</button>
+    </>);
+};
 
 export default EntityTable;

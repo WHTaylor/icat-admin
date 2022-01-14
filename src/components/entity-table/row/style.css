@@ -6,6 +6,18 @@
     background-color: #fafafa;
 }
 
+.markedForDeletion {
+    text-decoration: line-through;
+}
+
+.entityRow:nth-child(even) .markedForDeletion {
+    background-color: #f4c3c6;
+}
+
+.entityRow:nth-child(odd) .markedForDeletion {
+    background-color: #f4cbcd;
+}
+
 .editInput {
     width: 95%;
 }

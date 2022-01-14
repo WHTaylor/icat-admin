@@ -6,8 +6,8 @@ import ContextMenu from '../../context-menu';
 import {defaultHeaderSort, joinAttributeToTableName} from '../../../utils.js';
 
 const EntityTableView = ({
-    data, tableName,
-    openRelated, changeSortField, saveEntityModifications, modifyDataRow}) =>
+    data, tableName, deletions,
+    openRelated, changeSortField, saveEntityModifications, modifyDataRow, markToDelete, cancelDeletion}) =>
 {
     const [contextMenuPos, setContextMenuPos] =  useState(null);
     const [contextMenuItems, setContextMenuItems] =  useState(null);
@@ -122,6 +122,9 @@ const EntityTableView = ({
                     syncModifications={async () =>
                         await modifyDataRow(i, entityModifications[e.id])
                             .then(() => removeModifications(e.id))}
+                    markToDelete={() => markToDelete(i)}
+                    cancelDeletion={() => cancelDeletion(i)}
+                    markedForDeletion={deletions.has(i)}
                 />)}
         </table>
         {contextMenuPos !== null &&

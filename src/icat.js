@@ -154,6 +154,20 @@ class IcatClient {
             .then(res => res.json());
     }
 
+    async deleteEntities(entityType, ids) {
+        const entities = ids.map(id => ({[entityType]: {"id": id}}));
+        const params = {
+            "sessionId": this.sessionId,
+            "entities": JSON.stringify(entities)
+        };
+        const url = `${this.serviceUrl}/entityManager?${queryUrlClause(params)}`;
+        return fetch(url, {method: "DELETE"})
+            .then(res => res.ok
+                ? res
+                : formatError(res)
+                    .then(msg => Promise.reject(msg)));
+    }
+
     get loggedIn() {
         return this.sessionId !== undefined;
     }

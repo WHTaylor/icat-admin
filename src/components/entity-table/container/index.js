@@ -9,6 +9,7 @@ const EntityTable = ({icatClient, filter, handleFilterChange, openRelated, isOpe
     const [errMsg, setErrMsg] = useState(null);
     const [contextMenuPos, setContextMenuPos] = useState(null);
     const [count, setCount] = useState(null);
+    const [rowsToDelete, setRowsToDelete] = useState(new Set());
 
     const retrieveData = () => {
         setData(null);
@@ -82,6 +83,27 @@ const EntityTable = ({icatClient, filter, handleFilterChange, openRelated, isOpe
         });
     };
 
+    const markToDelete = i =>
+        setRowsToDelete(new Set([...rowsToDelete.add(i)]));
+
+    const cancelDeletion = i => {
+        rowsToDelete.delete(i);
+        setRowsToDelete(new Set([...rowsToDelete]));
+    }
+
+    const doDeletions = async () => {
+        let ids = [...rowsToDelete].map(i => data[i].id);
+        return icatClient.deleteEntities(filter.table, ids)
+            .then(() => {
+                const removedDescending = [...rowsToDelete]
+                    .sort((a, b) => b - a);
+                const newData = [...data];
+                removedDescending.forEach(i => newData.splice(i, 1))
+                setData(newData);
+            })
+            .then(setRowsToDelete(new Set()));
+    };
+
     return (
         <>
         <span class={style.tableTitleBar}>
@@ -101,16 +123,23 @@ const EntityTable = ({icatClient, filter, handleFilterChange, openRelated, isOpe
                 handlePageChange={changePage} />
             {count !== null &&
                 <p class={style.tableTitleCount}>{count} matches</p>}
+            <TableActions
+                deletions={rowsToDelete}
+                clearDeletions={() => setRowsToDelete(new Set())}
+                doDeletions={doDeletions} />
         </span>
         {errMsg ? <p>{errMsg}</p>
             : <EntityTableView
                 data={data}
                 tableName={filter.table}
+                deletions={rowsToDelete}
                 openRelated={openRelated}
                 changeSortField={changeSortField}
                 saveEntityModifications={e =>
                     icatClient.writeEntity(filter.table, e)}
                 modifyDataRow={changeData}
+                markToDelete={markToDelete}
+                cancelDeletion={cancelDeletion}
             />}
         </>
     );
@@ -172,5 +201,13 @@ const PaginationControl = ({isActive, pageNumber, handleSetPage, handleLimitChan
         </span>
     );
 }
+
+const TableActions = ({deletions, clearDeletions, doDeletions}) => {
+    if (deletions.size === 0) return;
+    return (<>
+        <button onClick={clearDeletions}>Cancel deletions</button>
+        <button onClick={doDeletions}>Delete {deletions.size} rows</button>
+    </>);
+};
 
 export default EntityTable;

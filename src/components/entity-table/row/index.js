@@ -17,9 +17,10 @@ function formatCellContent(cellContent) {
 }
 
 const EntityRow = ({
-    tableName, entity, modifications, headers, editingField, relatedEntityDisplayFields,
+    tableName, entity, modifications, headers, editingField, relatedEntityDisplayFields, markedForDeletion,
     showRelatedEntities, openContextMenu,
-    startEditing, stopEditing, makeEdit, saveEntityModifications, revertChanges, syncModifications}) =>
+    startEditing, stopEditing, makeEdit, saveEntityModifications, revertChanges, syncModifications,
+    markToDelete, cancelDeletion}) =>
 {
     const inputEl = useRef(null);
     const [isSaving, setIsSaving] = useState(false);
@@ -120,24 +121,6 @@ const EntityRow = ({
             : getFieldValue(field);
     };
 
-    const actions = saveSuccess !== null
-        // We just saved, show whether it was successful
-        ? saveSuccess
-            ? "✔️"
-            : "❌"
-        : isSaving
-            // Currently saving, may succeed or fail
-            ? "..."
-            // Haven't just saved
-            : modifications === undefined
-                // No changes made locally
-                ?  ""
-                // Changes made locally, give action options
-                : (<>
-                    <button title="Revert changes" onClick={revertChanges}>↩️</button>
-                    <button title="Save changes" onClick={saveChanges}>💾</button>
-                </>);
-
     const handleFieldClick = (ev, k) => {
         if (commonFields.includes(k)) return;
         ev.stopPropagation();
@@ -147,7 +130,16 @@ const EntityRow = ({
     return (
         <tr onContextMenu={doOpenContextMenu} class={style.entityRow}>
             <td>
-                {actions}
+                <RowActions
+                    saveSuccess={saveSuccess}
+                    isSaving={isSaving}
+                    isModified={modifications !== undefined}
+                    markedForDeletion={markedForDeletion}
+                    saveChanges={saveChanges}
+                    revertChanges={revertChanges}
+                    markToDelete={markToDelete}
+                    cancelDeletion={cancelDeletion}
+                />
             </td>
             {headers.map(k =>
                 k === editingField
@@ -169,6 +161,39 @@ const EntityRow = ({
             )}
         </tr>
     );
+}
+
+const RowActions = ({
+    saveSuccess, isSaving, isModified, markedForDeletion,
+    revertChanges, saveChanges, markToDelete, cancelDeletion}) =>
+{
+    // If just saved, show if successful
+    if (saveSuccess !== null) {
+        return saveSuccess ? "✔️" : "❌";
+    }
+
+    // Currently saving, may succeed or fail
+    if (isSaving) {
+        return "...";
+    }
+
+    let actions = [];
+
+    actions.push(markedForDeletion
+        ? { title: "Cancel deletion", ev: cancelDeletion, icon: "🚫"}
+        : { title: "Mark for deletion", ev: markToDelete, icon: "🗑"});
+
+    if (isModified) {
+        actions.push(
+            { title: "Save changes", ev: saveChanges, icon: "💾"});
+        actions.push(
+            { title: "Revert changes", ev: revertChanges, icon: "↩️"});
+    }
+    return (<>
+        {actions.map(a =>
+            <button key={a.title} title={a.title} onClick={a.ev}>{a.icon}</button>)}
+    </>);
+
 }
 
 export default EntityRow;

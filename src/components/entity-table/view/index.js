@@ -119,10 +119,9 @@ const EntityTableView = ({
                     makeEdit={(k, v) => editEntity(e.id, k, v)}
                     saveEntityModifications={saveEntityModifications}
                     revertChanges={() => removeModifications(e.id)}
-                    syncModifications={() => {
-                        modifyDataRow(i, entityModifications[e.id])
-                        removeModifications(e.id);
-                    }}
+                    syncModifications={async () =>
+                        await modifyDataRow(i, entityModifications[e.id])
+                            .then(() => removeModifications(e.id))}
                 />)}
         </table>
         {contextMenuPos !== null &&

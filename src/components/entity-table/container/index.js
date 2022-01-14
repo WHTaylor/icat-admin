@@ -2,7 +2,7 @@ import {useEffect, useState} from "preact/hooks";
 import style from './style.css';
 
 import EntityTableView from '../view';
-import {randomSuffix} from '../../../utils.js';
+import {randomSuffix, joinAttributeToTableName} from '../../../utils.js';
 
 const EntityTable = ({icatClient, filter, handleFilterChange, openRelated, isOpen, changeSortField}) => {
     const [data, setData] = useState(null);
@@ -61,10 +61,25 @@ const EntityTable = ({icatClient, filter, handleFilterChange, openRelated, isOpe
     };
     const pageNumber = Math.floor(filter.offset / filter.limit) + 1;
 
-    const changeData = (i, changes) => {
+    const changeData = async (i, changes) => {
         const changed = [...data];
-        changed[i] = {...changed[i], ...changes};
-        setData(changed);
+
+        // For related entity changes, we need to lookup the new entity in ICAT
+        const resolve = async (field, value) => {
+            if (typeof(value) !== "object") return [field, value];
+
+            const entityType = joinAttributeToTableName(filter.table, field);
+            return [field, await icatClient.getById(entityType, value.id)];
+        }
+
+        const toResolve = Promise.all(Object.entries(changes)
+            .map(([k, v]) => resolve(k, v)));
+
+        await toResolve.then(changes => {
+            const changeObj = Object.fromEntries(changes);
+            changed[i] = {...changed[i], ...changeObj};
+            setData(changed);
+        });
     };
 
     return (

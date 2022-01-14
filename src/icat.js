@@ -21,6 +21,13 @@ async function formatError(errResponse) {
         .then(r => `${header}: ${r["message"]}`);
 }
 
+function queryIncludeClause(table) {
+    const relatedEntities = oneToX[table];
+    return (relatedEntities === undefined || relatedEntities.length == 0)
+        ? ""
+        : `include ${relatedEntities.map(a => "e." + a).join(', ')}`;
+}
+
 function buildQuery(filter) {
     const where = queryWhereFromInput(filter.where);
     const limit =
@@ -30,10 +37,7 @@ function buildQuery(filter) {
     const order = filter.sortField === null
         ? ""
         : `order by e.${filter.sortField} ${filter.sortAsc ? "asc" : "desc"}`;
-    const relatedEntities = oneToX[filter.table];
-    const includes = (relatedEntities === undefined || relatedEntities.length == 0)
-        ? ""
-        : `include ${relatedEntities.map(a => "e." + a).join(', ')}`;
+    const includes = queryIncludeClause(filter.table);
     return `select e from ${filter.table} e ${where} ${order} ${limit} ${includes}`;
 }
 
@@ -98,6 +102,23 @@ class IcatClient {
                 : formatError(res)
                     .then(msg => Promise.reject(msg)))
             .then(res => res.json());
+    }
+
+    async getById(entityType, id) {
+        const query = `${entityType} e ${queryIncludeClause(entityType)}`;
+        const params = {
+            "sessionId": this.sessionId,
+            "query": query,
+            "id": id
+        };
+        const url = `${this.serviceUrl}/entityManager?${queryUrlClause(params)}`;
+        return fetch(url)
+            .then(res => res.ok
+                ? res
+                : formatError(res)
+                    .then(msg => Promise.reject(msg)))
+            .then(res => res.json())
+            .then(j => j[entityType]);
     }
 
     async isValidSession(sessionId) {

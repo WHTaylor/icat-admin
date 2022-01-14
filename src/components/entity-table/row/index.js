@@ -81,11 +81,18 @@ const EntityRow = ({
         return () => clearTimeout(id);
     }, [saveSuccess]);
 
-    // If the entity has been modified, show save and revert buttons
+    // If the entity has been modified, show the modified values
     const getFieldValue = field => {
-        const source = modifications === undefined || modifications[field] === undefined
-            ? entity
-            : modifications;
+        const isModified = modifications !== undefined
+                         && modifications[field] !== undefined;
+        const source = isModified
+            ? modifications
+            : entity;
+
+        // Always show id for modified related entities
+        if (isModified && typeof(source[field]) === "object") {
+            return source[field].id
+        }
 
         return relatedEntityDisplayFields[field] === undefined
             ? formatCellContent(source[field])

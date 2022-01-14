@@ -3,7 +3,7 @@ import style from './style.css';
 
 import EntityRow from '../row';
 import ContextMenu from '../../context-menu';
-import {defaultHeaderSort} from '../../../utils.js';
+import {defaultHeaderSort, joinAttributeToTableName} from '../../../utils.js';
 
 const EntityTableView = ({
     data, tableName,
@@ -47,7 +47,12 @@ const EntityTableView = ({
         const cur = entityModifications[id] === undefined
             ? {id: id}
             : entityModifications[id];
-        const edited = {...cur, [field]: value};
+        var fieldIsEntity = joinAttributeToTableName(tableName, field) !== null;
+        const newValue = fieldIsEntity
+            // TODO: Don't hardcode this to set id, and should probably validate it
+            ? { id: Number.parseInt(value) }
+            : value;
+        const edited = {...cur, [field]: newValue};
         const newModified = {...entityModifications, [id]: edited};
         setEntityModifications(newModified);
         stopEditing();

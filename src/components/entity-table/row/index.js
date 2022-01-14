@@ -153,7 +153,9 @@ const EntityRow = ({
                             onClick={ev => ev.stopPropagation()}
                             onChange={ev => makeEdit(editingField, ev.target.value)} />
                       </td>
-                    : <td onClick={ev => handleFieldClick(ev, k)}>
+                    : <td
+                        onClick={ev => handleFieldClick(ev, k)}
+                        class={markedForDeletion && style.markedForDeletion}>
                         <ReadMore
                             text={getFieldValue(k)}
                             maxUnsummarizedLength="70" />

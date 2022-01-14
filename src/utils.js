@@ -27,12 +27,12 @@ export function joinAttributeToTableName(originTable, attribute) {
         return "DataCollection";
     } else if (entityNames.includes(capitalize(attribute))) {
         return capitalize(attribute);
-    } else {
-        console.warn(`Unknown attribute in joinAttributeToTableName '${attribute}'`);
     }
+
+    return null;
 }
 
-function capitalize(s) { return s.charAt(0).toUpperCase() + s.slice(1);}
+function capitalize(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
 
 export function lowercaseFirst(s) { return s.charAt(0).toLowerCase() + s.slice(1) };
 

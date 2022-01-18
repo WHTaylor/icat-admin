@@ -38,7 +38,8 @@ const LoginForm = ({doLogin, errMsg, isLoggingIn}) => {
             <label for="passwordInput" class={style.block}>Password:</label>
             <input type="password" name="password" id="passwordInput" class={style.block} />
 
-            <input type="submit" value="Login" />
+            <button class={style.block}>Login</button>
+
             {errMsg !== null &&
                 <p>Error logging in: {errMsg}</p>}
             {isLoggingIn && <p>Logging in...</p>}
@@ -46,36 +47,30 @@ const LoginForm = ({doLogin, errMsg, isLoggingIn}) => {
 }
 
 const ServerSelector = () => {
-    const [addingServer, setAddingServer] = useState(false);
     const lastServer = getLastLogin()[0];
     const serverOptions = serverNames()
         .map(s => s === lastServer
-            ? <option selected>{s}</option>
-            : <option>{s}</option>);
+            ? <option key={s} selected>{s}</option>
+            : <option key={s}>{s}</option>);
+    const [addingServer, setAddingServer] = useState(serverOptions.length === 0);
 
-    let input;
-    if (serverOptions.length === 0) {
-        input = <input id="serverInput" type="text" />;
-    } else {
-        input =
-            <>
-                {addingServer
-                    ? <input type="text" name="server" id="serverInput" />
-                    : <select id="serverInput">{serverOptions}</select>}
-                <button
-                    type="button"
-                    onClick={() => setAddingServer(!addingServer)}>
-                        {addingServer ? "Cancel" : "Add new server"}
-                </button>
-            </>
-    }
+    const input = addingServer
+        ? <input id="serverInput" type="text" class={style.inline}/>
+        : <select id="serverInput" class={style.inline}>{serverOptions}</select>;
+
+    const button = <button
+        type="button"
+        onClick={() => setAddingServer(!addingServer)}
+        class={style.inline}>
+        {addingServer ? "Cancel" : "Add new server"} </button>;
 
     return (
-        <>
+        <div>
             <label for="serverInput" class={style.block}>ICAT Server:</label>
             {input}
-        </>
+            {serverOptions.length > 0 && button}
+        </div>
     );
-}
+};
 
 export default LoginForm;

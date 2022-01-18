@@ -1,3 +1,5 @@
+import style from './style.css';
+
 import {useState} from "preact/hooks";
 import {getLastLogin, serverNames} from '../../servercache.js'
 
@@ -24,19 +26,18 @@ const LoginForm = ({doLogin, errMsg, isLoggingIn}) => {
         <form
             class="mainContent"
             onSubmit={submit}>
+
             <ServerSelector />
-            <div>
-                <label for="pluginInput">Auth plugin:</label>
-                <input type="text" name="plugin" id="pluginInput" defaultValue="anon"/>
-            </div>
-            <div>
-                <label for="usernameInput">Username:</label>
-                <input type="text" name="username" id="usernameInput" />
-            </div>
-            <div>
-                <label for="passwordInput">Password:</label>
-                <input type="password" name="password" id="passwordInput" />
-            </div>
+
+            <label for="pluginInput" class={style.block}>Auth plugin:</label>
+            <input type="text" name="plugin" id="pluginInput" defaultValue="anon" class={style.block} />
+
+            <label for="usernameInput" class={style.block}>Username:</label>
+            <input type="text" name="username" id="usernameInput" class={style.block} />
+
+            <label for="passwordInput" class={style.block}>Password:</label>
+            <input type="password" name="password" id="passwordInput" class={style.block} />
+
             <input type="submit" value="Login" />
             {errMsg !== null &&
                 <p>Error logging in: {errMsg}</p>}
@@ -59,7 +60,7 @@ const ServerSelector = () => {
         input =
             <>
                 {addingServer
-                    ? <input type="text" name="server" id="serverInput"/>
+                    ? <input type="text" name="server" id="serverInput" />
                     : <select id="serverInput">{serverOptions}</select>}
                 <button
                     type="button"
@@ -71,10 +72,8 @@ const ServerSelector = () => {
 
     return (
         <>
-            <div>
-                <label for="serverInput">ICAT Server:</label>
-                {input}
-            </div>
+            <label for="serverInput" class={style.block}>ICAT Server:</label>
+            {input}
         </>
     );
 }

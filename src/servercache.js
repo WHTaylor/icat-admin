@@ -93,3 +93,9 @@ function serverEntries() {
         .filter(k => k.startsWith("servers"))
         .map(k => [...k.split("|").slice(1), localStorage[k]]);
 }
+
+export function serverNames() {
+    return serverEntries()
+        .filter(([n, k, v]) => k == "name")
+        .map(([n, k, v]) => v);
+}

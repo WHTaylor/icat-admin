@@ -8,6 +8,13 @@ const ServerConnector = ({createConnection}) => {
     const [isLoggingIn, setIsLoggingIn] = useState(false);
 
     const doLogin = async (server, plugin, username, password) => {
+        if (server.trim().length === 0) {
+            setErrMsg("Server must be specified")
+            return;
+        } else if (plugin.trim().length === 0) {
+            setErrMsg("Auth plugin must be specified")
+            return;
+        }
         const client = new IcatClient(server);
         setIsLoggingIn(true);
         setErrMsg(null);

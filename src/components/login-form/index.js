@@ -1,15 +1,22 @@
-function server(isDev) {
-    const res = isDev
-        ? "https://icat-dev.isis.stfc.ac.uk"
-        : "https://icatisis.esc.rl.ac.uk";
-    return res;
+import style from './style.css';
+
+import {useState} from "preact/hooks";
+import {getLastLogin, serverNames} from '../../servercache.js'
+
+function processServerName(name) {
+    if (name.trim().length === 0) return "";
+    let processed = name.toLowerCase();
+    if (name.split("://").length === 1) {
+        processed = "https://" + processed;
+    }
+    return new URL(processed).origin
 }
 
 const LoginForm = ({doLogin, errMsg, isLoggingIn}) => {
     const submit = ev => {
         ev.preventDefault();
         doLogin(
-            server(document.getElementById("devRadio").checked),
+            processServerName(document.getElementById("serverInput").value),
             document.getElementById("pluginInput").value,
             document.getElementById("usernameInput").value,
             document.getElementById("passwordInput").value);
@@ -19,31 +26,51 @@ const LoginForm = ({doLogin, errMsg, isLoggingIn}) => {
         <form
             class="mainContent"
             onSubmit={submit}>
-            <div>
-                <label for="prodRadio">Prod</label>
-                <input type="radio" name="server" id="prodRadio" checked />
-            </div>
-            <div>
-                <label for="devRadio">Dev</label>
-                <input type="radio" name="server" id="devRadio" />
-            </div>
-            <div>
-                <label for="pluginInput">Auth plugin:</label>
-                <input type="text" name="plugin" id="pluginInput" defaultValue="anon"/>
-            </div>
-            <div>
-                <label for="usernameInput">Username:</label>
-                <input type="text" name="username" id="usernameInput" />
-            </div>
-            <div>
-                <label for="passwordInput">Password:</label>
-                <input type="password" name="password" id="passwordInput" />
-            </div>
-            <input type="submit" value="Login" />
+
+            <ServerSelector />
+
+            <label for="pluginInput" class={style.block}>Auth plugin:</label>
+            <input type="text" name="plugin" id="pluginInput" defaultValue="anon" class={style.block} />
+
+            <label for="usernameInput" class={style.block}>Username:</label>
+            <input type="text" name="username" id="usernameInput" class={style.block} />
+
+            <label for="passwordInput" class={style.block}>Password:</label>
+            <input type="password" name="password" id="passwordInput" class={style.block} />
+
+            <button class={style.block}>Login</button>
+
             {errMsg !== null &&
                 <p>Error logging in: {errMsg}</p>}
             {isLoggingIn && <p>Logging in...</p>}
         </form>);
 }
+
+const ServerSelector = () => {
+    const lastServer = getLastLogin()[0];
+    const serverOptions = serverNames()
+        .map(s => s === lastServer
+            ? <option key={s} selected>{s}</option>
+            : <option key={s}>{s}</option>);
+    const [addingServer, setAddingServer] = useState(serverOptions.length === 0);
+
+    const input = addingServer
+        ? <input id="serverInput" type="text" class={style.inline}/>
+        : <select id="serverInput" class={style.inline}>{serverOptions}</select>;
+
+    const button = <button
+        type="button"
+        onClick={() => setAddingServer(!addingServer)}
+        class={style.inline}>
+        {addingServer ? "Cancel" : "Add new server"} </button>;
+
+    return (
+        <div>
+            <label for="serverInput" class={style.block}>ICAT Server:</label>
+            {input}
+            {serverOptions.length > 0 && button}
+        </div>
+    );
+};
 
 export default LoginForm;

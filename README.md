@@ -4,7 +4,6 @@ A web application for convenient browsing and editing of ICAT data. See it in ac
 
 Still a WIP, but closing in on feature parity with ICAT Manager. Incoming things:
 
- - Show feedback to user after saving an edit, either successful or failure
  - Validation and suggestions for editing
  - Prefecthing next page of data
  - Prefetching on table button hover

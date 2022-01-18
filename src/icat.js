@@ -43,8 +43,18 @@ function buildQuery(filter) {
 
 class IcatClient {
     constructor(host, sessionId) {
-        this.serviceUrl = host + "/icat";
+        this.hostUrl = new URL(host);
         this.sessionId = sessionId;
+    }
+
+    sessionUrl(sessionId) {
+        return new URL("icat/session/" + sessionId, this.hostUrl);
+    }
+
+    entityUrl(queryParams) {
+        return new URL(
+            `icat/entityManager?${queryUrlClause(queryParams)}`,
+            this.hostUrl);
     }
 
     async login(plugin, username, password) {
@@ -55,8 +65,9 @@ class IcatClient {
                 {"password": password}]};
         const form = new FormData();
         form.append('json', JSON.stringify(creds));
+        const url = new URL("icat/session", this.hostUrl);
         return fetch(
-            this.serviceUrl + "/session", {
+            url, {
                 method: "POST",
                 body: new URLSearchParams(form),
             })
@@ -69,7 +80,7 @@ class IcatClient {
     }
 
     async refresh() {
-        fetch(this.serviceUrl + '/session/' + this.sessionId, { method: "PUT" });
+        fetch(this.sessionUrl(this.sessionId), { method: "PUT" });
     }
 
     async getEntries(filter, signal) {
@@ -78,8 +89,7 @@ class IcatClient {
             "sessionId": this.sessionId,
             "query": query,
         }
-        const url = `${this.serviceUrl}/entityManager?${queryUrlClause(params)}`;
-        return fetch(url, {signal})
+        return fetch(this.entityUrl(params), {signal})
             .then(res => res.ok
                 ? res
                 : formatError(res)
@@ -95,8 +105,7 @@ class IcatClient {
             "sessionId": this.sessionId,
             "query": query,
         }
-        const url = `${this.serviceUrl}/entityManager?${queryUrlClause(params)}`;
-        return fetch(url, {signal})
+        return fetch(this.entityUrl(params), {signal})
             .then(res => res.ok
                 ? res
                 : formatError(res)
@@ -111,8 +120,7 @@ class IcatClient {
             "query": query,
             "id": id
         };
-        const url = `${this.serviceUrl}/entityManager?${queryUrlClause(params)}`;
-        return fetch(url)
+        return fetch(this.entityUrl(params))
             .then(res => res.ok
                 ? res
                 : formatError(res)
@@ -122,19 +130,18 @@ class IcatClient {
     }
 
     async isValidSession(sessionId) {
-        const url = `${this.serviceUrl}/session/${sessionId}`;
-        return fetch(url)
+        return fetch(this.sessionUrl(sessionId))
             .then(res => res.ok);
     }
 
     async logout() {
-        fetch(`${this.serviceUrl}/session/${this.sessionId}`,
+        fetch(this.sessionUrl(this.sessionId),
             { method: "DELETE" });
         this.sessionId = undefined;
     }
 
     async getUserName() {
-        return fetch(`${this.serviceUrl}/session/${this.sessionId}`)
+        return fetch(this.sessionUrl(this.sessionId))
             .then(r => r.json());
     }
 
@@ -143,7 +150,7 @@ class IcatClient {
         form.append('entities', JSON.stringify({[entityType]: entity}));
         form.append('sessionId', this.sessionId);
         return fetch(
-            this.serviceUrl + "/entityManager", {
+            new URL("icat/entityManager", this.hostUrl), {
                 method: "POST",
                 body: new URLSearchParams(form),
             })
@@ -160,8 +167,7 @@ class IcatClient {
             "sessionId": this.sessionId,
             "entities": JSON.stringify(entities)
         };
-        const url = `${this.serviceUrl}/entityManager?${queryUrlClause(params)}`;
-        return fetch(url, {method: "DELETE"})
+        return fetch(this.entityUrl(params), {method: "DELETE"})
             .then(res => res.ok
                 ? res
                 : formatError(res)

@@ -12,7 +12,7 @@ function formatCellContent(cellContent) {
             ? cellContent.id.toString()
             : cellContent.toString()
         : isDatetime(cellContent)
-            ? new Date(cellContent).toLocaleString()
+            ? new Date(cellContent).toISOString()
             : cellContent;
 }
 

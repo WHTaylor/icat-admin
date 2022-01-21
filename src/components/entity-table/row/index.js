@@ -69,7 +69,7 @@ const EntityRow = ({
 
     const saveChanges = () => {
         setIsSaving(true);
-        saveEntityModifications({...modifications})
+        saveEntityModifications({...modifications, id: entity.id})
             .then(() => {setSaveSuccess(true); syncModifications()})
             .catch(() => setSaveSuccess(false))
             .finally(() => setIsSaving(false));

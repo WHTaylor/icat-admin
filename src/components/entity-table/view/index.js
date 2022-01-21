@@ -45,7 +45,7 @@ const EntityTableView = ({
 
     const editEntity = (id, field, value) => {
         const cur = entityModifications[id] === undefined
-            ? {id: id}
+            ? {}
             : entityModifications[id];
         var fieldIsEntity = joinAttributeToTableName(tableName, field) !== null;
         const newValue = fieldIsEntity

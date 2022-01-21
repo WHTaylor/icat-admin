@@ -6,14 +6,21 @@ import ContextMenu from '../../context-menu';
 import {defaultHeaderSort, joinAttributeToTableName} from '../../../utils.js';
 
 const EntityTableView = ({
-    data, tableName, deletions,
-    openRelated, changeSortField, saveEntityModifications, modifyDataRow, markToDelete, cancelDeletion}) =>
+    data, tableName, deletions, creations,
+    openRelated, changeSortField, saveEntity, modifyDataRow,
+    markToDelete, cancelDeletion,
+    editCreation, cancelCreate, insertCreation
+}) =>
 {
     const [contextMenuPos, setContextMenuPos] =  useState(null);
     const [contextMenuItems, setContextMenuItems] =  useState(null);
     // Locally saved changes to entities
     const [entityModifications, setEntityModifications] = useState({});
-    // [Entity id, field key] being edited. [null, null] for nothing
+    // fieldBeing edited is:
+    // [null, null] - nothing being edited
+    // if editingNewRow, [index in creations, field]
+    // else [entity id, field]
+    const [editingNewRow, setEditingNewRow] = useState(null);
     const [fieldBeingEdited, setFieldBeingEdited] = useState([null, null]);
     const stopEditing = () => setFieldBeingEdited([null, null]);
     // Field to show for each related entity in table
@@ -45,17 +52,20 @@ const EntityTableView = ({
 
     const editEntity = (id, field, value) => {
         const cur = entityModifications[id] === undefined
-            ? {id: id}
+            ? {}
             : entityModifications[id];
-        var fieldIsEntity = joinAttributeToTableName(tableName, field) !== null;
-        const newValue = fieldIsEntity
-            // TODO: Don't hardcode this to set id, and should probably validate it
-            ? { id: Number.parseInt(value) }
-            : value;
+        const originalValue = data.filter(e => e.id === id)[0][field];
         const edited = {...cur, [field]: newValue};
+        // If we've modified the value back to the original, remove the modification
+        if (newValue === originalValue) {
+            delete edited[field];
+        }
         const newModified = {...entityModifications, [id]: edited};
+        // If all values have been reverted back to the originals, remove modifications
+        if (Object.keys(edited).length === 0) {
+            delete newModified[id];
+        }
         setEntityModifications(newModified);
-        stopEditing();
     };
 
     const removeModifications = id =>
@@ -86,6 +96,63 @@ const EntityTableView = ({
         </select>);
     };
 
+    const buildEntityRow = (e, i) => {
+        const isNewRow = e.id === undefined;
+        const key = isNewRow ? "thisIsABadKeyToUse" + i : e.id;
+        const makeEdit = (k, v) => {
+            var fieldIsEntity = joinAttributeToTableName(tableName, k) !== null;
+            const newValue = fieldIsEntity
+                // TODO: Don't hardcode this to id, and should probably validate it
+                ? { id: Number.parseInt(v) }
+                : v;
+            isNewRow
+                ? editCreation(i, k, newValue)
+                : editEntity(e.id, k, newValue);
+            stopEditing();
+        }
+        const syncModifications = isNewRow
+            ? async id => await insertCreation(i, id)
+            : async () => await modifyDataRow(i, entityModifications[e.id])
+                    .then(() => removeModifications(e.id));
+        const revertChanges = isNewRow
+            ? () => cancelCreate(i)
+            : () => removeModifications(e.id);
+        return <EntityRow
+            key={key}
+            tableName={tableName}
+            headers={keys}
+            entity={e}
+            modifications={isNewRow ? undefined : entityModifications[e.id]}
+            editingField={
+                editingNewRow
+                    ? isNewRow
+                        ? fieldBeingEdited[0] === i
+                            ? fieldBeingEdited[1]
+                            : null
+                        : null
+                    : !isNewRow
+                        ? fieldBeingEdited[0] === e.id
+                            ? fieldBeingEdited[1]
+                            : null
+                        : null} // This is insane
+            relatedEntityDisplayFields={relatedDisplayFields}
+            showRelatedEntities={openRelated}
+            openContextMenu={openContextMenu}
+            startEditing={field => {
+                clearContextMenu();
+                setFieldBeingEdited([isNewRow ? i : e.id, field]);
+                setEditingNewRow(isNewRow);
+            }}
+            stopEditing={stopEditing}
+            makeEdit={makeEdit}
+            saveEntity={saveEntity}
+            revertChanges={revertChanges}
+            syncModifications={syncModifications}
+            markToDelete={() => markToDelete(e.id)}
+            cancelDeletion={() => cancelDeletion(e.id)}
+            markedForDeletion={deletions.has(e.id)} />;
+    };
+
     return (
         <>
         <table>
@@ -98,34 +165,7 @@ const EntityTableView = ({
                                 relatedFieldDisplaySelect(k)}
                     </th>)}
             </tr>
-            {data.map((e, i) =>
-                <EntityRow
-                    key={e.id}
-                    tableName={tableName}
-                    headers={keys}
-                    entity={e}
-                    modifications={entityModifications[e.id]}
-                    editingField={fieldBeingEdited[0] === e.id
-                        ? fieldBeingEdited[1]
-                        : null}
-                    relatedEntityDisplayFields={relatedDisplayFields}
-                    showRelatedEntities={openRelated}
-                    openContextMenu={openContextMenu}
-                    startEditing={field => {
-                        clearContextMenu();
-                        setFieldBeingEdited([e.id, field]);
-                    }}
-                    stopEditing={stopEditing}
-                    makeEdit={(k, v) => editEntity(e.id, k, v)}
-                    saveEntityModifications={saveEntityModifications}
-                    revertChanges={() => removeModifications(e.id)}
-                    syncModifications={async () =>
-                        await modifyDataRow(i, entityModifications[e.id])
-                            .then(() => removeModifications(e.id))}
-                    markToDelete={() => markToDelete(i)}
-                    cancelDeletion={() => cancelDeletion(i)}
-                    markedForDeletion={deletions.has(i)}
-                />)}
+            {creations.concat(data).map((e, i) => buildEntityRow(e, i))}
         </table>
         {contextMenuPos !== null &&
             <ContextMenu items={contextMenuItems} pos={contextMenuPos} />}

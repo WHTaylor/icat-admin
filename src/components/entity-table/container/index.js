@@ -10,6 +10,7 @@ const EntityTable = ({icatClient, filter, handleFilterChange, openRelated, isOpe
     const [contextMenuPos, setContextMenuPos] = useState(null);
     const [count, setCount] = useState(null);
     const [rowsToDelete, setRowsToDelete] = useState(new Set());
+    const [rowsToCreate, setRowsToCreate] = useState([]);
 
     const retrieveData = () => {
         setData(null);
@@ -87,32 +88,57 @@ const EntityTable = ({icatClient, filter, handleFilterChange, openRelated, isOpe
         });
     };
 
-    const markToDelete = i =>
-        setRowsToDelete(new Set([...rowsToDelete.add(i)]));
+    const markToDelete = id =>
+        setRowsToDelete(new Set([...rowsToDelete.add(id)]));
 
-    const cancelDeletion = i => {
-        rowsToDelete.delete(i);
+    const cancelDeletion = id => {
+        rowsToDelete.delete(id);
         setRowsToDelete(new Set([...rowsToDelete]));
     }
 
     const doDeletions = async () => {
-        let ids = [...rowsToDelete].map(i => data[i].id);
+        let ids = [...rowsToDelete];
         return icatClient.deleteEntities(filter.table, ids)
             .then(() => {
-                const removedDescending = [...rowsToDelete]
-                    .sort((a, b) => b - a);
-                const newData = [...data];
-                removedDescending.forEach(i => newData.splice(i, 1))
+                const newData = data.filter(e => !ids.includes(e.id));
                 setData(newData);
             })
             .then(setCount(count - rowsToDelete.size))
             .then(setRowsToDelete(new Set()));
     };
 
+    const editCreation = (i, k, v) => {
+        const cur = rowsToCreate[i];
+        const modified = {...cur, [k]: v};
+        const newToCreate = [...rowsToCreate];
+        newToCreate[i] = modified;
+        setRowsToCreate(newToCreate);
+    };
+
+    const cancelCreate = i => {
+        const newToCreate = [...rowsToCreate];
+        newToCreate.splice(i, 1);
+        setRowsToCreate(newToCreate);
+    };
+
+    const insertCreation = async (i, id) => {
+        const created = await icatClient.getById(filter.table, id);
+        const withCreated = [...data]; withCreated.unshift(created);
+        setData(withCreated);
+        cancelCreate(i);
+    };
+
     return (
         <>
         <span class={style.tableTitleBar}>
-            <h1 class={style.tableNameHeader}>{filter.table}</h1>
+            <div>
+                <h1 class={style.tableNameHeader}>{filter.table}</h1>
+                <CreateActions
+                    creations={rowsToCreate}
+                    addCreation={() => setRowsToCreate(rowsToCreate.concat({}))}
+                    clearCreations={() => setRowsToCreate([])}
+                    doCreations={() => {}} />
+            </div>
             <input
                 type="text"
                 class={style.filterInput}
@@ -128,7 +154,7 @@ const EntityTable = ({icatClient, filter, handleFilterChange, openRelated, isOpe
                 handlePageChange={changePage} />
             {count !== null &&
                 <p class={style.tableTitleCount}>{count} matches</p>}
-            <TableActions
+            <DeleteActions
                 deletions={rowsToDelete}
                 clearDeletions={() => setRowsToDelete(new Set())}
                 doDeletions={doDeletions} />
@@ -138,13 +164,17 @@ const EntityTable = ({icatClient, filter, handleFilterChange, openRelated, isOpe
                 data={data}
                 tableName={filter.table}
                 deletions={rowsToDelete}
+                creations={rowsToCreate}
                 openRelated={openRelated}
                 changeSortField={changeSortField}
-                saveEntityModifications={e =>
+                saveEntity={e =>
                     icatClient.writeEntity(filter.table, e)}
                 modifyDataRow={changeData}
                 markToDelete={markToDelete}
                 cancelDeletion={cancelDeletion}
+                editCreation={editCreation}
+                cancelCreate={cancelCreate}
+                insertCreation={insertCreation}
             />}
         </>
     );
@@ -207,12 +237,24 @@ const PaginationControl = ({isActive, pageNumber, handleSetPage, handleLimitChan
     );
 }
 
-const TableActions = ({deletions, clearDeletions, doDeletions}) => {
+const DeleteActions = ({deletions, clearDeletions, doDeletions}) => {
     if (deletions.size === 0) return;
     return (<>
         <button onClick={clearDeletions}>Cancel deletions</button>
         <button onClick={doDeletions}>Delete {deletions.size} rows</button>
     </>);
+};
+
+const CreateActions = ({creations, addCreation, clearCreations, doCreations}) => {
+    return (
+        <div>
+            <button onClick={addCreation}>Add new</button>
+            {creations.length > 0 &&
+                <>
+                <button onClick={clearCreations}>Cancel creations</button>
+                <button onClick={doCreations}>Create {creations.length} rows</button>
+                </>}
+        </div>);
 };
 
 export default EntityTable;

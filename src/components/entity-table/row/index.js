@@ -19,7 +19,7 @@ function formatCellContent(cellContent) {
 const EntityRow = ({
     tableName, entity, modifications, headers, editingField, relatedEntityDisplayFields, markedForDeletion,
     showRelatedEntities, openContextMenu,
-    startEditing, stopEditing, makeEdit, saveEntityModifications, revertChanges, syncModifications,
+    startEditing, stopEditing, makeEdit, saveEntity, revertChanges, syncModifications,
     markToDelete, cancelDeletion}) =>
 {
     const inputEl = useRef(null);
@@ -69,9 +69,18 @@ const EntityRow = ({
 
     const saveChanges = () => {
         setIsSaving(true);
-        saveEntityModifications({...modifications, id: entity.id})
-            .then(() => {setSaveSuccess(true); syncModifications()})
-            .catch(() => setSaveSuccess(false))
+        // If entity.id is undefined, this a new entity to be created
+        // Otherwise we just want to send modifications with the current id
+        const e = entity.id === undefined
+            ? entity
+            : {...modifications, id: entity.id};
+        const successHandle = entity.id === undefined
+            ? res => syncModifications(res[0])
+            : syncModifications;
+        saveEntity(e)
+            .then(successHandle)
+            .then(() => setSaveSuccess(true))
+            .catch(err => setSaveSuccess(false))
             .finally(() => setIsSaving(false));
     };
 
@@ -131,6 +140,7 @@ const EntityRow = ({
         <tr onContextMenu={doOpenContextMenu} class={style.entityRow}>
             <td>
                 <RowActions
+                    isNewRow={entity.id === undefined}
                     saveSuccess={saveSuccess}
                     isSaving={isSaving}
                     isModified={modifications !== undefined}
@@ -166,7 +176,7 @@ const EntityRow = ({
 }
 
 const RowActions = ({
-    saveSuccess, isSaving, isModified, markedForDeletion,
+    isNewRow, saveSuccess, isSaving, isModified, markedForDeletion,
     revertChanges, saveChanges, markToDelete, cancelDeletion}) =>
 {
     // If just saved, show if successful
@@ -181,9 +191,14 @@ const RowActions = ({
 
     let actions = [];
 
-    actions.push(markedForDeletion
-        ? { title: "Cancel deletion", ev: cancelDeletion, icon: "🚫"}
-        : { title: "Mark for deletion", ev: markToDelete, icon: "🗑"});
+    if (isNewRow) {
+        actions.push({ title: "Create row", ev: saveChanges, icon: "💾"});
+        actions.push({ title: "Cancel creation", ev: revertChanges, icon: "🚫"});
+    } else {
+        actions.push(markedForDeletion
+            ? { title: "Cancel deletion", ev: cancelDeletion, icon: "🚫"}
+            : { title: "Mark for deletion", ev: markToDelete, icon: "🗑"});
+    }
 
     if (isModified) {
         actions.push(

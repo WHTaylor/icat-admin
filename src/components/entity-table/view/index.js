@@ -52,8 +52,17 @@ const EntityTableView = ({
             // TODO: Don't hardcode this to set id, and should probably validate it
             ? { id: Number.parseInt(value) }
             : value;
+        const originalValue = data.filter(e => e.id === id)[0][field];
         const edited = {...cur, [field]: newValue};
+        // If we've modified the value back to the original, remove the modification
+        if (newValue === originalValue) {
+            delete edited[field];
+        }
         const newModified = {...entityModifications, [id]: edited};
+        // If all values have been reverted back to the originals, remove modifications
+        if (Object.keys(edited).length === 0) {
+            delete newModified[id];
+        }
         setEntityModifications(newModified);
         stopEditing();
     };

@@ -17,6 +17,8 @@ export function icatAttributeToTableName(tableName, a) {
 
 export function joinAttributeToTableName(originTable, attribute) {
     if (attribute === "type") {
+        // instrument.type is just a free text description field
+        if (originTable == "Instrument") return null
         if (originTable.endsWith("Parameter")) return "ParameterType";
         return originTable + "Type";
     } else if (attribute === "facility") {

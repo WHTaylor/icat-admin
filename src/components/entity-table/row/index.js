@@ -20,7 +20,7 @@ const EntityRow = ({
     tableName, entity, modifications, headers, editingField, relatedEntityDisplayFields, markedForDeletion,
     showRelatedEntities, openContextMenu,
     startEditing, stopEditing, makeEdit, saveEntity, revertChanges, syncModifications,
-    markToDelete, cancelDeletion}) =>
+    markToDelete, cancelDeletion, doDelete}) =>
 {
     const inputEl = useRef(null);
     const [isSaving, setIsSaving] = useState(false);
@@ -149,6 +149,7 @@ const EntityRow = ({
                     revertChanges={revertChanges}
                     markToDelete={markToDelete}
                     cancelDeletion={cancelDeletion}
+                    doDelete={doDelete}
                 />
             </td>
             {headers.map(k =>
@@ -177,7 +178,7 @@ const EntityRow = ({
 
 const RowActions = ({
     isNewRow, saveSuccess, isSaving, isModified, markedForDeletion,
-    revertChanges, saveChanges, markToDelete, cancelDeletion}) =>
+    revertChanges, saveChanges, markToDelete, cancelDeletion, doDelete}) =>
 {
     // If just saved, show if successful
     if (saveSuccess !== null) {
@@ -194,10 +195,11 @@ const RowActions = ({
     if (isNewRow) {
         actions.push({ title: "Create row", ev: saveChanges, icon: "💾"});
         actions.push({ title: "Cancel creation", ev: revertChanges, icon: "🚫"});
+    } else if (markedForDeletion) {
+        actions.push({ title: "Cancel deletion", ev: cancelDeletion, icon: "↩️"});
+        actions.push({ title: "Confirm deletion", ev: doDelete, icon: "✔️"});
     } else {
-        actions.push(markedForDeletion
-            ? { title: "Cancel deletion", ev: cancelDeletion, icon: "↩️"}
-            : { title: "Mark for deletion", ev: markToDelete, icon: "🗑"});
+        actions.push({ title: "Mark for deletion", ev: markToDelete, icon: "🗑"});
     }
 
     if (isModified) {

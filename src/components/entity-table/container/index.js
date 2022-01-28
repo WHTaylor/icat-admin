@@ -2,7 +2,7 @@ import {useEffect, useState} from "preact/hooks";
 import style from './style.css';
 
 import EntityTableView from '../view';
-import {randomSuffix, joinAttributeToTableName} from '../../../utils.js';
+import {randomSuffix, joinAttributeToTableName, difference} from '../../../utils.js';
 
 const EntityTable = ({icatClient, filter, handleFilterChange, openRelated, isOpen, changeSortField, refreshData}) => {
     const [data, setData] = useState(null);
@@ -96,16 +96,15 @@ const EntityTable = ({icatClient, filter, handleFilterChange, openRelated, isOpe
         setRowsToDelete(new Set([...rowsToDelete]));
     }
 
-    const doDeletions = async () => {
-        let ids = [...rowsToDelete];
-        return icatClient.deleteEntities(filter.table, ids)
+    const deleteEntities = async ids =>
+        icatClient.deleteEntities(filter.table, ids)
             .then(() => {
                 const newData = data.filter(e => !ids.includes(e.id));
                 setData(newData);
             })
             .then(setCount(count - rowsToDelete.size))
-            .then(setRowsToDelete(new Set()));
-    };
+            .then(setRowsToDelete(difference(rowsToDelete, ids)));
+
 
     const editCreation = (i, k, v) => {
         const cur = rowsToCreate[i];
@@ -156,7 +155,7 @@ const EntityTable = ({icatClient, filter, handleFilterChange, openRelated, isOpe
             <DeleteActions
                 deletions={rowsToDelete}
                 clearDeletions={() => setRowsToDelete(new Set())}
-                doDeletions={doDeletions} />
+                doDeletions={() => deleteEntities([...rowsToDelete])} />
         </span>
         {errMsg ? <p>{errMsg}</p>
             : <EntityTableView
@@ -171,6 +170,7 @@ const EntityTable = ({icatClient, filter, handleFilterChange, openRelated, isOpe
                 modifyDataRow={changeData}
                 markToDelete={markToDelete}
                 cancelDeletion={cancelDeletion}
+                doDelete={id => deleteEntities([id])}
                 editCreation={editCreation}
                 cancelCreate={cancelCreate}
                 insertCreation={insertCreation}

@@ -8,7 +8,7 @@ import {defaultHeaderSort, joinAttributeToTableName} from '../../../utils.js';
 const EntityTableView = ({
     data, tableName, deletions, creations,
     openRelated, changeSortField, saveEntity, modifyDataRow,
-    markToDelete, cancelDeletion,
+    markToDelete, cancelDeletion, doDelete,
     editCreation, cancelCreate, insertCreation
 }) =>
 {
@@ -150,6 +150,7 @@ const EntityTableView = ({
             syncModifications={syncModifications}
             markToDelete={() => markToDelete(e.id)}
             cancelDeletion={() => cancelDeletion(e.id)}
+            doDelete={() => doDelete(e.id)}
             markedForDeletion={deletions.has(e.id)} />;
     };
 

@@ -95,3 +95,11 @@ export function queryWhereFromInput(whereInput) {
         .join(" ");
     return ` where ${withEntityIdentifier}`;
 }
+
+export function difference(set, other) {
+    let diff = new Set(set);
+    for (let e of other) {
+        diff.delete(e);
+    }
+    return diff;
+}

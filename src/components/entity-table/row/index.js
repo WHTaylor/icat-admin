@@ -193,8 +193,8 @@ const RowActions = ({
     let actions = [];
 
     if (isNewRow) {
-        actions.push({ title: "Create row", ev: saveChanges, icon: "💾"});
         actions.push({ title: "Cancel creation", ev: revertChanges, icon: "🚫"});
+        actions.push({ title: "Create row", ev: saveChanges, icon: "💾"});
     } else if (markedForDeletion) {
         actions.push({ title: "Cancel deletion", ev: cancelDeletion, icon: "↩️"});
         actions.push({ title: "Confirm deletion", ev: doDelete, icon: "✔️"});
@@ -204,9 +204,9 @@ const RowActions = ({
 
     if (isModified) {
         actions.push(
-            { title: "Save changes", ev: saveChanges, icon: "💾"});
-        actions.push(
             { title: "Revert changes", ev: revertChanges, icon: "↩️"});
+        actions.push(
+            { title: "Save changes", ev: saveChanges, icon: "💾"});
     }
     return (<>
         {actions.map(a =>

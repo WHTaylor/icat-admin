@@ -158,7 +158,7 @@ const EntityTableView = ({
         <>
         <table>
             <tr>
-                <th></th>{ /* Empty row for action buttons (save/revert changes)*/ }
+                <th>Actions</th>
                 {keys.map(k =>
                     <th class={style.tableHeader}>
                         <p onClick={() => changeSortField(k)}>{k}</p>

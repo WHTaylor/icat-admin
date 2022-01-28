@@ -4,7 +4,7 @@ import style from './style.css';
 import EntityTableView from '../view';
 import {randomSuffix, joinAttributeToTableName} from '../../../utils.js';
 
-const EntityTable = ({icatClient, filter, handleFilterChange, openRelated, isOpen, changeSortField}) => {
+const EntityTable = ({icatClient, filter, handleFilterChange, openRelated, isOpen, changeSortField, refreshData}) => {
     const [data, setData] = useState(null);
     const [errMsg, setErrMsg] = useState(null);
     const [contextMenuPos, setContextMenuPos] = useState(null);
@@ -144,7 +144,7 @@ const EntityTable = ({icatClient, filter, handleFilterChange, openRelated, isOpe
                 value={filter.where}
                 placeholder="Filter by (ie. id = 1234)"
                 onChange={ev => changeWhere(ev.target.value)}/>
-            <button title="Refresh data" onClick={() => retrieveData() && retrieveCount()}>↻</button>
+            <button title="Refresh data" onClick={refreshData}>↻</button>
             <PaginationControl
                 isActive={isOpen}
                 pageNumber={pageNumber}

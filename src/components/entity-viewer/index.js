@@ -84,6 +84,12 @@ const EntityViewer = ({icatClient, visible}) => {
         handleFilterChange(i, newFilter);
     };
 
+    const refreshTab = i => {
+        const f = tabFilters[i];
+        const newFilter= {...f, key: Math.random()};
+        handleFilterChange(i, newFilter);
+    }
+
     useEffect(() => {
         // Could base this on the icat/properties.lifetimeMinutes, but this is simpler
         const twentyMinutes = 1000 * 60 * 20;
@@ -116,6 +122,7 @@ const EntityViewer = ({icatClient, visible}) => {
                                 openRelated(e, f.table, id, isOneToMany, fromType)}
                             changeSortField={k => changeSortField(i, k)}
                             isOpen={i === activeTab}
+                            refreshData={() => refreshTab(i)}
                             key={f.key} />])}
             </TabWindow>
         </div>

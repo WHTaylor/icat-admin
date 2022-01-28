@@ -9,7 +9,9 @@ const EntityTable = ({icatClient, filter, handleFilterChange, openRelated, isOpe
     const [errMsg, setErrMsg] = useState(null);
     const [contextMenuPos, setContextMenuPos] = useState(null);
     const [count, setCount] = useState(null);
+    // Row indexes that are marked to be deleted
     const [rowsToDelete, setRowsToDelete] = useState(new Set());
+    // Objects without ids to be written to ICAT
     const [rowsToCreate, setRowsToCreate] = useState([]);
 
     const retrieveData = () => {

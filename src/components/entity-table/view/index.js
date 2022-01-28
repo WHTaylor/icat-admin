@@ -57,7 +57,8 @@ const EntityTableView = ({
         const originalValue = data.filter(e => e.id === id)[0][field];
         const edited = {...cur, [field]: newValue};
         // If we've modified the value back to the original, remove the modification
-        if (newValue === originalValue) {
+        if (newValue === originalValue
+            || typeof originalValue === "object" && originalValue.id === newValue.id) {
             delete edited[field];
         }
         const newModified = {...entityModifications, [id]: edited};

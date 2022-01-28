@@ -196,7 +196,7 @@ const RowActions = ({
         actions.push({ title: "Cancel creation", ev: revertChanges, icon: "🚫"});
     } else {
         actions.push(markedForDeletion
-            ? { title: "Cancel deletion", ev: cancelDeletion, icon: "🚫"}
+            ? { title: "Cancel deletion", ev: cancelDeletion, icon: "↩️"}
             : { title: "Mark for deletion", ev: markToDelete, icon: "🗑"});
     }
 

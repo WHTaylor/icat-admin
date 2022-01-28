@@ -130,13 +130,7 @@ const EntityTable = ({icatClient, filter, handleFilterChange, openRelated, isOpe
     return (
         <>
         <span class={style.tableTitleBar}>
-            <div>
-                <h1 class={style.tableNameHeader}>{filter.table}</h1>
-                <CreateActions
-                    creations={rowsToCreate}
-                    addCreation={() => setRowsToCreate(rowsToCreate.concat({}))}
-                    clearCreations={() => setRowsToCreate([])} />
-            </div>
+            <h1>{filter.table}</h1>
             <input
                 type="text"
                 class={style.filterInput}
@@ -152,6 +146,12 @@ const EntityTable = ({icatClient, filter, handleFilterChange, openRelated, isOpe
                 handlePageChange={changePage} />
             {count !== null &&
                 <p class={style.tableTitleCount}>{count} matches</p>}
+        </span>
+        <span class={style.tableActionsBar}>
+            <CreateActions
+                creations={rowsToCreate}
+                addCreation={() => setRowsToCreate(rowsToCreate.concat({}))}
+                clearCreations={() => setRowsToCreate([])} />
             <DeleteActions
                 deletions={rowsToDelete}
                 clearDeletions={() => setRowsToDelete(new Set())}
@@ -239,20 +239,21 @@ const PaginationControl = ({isActive, pageNumber, handleSetPage, handleLimitChan
 
 const DeleteActions = ({deletions, clearDeletions, doDeletions}) => {
     if (deletions.size === 0) return;
-    return (<>
-        <button onClick={clearDeletions}>Cancel deletions</button>
-        <button onClick={doDeletions}>Delete {deletions.size} rows</button>
-    </>);
+    return (
+        <span>
+            <button onClick={doDeletions}>Delete {deletions.size} rows</button>
+            <button onClick={clearDeletions}>Cancel deletions</button>
+        </span>);
 };
 
 const CreateActions = ({creations, addCreation, clearCreations}) => {
     return (
-        <div>
+        <span>
             <button onClick={addCreation}>Add new</button>
             {creations.length > 0 &&
                 <button onClick={clearCreations}>Cancel creations</button>
                 }
-        </div>);
+        </span>);
 };
 
 export default EntityTable;

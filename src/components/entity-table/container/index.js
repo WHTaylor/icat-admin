@@ -136,8 +136,7 @@ const EntityTable = ({icatClient, filter, handleFilterChange, openRelated, isOpe
                 <CreateActions
                     creations={rowsToCreate}
                     addCreation={() => setRowsToCreate(rowsToCreate.concat({}))}
-                    clearCreations={() => setRowsToCreate([])}
-                    doCreations={() => {}} />
+                    clearCreations={() => setRowsToCreate([])} />
             </div>
             <input
                 type="text"
@@ -245,15 +244,13 @@ const DeleteActions = ({deletions, clearDeletions, doDeletions}) => {
     </>);
 };
 
-const CreateActions = ({creations, addCreation, clearCreations, doCreations}) => {
+const CreateActions = ({creations, addCreation, clearCreations}) => {
     return (
         <div>
             <button onClick={addCreation}>Add new</button>
             {creations.length > 0 &&
-                <>
                 <button onClick={clearCreations}>Cancel creations</button>
-                <button onClick={doCreations}>Create {creations.length} rows</button>
-                </>}
+                }
         </div>);
 };
 

@@ -20,6 +20,7 @@ const TableList = ({openTab}) => {
     useEffect(() => {
         const readKey = ev => {
             if (document.activeElement !== document.body) return;
+            if (ev.altKey || ev.ctrlKey) return;
             if (ev.key === "Escape") {
                 setTyped("");
             } else if (ev.keyCode >= 65 && ev.keyCode <= 90) {

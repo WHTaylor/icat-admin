@@ -5,11 +5,28 @@ table {
 .tableHeader {
     text-align: left;
     padding: 0.1em 0.25em;
+    user-select: none;
+    display: flex;
+    align-items: center;
 }
 
-.tableHeader p {
-    user-select: none;
+.tableHeader span {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0.5em 0.5em 0.5em 0;
+}
+
+.tableHeader button {
+    font-size: xx-small;
+    border: none;
+    background: none;
+    color: #d5d5d5;
     cursor: pointer;
+}
+
+.tableHeader button.activeSort {
+    color: black;
 }
 
 td {

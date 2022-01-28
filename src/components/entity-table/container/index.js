@@ -4,7 +4,7 @@ import style from './style.css';
 import EntityTableView from '../view';
 import {randomSuffix, joinAttributeToTableName, difference} from '../../../utils.js';
 
-const EntityTable = ({icatClient, filter, handleFilterChange, openRelated, isOpen, changeSortField, refreshData}) => {
+const EntityTable = ({icatClient, filter, handleFilterChange, openRelated, isOpen, toggleSortBy, refreshData}) => {
     const [data, setData] = useState(null);
     const [errMsg, setErrMsg] = useState(null);
     const [contextMenuPos, setContextMenuPos] = useState(null);
@@ -161,10 +161,11 @@ const EntityTable = ({icatClient, filter, handleFilterChange, openRelated, isOpe
             : <EntityTableView
                 data={data}
                 tableName={filter.table}
+                sortingBy={{field: filter.sortField, asc: filter.sortAsc}}
                 deletions={rowsToDelete}
                 creations={rowsToCreate}
                 openRelated={openRelated}
-                changeSortField={changeSortField}
+                toggleSortBy={toggleSortBy}
                 saveEntity={e =>
                     icatClient.writeEntity(filter.table, e)}
                 modifyDataRow={changeData}

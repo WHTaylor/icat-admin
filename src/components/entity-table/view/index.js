@@ -6,8 +6,8 @@ import ContextMenu from '../../context-menu';
 import {defaultHeaderSort, joinAttributeToTableName} from '../../../utils.js';
 
 const EntityTableView = ({
-    data, tableName, deletions, creations,
-    openRelated, changeSortField, saveEntity, modifyDataRow,
+    data, tableName, sortingBy, deletions, creations,
+    openRelated, toggleSortBy, saveEntity, modifyDataRow,
     markToDelete, cancelDeletion, doDelete,
     editCreation, cancelCreate, insertCreation
 }) =>
@@ -77,7 +77,7 @@ const EntityTableView = ({
     const keys = defaultHeaderSort(
         [...new Set(dataAttributes.reduce((dk1, dk2) => dk1.concat(dk2)))]);
 
-    const showRelatedFieldDisplayOptions = k => {
+    const shouldShowRelatedFieldDisplayOptions = k => {
         const v = data[0][k];
         return typeof v === "object" && !Array.isArray(v)
     };
@@ -160,9 +160,27 @@ const EntityTableView = ({
             <tr>
                 <th>Actions</th>
                 {keys.map(k =>
-                    <th class={style.tableHeader}>
-                        <p onClick={() => changeSortField(k)}>{k}</p>
-                        {showRelatedFieldDisplayOptions(k) &&
+                    <th>
+                        <span class={style.tableHeader}>
+                            {k}
+                            <span>
+                                <button
+                                    class={sortingBy.field === k && !sortingBy.asc
+                                        && style.activeSort}
+                                    onClick={() => toggleSortBy(k, false)}
+                                    title={`Sort by ${k}, descending`}>
+                                    ▲
+                                </button>
+                                <button
+                                    class={sortingBy.field === k && sortingBy.asc
+                                        && style.activeSort}
+                                    onClick={() => toggleSortBy(k, true)}
+                                    title={`Sort by ${k}, ascending`}>
+                                    ▼
+                                </button>
+                            </span>
+                        </span>
+                        {shouldShowRelatedFieldDisplayOptions(k) &&
                                 relatedFieldDisplaySelect(k)}
                     </th>)}
             </tr>

@@ -161,28 +161,30 @@ const EntityTableView = ({
             <tr>
                 <th>Actions</th>
                 {keys.map(k =>
-                    <th>
-                        <span class={style.tableHeader}>
-                            {k}
-                            <span>
-                                <button
-                                    class={sortingBy.field === k && !sortingBy.asc
-                                        && style.activeSort}
-                                    onClick={() => toggleSortBy(k, false)}
-                                    title={`Sort by ${k}, descending`}>
-                                    ▲
-                                </button>
-                                <button
-                                    class={sortingBy.field === k && sortingBy.asc
-                                        && style.activeSort}
-                                    onClick={() => toggleSortBy(k, true)}
-                                    title={`Sort by ${k}, ascending`}>
-                                    ▼
-                                </button>
+                    <th key={k + "-header"}>
+                        <div class={style.tableHeaderContainer}>
+                            <span class={style.tableHeading}>
+                                {k}
+                                <span>
+                                    <button
+                                        class={sortingBy.field === k && !sortingBy.asc
+                                            && style.activeSort}
+                                        onClick={() => toggleSortBy(k, false)}
+                                        title={`Sort by ${k}, descending`}>
+                                        ▲
+                                    </button>
+                                    <button
+                                        class={sortingBy.field === k && sortingBy.asc
+                                            && style.activeSort}
+                                        onClick={() => toggleSortBy(k, true)}
+                                        title={`Sort by ${k}, ascending`}>
+                                        ▼
+                                    </button>
+                                </span>
                             </span>
-                        </span>
                         {shouldShowRelatedFieldDisplayOptions(k) &&
                                 relatedFieldDisplaySelect(k)}
+                        </div>
                     </th>)}
             </tr>
             {creations.concat(data).map((e, i) => buildEntityRow(e, i))}

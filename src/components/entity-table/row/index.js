@@ -166,7 +166,9 @@ const EntityRow = ({
                       </td>
                     : <td
                         onClick={ev => handleFieldClick(ev, k)}
-                        class={markedForDeletion && style.markedForDeletion}>
+                        class={markedForDeletion
+                            ? style.markedForDeletion
+                            : entity.id === undefined && style.newRow}>
                         <ReadMore
                             text={getFieldValue(k)}
                             maxUnsummarizedLength="70" />
@@ -210,7 +212,13 @@ const RowActions = ({
     }
     return (<>
         {actions.map(a =>
-            <button key={a.title} title={a.title} onClick={a.ev}>{a.icon}</button>)}
+            <button
+                class={style.actionButton}
+                key={a.title}
+                title={a.title}
+                onClick={a.ev}>
+                {a.icon}
+            </button>)}
     </>);
 
 }

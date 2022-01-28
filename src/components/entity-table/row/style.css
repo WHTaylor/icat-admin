@@ -18,6 +18,14 @@
     background-color: #f4cbcd;
 }
 
+.entityRow:nth-child(even) .newRow {
+    background-color: #d4fdd6;
+}
+
+.entityRow:nth-child(odd) .newRow {
+    background-color: #e1ffe2;
+}
+
 .editInput {
     width: 95%;
 }

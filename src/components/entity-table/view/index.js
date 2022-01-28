@@ -50,7 +50,7 @@ const EntityTableView = ({
     if (data === null) return <p>Loading...</p>;
     if (data.length === 0) return <p>No entries</p>;
 
-    const editEntity = (id, field, value) => {
+    const editEntity = (id, field, newValue) => {
         const cur = entityModifications[id] === undefined
             ? {}
             : entityModifications[id];

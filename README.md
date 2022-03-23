@@ -2,12 +2,6 @@
 
 A web application for convenient browsing and editing of ICAT data. See it in action [here](https://vigorous-lamarr-7b3487.netlify.app). Designed as an alternative to [ICAT Manager](https://github.com/icatproject/manager.icat-manager).
 
-Still a WIP, but closing in on feature parity with ICAT Manager. Incoming things:
-
- - Validation and suggestions for editing
- - Prefecthing next page of data
- - Prefetching on table button hover
-
 ## CLI Commands
 
 Created with preact-cli, so uses the same set of commands to build/run.

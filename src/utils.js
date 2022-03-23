@@ -17,6 +17,8 @@ export function icatAttributeToTableName(tableName, a) {
 
 export function joinAttributeToTableName(originTable, attribute) {
     if (attribute === "type") {
+        // instrument.type is just a free text description field
+        if (originTable == "Instrument") return null
         if (originTable.endsWith("Parameter")) return "ParameterType";
         return originTable + "Type";
     } else if (attribute === "facility") {
@@ -92,4 +94,12 @@ export function queryWhereFromInput(whereInput) {
     const withEntityIdentifier = words.map((w, i) => isFieldIdentifier(i) ? `e.${w}` : w)
         .join(" ");
     return ` where ${withEntityIdentifier}`;
+}
+
+export function difference(set, other) {
+    let diff = new Set(set);
+    for (let e of other) {
+        diff.delete(e);
+    }
+    return diff;
 }

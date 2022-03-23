@@ -2,14 +2,36 @@ table {
     border-collapse: collapse;
 }
 
-.tableHeader {
-    text-align: left;
-    padding: 0.1em 0.25em;
+.tableHeaderContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
 }
 
-.tableHeader p {
+.tableHeading {
+    padding: 0.1em 0.25em;
     user-select: none;
+    display: flex;
+    align-items: center;
+}
+
+.tableHeading span {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0.5em 0.5em 0.5em 0;
+}
+
+.tableHeading button {
+    font-size: xx-small;
+    border: none;
+    background: none;
+    color: #d5d5d5;
     cursor: pointer;
+}
+
+.tableHeading button.activeSort {
+    color: black;
 }
 
 td {

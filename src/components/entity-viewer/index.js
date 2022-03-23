@@ -74,15 +74,21 @@ const EntityViewer = ({icatClient, visible}) => {
         }
     };
 
-    const changeSortField = (i, k) => {
+    const toggleSortBy = (i, k, sortAsc) => {
         const f = tabFilters[i];
-        const newFilter = f.sortField !== k
-            ? {...f, sortField: k, sortAsc: true }
-            : f.sortAsc
-                ? {...f, sortAsc: false}
-                : {...f, sortField: null};
+        const newFilter = f.sortField !== k || f.sortAsc !== sortAsc
+            ? {...f, sortField: k, sortAsc: sortAsc }
+            : f.sortAsc === sortAsc
+                ? {...f, sortField: null}
+                : {...f, sortAsc: sortAsc};
         handleFilterChange(i, newFilter);
     };
+
+    const refreshTab = i => {
+        const f = tabFilters[i];
+        const newFilter= {...f, key: Math.random()};
+        handleFilterChange(i, newFilter);
+    }
 
     useEffect(() => {
         // Could base this on the icat/properties.lifetimeMinutes, but this is simpler
@@ -114,8 +120,9 @@ const EntityViewer = ({icatClient, visible}) => {
                             handleFilterChange={f => handleFilterChange(i, f)}
                             openRelated={(e, id, isOneToMany, fromType) =>
                                 openRelated(e, f.table, id, isOneToMany, fromType)}
-                            changeSortField={k => changeSortField(i, k)}
+                            toggleSortBy={(k, sortAsc) => toggleSortBy(i, k, sortAsc)}
                             isOpen={i === activeTab}
+                            refreshData={() => refreshTab(i)}
                             key={f.key} />])}
             </TabWindow>
         </div>

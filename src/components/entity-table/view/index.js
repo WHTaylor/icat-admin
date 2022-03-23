@@ -6,9 +6,9 @@ import ContextMenu from '../../context-menu';
 import {defaultHeaderSort, joinAttributeToTableName} from '../../../utils.js';
 
 const EntityTableView = ({
-    data, tableName, deletions, creations,
-    openRelated, changeSortField, saveEntity, modifyDataRow,
-    markToDelete, cancelDeletion,
+    data, tableName, sortingBy, deletions, creations,
+    openRelated, toggleSortBy, saveEntity, modifyDataRow,
+    markToDelete, cancelDeletion, doDelete,
     editCreation, cancelCreate, insertCreation
 }) =>
 {
@@ -50,14 +50,15 @@ const EntityTableView = ({
     if (data === null) return <p>Loading...</p>;
     if (data.length === 0) return <p>No entries</p>;
 
-    const editEntity = (id, field, value) => {
+    const editEntity = (id, field, newValue) => {
         const cur = entityModifications[id] === undefined
             ? {}
             : entityModifications[id];
         const originalValue = data.filter(e => e.id === id)[0][field];
         const edited = {...cur, [field]: newValue};
         // If we've modified the value back to the original, remove the modification
-        if (newValue === originalValue) {
+        if (newValue === originalValue
+            || typeof originalValue === "object" && originalValue.id === newValue.id) {
             delete edited[field];
         }
         const newModified = {...entityModifications, [id]: edited};
@@ -77,7 +78,7 @@ const EntityTableView = ({
     const keys = defaultHeaderSort(
         [...new Set(dataAttributes.reduce((dk1, dk2) => dk1.concat(dk2)))]);
 
-    const showRelatedFieldDisplayOptions = k => {
+    const shouldShowRelatedFieldDisplayOptions = k => {
         const v = data[0][k];
         return typeof v === "object" && !Array.isArray(v)
     };
@@ -150,6 +151,7 @@ const EntityTableView = ({
             syncModifications={syncModifications}
             markToDelete={() => markToDelete(e.id)}
             cancelDeletion={() => cancelDeletion(e.id)}
+            doDelete={() => doDelete(e.id)}
             markedForDeletion={deletions.has(e.id)} />;
     };
 
@@ -157,12 +159,32 @@ const EntityTableView = ({
         <>
         <table>
             <tr>
-                <th></th>{ /* Empty row for action buttons (save/revert changes)*/ }
+                <th>Actions</th>
                 {keys.map(k =>
-                    <th class={style.tableHeader}>
-                        <p onClick={() => changeSortField(k)}>{k}</p>
-                        {showRelatedFieldDisplayOptions(k) &&
+                    <th key={k + "-header"}>
+                        <div class={style.tableHeaderContainer}>
+                            <span class={style.tableHeading}>
+                                {k}
+                                <span>
+                                    <button
+                                        class={sortingBy.field === k && sortingBy.asc
+                                            && style.activeSort}
+                                        onClick={() => toggleSortBy(k, true)}
+                                        title={`Sort by ${k}, ascending`}>
+                                        ▲
+                                    </button>
+                                    <button
+                                        class={sortingBy.field === k && !sortingBy.asc
+                                            && style.activeSort}
+                                        onClick={() => toggleSortBy(k, false)}
+                                        title={`Sort by ${k}, descending`}>
+                                        ▼
+                                    </button>
+                                </span>
+                            </span>
+                        {shouldShowRelatedFieldDisplayOptions(k) &&
                                 relatedFieldDisplaySelect(k)}
+                        </div>
                     </th>)}
             </tr>
             {creations.concat(data).map((e, i) => buildEntityRow(e, i))}

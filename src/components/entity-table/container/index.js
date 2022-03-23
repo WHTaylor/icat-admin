@@ -2,14 +2,16 @@ import {useEffect, useState} from "preact/hooks";
 import style from './style.css';
 
 import EntityTableView from '../view';
-import {randomSuffix, joinAttributeToTableName} from '../../../utils.js';
+import {randomSuffix, joinAttributeToTableName, difference} from '../../../utils.js';
 
-const EntityTable = ({icatClient, filter, handleFilterChange, openRelated, isOpen, changeSortField}) => {
+const EntityTable = ({icatClient, filter, handleFilterChange, openRelated, isOpen, toggleSortBy, refreshData}) => {
     const [data, setData] = useState(null);
     const [errMsg, setErrMsg] = useState(null);
     const [contextMenuPos, setContextMenuPos] = useState(null);
     const [count, setCount] = useState(null);
+    // Row indexes that are marked to be deleted
     const [rowsToDelete, setRowsToDelete] = useState(new Set());
+    // Objects without ids to be written to ICAT
     const [rowsToCreate, setRowsToCreate] = useState([]);
 
     const retrieveData = () => {
@@ -96,16 +98,15 @@ const EntityTable = ({icatClient, filter, handleFilterChange, openRelated, isOpe
         setRowsToDelete(new Set([...rowsToDelete]));
     }
 
-    const doDeletions = async () => {
-        let ids = [...rowsToDelete];
-        return icatClient.deleteEntities(filter.table, ids)
+    const deleteEntities = async ids =>
+        icatClient.deleteEntities(filter.table, ids)
             .then(() => {
                 const newData = data.filter(e => !ids.includes(e.id));
                 setData(newData);
             })
             .then(setCount(count - rowsToDelete.size))
-            .then(setRowsToDelete(new Set()));
-    };
+            .then(setRowsToDelete(difference(rowsToDelete, ids)));
+
 
     const editCreation = (i, k, v) => {
         const cur = rowsToCreate[i];
@@ -131,21 +132,14 @@ const EntityTable = ({icatClient, filter, handleFilterChange, openRelated, isOpe
     return (
         <>
         <span class={style.tableTitleBar}>
-            <div>
-                <h1 class={style.tableNameHeader}>{filter.table}</h1>
-                <CreateActions
-                    creations={rowsToCreate}
-                    addCreation={() => setRowsToCreate(rowsToCreate.concat({}))}
-                    clearCreations={() => setRowsToCreate([])}
-                    doCreations={() => {}} />
-            </div>
+            <h1>{filter.table}</h1>
             <input
                 type="text"
                 class={style.filterInput}
                 value={filter.where}
                 placeholder="Filter by (ie. id = 1234)"
                 onChange={ev => changeWhere(ev.target.value)}/>
-            <button title="Refresh data" onClick={() => retrieveData() && retrieveCount()}>↻</button>
+            <button title="Refresh data" onClick={refreshData}>↻</button>
             <PaginationControl
                 isActive={isOpen}
                 pageNumber={pageNumber}
@@ -154,24 +148,32 @@ const EntityTable = ({icatClient, filter, handleFilterChange, openRelated, isOpe
                 handlePageChange={changePage} />
             {count !== null &&
                 <p class={style.tableTitleCount}>{count} matches</p>}
+        </span>
+        <span class={style.tableActionsBar}>
+            <CreateActions
+                creations={rowsToCreate}
+                addCreation={() => setRowsToCreate(rowsToCreate.concat({}))}
+                clearCreations={() => setRowsToCreate([])} />
             <DeleteActions
                 deletions={rowsToDelete}
                 clearDeletions={() => setRowsToDelete(new Set())}
-                doDeletions={doDeletions} />
+                doDeletions={() => deleteEntities([...rowsToDelete])} />
         </span>
         {errMsg ? <p>{errMsg}</p>
             : <EntityTableView
                 data={data}
                 tableName={filter.table}
+                sortingBy={{field: filter.sortField, asc: filter.sortAsc}}
                 deletions={rowsToDelete}
                 creations={rowsToCreate}
                 openRelated={openRelated}
-                changeSortField={changeSortField}
+                toggleSortBy={toggleSortBy}
                 saveEntity={e =>
                     icatClient.writeEntity(filter.table, e)}
                 modifyDataRow={changeData}
                 markToDelete={markToDelete}
                 cancelDeletion={cancelDeletion}
+                doDelete={id => deleteEntities([id])}
                 editCreation={editCreation}
                 cancelCreate={cancelCreate}
                 insertCreation={insertCreation}
@@ -239,22 +241,21 @@ const PaginationControl = ({isActive, pageNumber, handleSetPage, handleLimitChan
 
 const DeleteActions = ({deletions, clearDeletions, doDeletions}) => {
     if (deletions.size === 0) return;
-    return (<>
-        <button onClick={clearDeletions}>Cancel deletions</button>
-        <button onClick={doDeletions}>Delete {deletions.size} rows</button>
-    </>);
+    return (
+        <span>
+            <button onClick={doDeletions}>Delete {deletions.size} rows</button>
+            <button onClick={clearDeletions}>Cancel deletions</button>
+        </span>);
 };
 
-const CreateActions = ({creations, addCreation, clearCreations, doCreations}) => {
+const CreateActions = ({creations, addCreation, clearCreations}) => {
     return (
-        <div>
+        <span>
             <button onClick={addCreation}>Add new</button>
             {creations.length > 0 &&
-                <>
                 <button onClick={clearCreations}>Cancel creations</button>
-                <button onClick={doCreations}>Create {creations.length} rows</button>
-                </>}
-        </div>);
+                }
+        </span>);
 };
 
 export default EntityTable;

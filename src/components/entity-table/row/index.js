@@ -80,7 +80,7 @@ const EntityRow = ({
         saveEntity(e)
             .then(successHandle)
             .then(() => setSaveSuccess(true))
-            .catch(err => setSaveSuccess(false))
+            .catch(() => setSaveSuccess(false))
             .finally(() => setIsSaving(false));
     };
 

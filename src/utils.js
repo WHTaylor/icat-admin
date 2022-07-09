@@ -67,8 +67,6 @@ export function randomSuffix() {
     return (a + b).slice(0, 8);
 }
 
-export function isDatetime(s) { return !isNaN(Date.parse(s)) };
-
 export function queryWhereFromInput(whereInput) {
     if (whereInput === null || whereInput === undefined || whereInput.trim() === "")
         return " ";
@@ -102,4 +100,12 @@ export function difference(set, other) {
         diff.delete(e);
     }
     return diff;
+}
+
+const isoDatePatt = /(\d{4})-(\d\d)-(\d\d)T(\d\d):(\d\d):(\d\d).+/
+export function parseISODate(s) {
+    let m  = s.match(isoDatePatt)
+    if (m == null) return null;
+
+    return new Date(m[1], m[2], m[3], m[4], m[5], m[6]);
 }

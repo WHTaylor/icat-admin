@@ -4,20 +4,16 @@ A web application for convenient browsing and editing of ICAT data. See it in ac
 
 ## CLI Commands
 
-Created with preact-cli, so uses the same set of commands to build/run.
-
 ``` bash
-# install dependencies
-npm install
+# install dependencies to node_modules
+yarn install
 
 # serve with hot reload at localhost:8080
-npm run dev
+yarn run dev
 
 # build for production with minification
-npm run build
+yarn run build
 
-# test the production build locally
-npm run serve
+# run the production build locally
+yarn run serve
 ```
-
-For detailed explanation on how things work, checkout the [CLI Readme](https://github.com/developit/preact-cli/blob/master/README.md).

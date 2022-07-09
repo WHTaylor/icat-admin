@@ -1,19 +1,18 @@
 import {useEffect, useState, useRef} from "preact/hooks";
 import style from './style.css';
 
-import {icatAttributeToTableName, joinAttributeToTableName, isDatetime, commonFields} from '../../../utils.js';
+import {icatAttributeToTableName, joinAttributeToTableName, parseISODate, commonFields} from '../../../utils.js';
 import ReadMore from '../../generic/read-more';
 
 function formatCellContent(cellContent) {
     if (cellContent === undefined || cellContent === null) return "";
-
-    return typeof cellContent !== "string"
-        ? typeof cellContent === "object"
-            ? cellContent.id.toString()
-            : cellContent.toString()
-        : isDatetime(cellContent)
-            ? new Date(cellContent).toISOString()
-            : cellContent;
+    if (typeof cellContent === "string") {
+        let asDate = parseISODate(cellContent);
+        return asDate == null ? cellContent : asDate.toISOString();
+    }
+    return typeof cellContent === "object"
+        ? cellContent.id.toString()
+        : cellContent.toString()
 }
 
 const EntityRow = ({
@@ -80,7 +79,7 @@ const EntityRow = ({
         saveEntity(e)
             .then(successHandle)
             .then(() => setSaveSuccess(true))
-            .catch(err => setSaveSuccess(false))
+            .catch(() => setSaveSuccess(false))
             .finally(() => setIsSaving(false));
     };
 

@@ -1,5 +1,6 @@
 import {useEffect, useState} from "preact/hooks";
 import style from './style.css';
+import {simplifyIcatErrMessage} from '../../../icatErrorHandling.js';
 
 import EntityTableView from '../view';
 import {randomSuffix, joinAttributeToTableName, difference} from '../../../utils.js';
@@ -7,53 +8,52 @@ import {randomSuffix, joinAttributeToTableName, difference} from '../../../utils
 const EntityTable = ({icatClient, filter, handleFilterChange, openRelated, isOpen, toggleSortBy, refreshData}) => {
     const [data, setData] = useState(null);
     const [errMsg, setErrMsg] = useState(null);
-    const [contextMenuPos, setContextMenuPos] = useState(null);
     const [count, setCount] = useState(null);
     // Row indexes that are marked to be deleted
     const [rowsToDelete, setRowsToDelete] = useState(new Set());
     // Objects without ids to be written to ICAT
     const [rowsToCreate, setRowsToCreate] = useState([]);
 
-    const retrieveData = () => {
-        setData(null);
-        setErrMsg(null);
-        const controller = new AbortController();
-        const signal = controller.signal;
-        const getEntries = async () => {
-            icatClient.getEntries(filter, signal)
-                .then(d => setData(d))
-                .catch(err => {
-                    // DOMException gets throws if promise is aborted, which it is
-                    // during cleanup `controller.abort()` when table/filter changes
-                    // before request finishes
-                    if (err instanceof DOMException) return;
-                    setErrMsg(err);});
-        };
-        getEntries();
-        return () => controller.abort();
-    }
-
-    const retrieveCount = () => {
-        setCount(null);
-        const controller = new AbortController();
-        const signal = controller.signal;
-        const getCount = async () => {
-            icatClient.getCount(filter, signal)
-                .then(d => setCount(d[0]))
-                // Silently ignore errors, this is only a nice to have
-                .catch(err => {});
-        };
-        getCount();
-        return () => controller.abort();
-    }
-
     useEffect(() => {
+      const retrieveData = () => {
+          setData(null);
+          setErrMsg(null);
+          const controller = new AbortController();
+          const signal = controller.signal;
+          const getEntries = async () => {
+              icatClient.getEntries(filter, signal)
+                  .then(d => setData(d))
+                  .catch(err => {
+                      // DOMException gets throws if promise is aborted, which it is
+                      // during cleanup `controller.abort()` when table/filter changes
+                      // before request finishes
+                      if (err instanceof DOMException) return;
+                      setErrMsg(simplifyIcatErrMessage(err));});
+          };
+          getEntries();
+          return () => controller.abort();
+      }
+
         return retrieveData();
-    }, [filter]);
+    }, [filter, icatClient]);
 
     useEffect(() => {
+      const retrieveCount = () => {
+          setCount(null);
+          const controller = new AbortController();
+          const signal = controller.signal;
+          const getCount = async () => {
+              icatClient.getCount(filter, signal)
+                  .then(d => setCount(d[0]))
+                  // Silently ignore errors, this is only a nice to have
+                  .catch(() => {});
+          };
+          getCount();
+          return () => controller.abort();
+      }
+
         return retrieveCount();
-    }, [filter]);
+    }, [filter, icatClient]);
 
     const changeWhere = w => handleFilterChange({...filter, where: w});
     const changeLimit = l => handleFilterChange({...filter, limit: l});
@@ -138,7 +138,7 @@ const EntityTable = ({icatClient, filter, handleFilterChange, openRelated, isOpe
                 class={style.filterInput}
                 value={filter.where}
                 placeholder="Filter by (ie. id = 1234)"
-                onChange={ev => changeWhere(ev.target.value)}/>
+                onChange={ev => changeWhere(ev.target.value)} />
             <button title="Refresh data" onClick={refreshData}>↻</button>
             <PaginationControl
                 isActive={isOpen}
@@ -229,7 +229,7 @@ const PaginationControl = ({isActive, pageNumber, handleSetPage, handleLimitChan
             <span>
                 <label for="pageSizeInput">Per page:</label>
                 <select name="pageSizeInput" onChange={
-                        ev => handleLimitChange(Number.parseInt(ev.target.value))}>
+                        ev => handleLimitChange(Number.parseInt(ev.target.value, 10))}>
                     <option value="20">20</option>
                     <option value="50" selected>50</option>
                     <option value="100">100</option>

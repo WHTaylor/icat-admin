@@ -1,5 +1,6 @@
 import {useEffect, useState} from "preact/hooks";
 import style from './style.css';
+import {simplifyIcatErrMessage} from '../../../icatErrorHandling.js';
 
 import EntityTableView from '../view';
 import {randomSuffix, joinAttributeToTableName, difference} from '../../../utils.js';
@@ -27,7 +28,7 @@ const EntityTable = ({icatClient, filter, handleFilterChange, openRelated, isOpe
                     // during cleanup `controller.abort()` when table/filter changes
                     // before request finishes
                     if (err instanceof DOMException) return;
-                    setErrMsg(err);});
+                    setErrMsg(simplifyIcatErrMessage(err));});
         };
         getEntries();
         return () => controller.abort();

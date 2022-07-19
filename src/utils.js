@@ -1,4 +1,8 @@
 import {entityNames} from './icat.js';
+import dayjs from 'dayjs';
+import customParseFormat from 'dayjs/plugin/customParseFormat';
+
+dayjs.extend(customParseFormat);
 
 // On ICAT objects, attribute names for related entities are lowercase and pluralised.
 // Remove the 's' and uppercase the first letter to get the table name.
@@ -102,10 +106,10 @@ export function difference(set, other) {
     return diff;
 }
 
-const isoDatePatt = /(\d{4})-(\d\d)-(\d\d)T(\d\d):(\d\d):(\d\d).+/
+const dateFormats = [
+ "YYYY-MM-DDTHH:mm:ss.SSSZ",
+ "YYYY-MM-DDTHH:mm:ss.SSS[Z]",
+];
 export function parseISODate(s) {
-    let m  = s.match(isoDatePatt)
-    if (m == null) return null;
-
-    return new Date(m[1], m[2], m[3], m[4], m[5], m[6]);
+    return dayjs(s, dateFormats, true);
 }

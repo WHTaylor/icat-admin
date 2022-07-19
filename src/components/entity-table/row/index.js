@@ -7,8 +7,10 @@ import ReadMore from '../../generic/read-more';
 function formatCellContent(cellContent) {
     if (cellContent === undefined || cellContent === null) return "";
     if (typeof cellContent === "string") {
-        let asDate = parseISODate(cellContent);
-        return asDate == null ? cellContent : asDate.toISOString();
+        const asDate = parseISODate(cellContent);
+        return asDate.isValid()
+            ? asDate.format("YYYY-MM-DDTmm:HH:ssZ")
+            : cellContent;
     }
     return typeof cellContent === "object"
         ? cellContent.id.toString()

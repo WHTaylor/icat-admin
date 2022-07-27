@@ -9,7 +9,7 @@ function formatCellContent(cellContent) {
     if (typeof cellContent === "string") {
         const asDate = parseISODate(cellContent);
         return asDate.isValid()
-            ? asDate.format("YYYY-MM-DDTmm:HH:ssZ")
+            ? asDate.format("YYYY-MM-DDTHH:mm:ssZ")
             : cellContent;
     }
     return typeof cellContent === "object"

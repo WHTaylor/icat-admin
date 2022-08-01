@@ -17,4 +17,4 @@ const About = () => (
         </ul>
     </div>);
 
-export default About
+export default About;

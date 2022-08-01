@@ -3,6 +3,7 @@ import { useLayoutEffect, useEffect, useState } from "preact/hooks";
 
 import IcatClient from '../icat.js';
 import About from './about';
+import Tips from './tips';
 import Header from './header';
 import EntityViewer from './entity-viewer';
 import ServerConnector from './server-connector';
@@ -13,6 +14,7 @@ const App = () => {
     // activePage is one of
     //  - null - show a login page
     //  - "about" - show the about page
+    //  - "tips" - show the tips page
     //  - A number - show EntityViewer for the corresponding server
     const [activePage, setActivePage] = useState(null);
 
@@ -45,7 +47,7 @@ const App = () => {
         } else if (i === activePage) {
             if (i === 0) {
                 if (numConnections === 1) setActivePage(null);
-                else setActivePage(0);
+                else setActivePage(-1);
             }
             else if (i === numConnections - 1) setActivePage(activePage - 1);
         }
@@ -68,6 +70,7 @@ const App = () => {
                 setActiveServer={i => setActivePage(i)}
                 closeServer={removeConnection}
                 showAbout={() => setActivePage("about")}
+                showTips={() => setActivePage("tips")}
                 showLoginForm={() => setActivePage(null)} />
             {connections.map((c, i) =>
                 <EntityViewer
@@ -75,6 +78,7 @@ const App = () => {
                     icatClient={new IcatClient(c.server, c.sessionId)}
                     visible={aServerIsActive && i === activePage} />)}
             {activePage === "about" && <About /> }
+            {activePage === "tips" && <Tips /> }
             {activePage === null &&
                 <ServerConnector
                     createConnection={createConnection} />}

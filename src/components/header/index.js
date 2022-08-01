@@ -9,7 +9,7 @@ function stripProtocol(s) {
 
 const Header = ({
     servers, activePage,
-    setActiveServer, closeServer, showLoginForm, showAbout}) =>
+    setActiveServer, closeServer, showLoginForm, showTips, showAbout}) =>
 {
     const onClickServerLink = (ev, i) => {
         // Middle click to close, left click to activate
@@ -31,6 +31,12 @@ const Header = ({
                 <a
                     onClick={showLoginForm}
                     class={activePage === null && style.active}>+</a>
+                <a
+                    onClick={showTips}
+                    id={style.tipsLink}
+                    class={activePage === "tips" && style.active}>
+                    Tips
+                </a>
                 <a
                     onClick={showAbout}
                     id={style.aboutLink}

@@ -170,9 +170,7 @@ const EntityRow = ({
                         class={markedForDeletion
                             ? style.markedForDeletion
                             : entity.id === undefined && style.newRow}>
-                        <ReadMore
-                            text={getFieldValue(k)}
-                            maxUnsummarizedLength="70" />
+                        <ReadMore text={getFieldValue(k)} />
                       </td>
             )}
         </tr>

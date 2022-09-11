@@ -14,9 +14,9 @@ export function icatAttributeToTableName(tableName, a) {
     const capitalizedSingular = capitalize(singular);
     if (singular === "parameter") {
         return tableName + capitalizedSingular;
-    } else {
-        return capitalizedSingular;
     }
+
+    return capitalizedSingular;
 }
 
 export function joinAttributeToTableName(originTable, attribute) {
@@ -40,7 +40,7 @@ export function joinAttributeToTableName(originTable, attribute) {
 
 function capitalize(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
 
-export function lowercaseFirst(s) { return s.charAt(0).toLowerCase() + s.slice(1) };
+export function lowercaseFirst(s) { return s.charAt(0).toLowerCase() + s.slice(1); }
 
 export function tableFilter(table, offset, limit, where, sortField=null, sortAsc=true) {
     if (table === undefined) console.error("tableFilter called without args");

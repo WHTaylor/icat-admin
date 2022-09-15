@@ -1,8 +1,6 @@
 // Login as anon on the prod ICAT server
 beforeEach(() => {
-    cy.visit('localhost:8080');
-    cy.get('#serverInput').click().type('icatisis.esc.rl.ac.uk');
-    cy.contains('Login').click();
+    cy.login('prod')
 })
 
 describe('Investigations are accessible', () => {

@@ -9,7 +9,7 @@ const login = env => {
 };
 
 Cypress.Commands.add('login', (env) => {
-  cy.visit('localhost:8080');
+  cy.visit('/');
   login(env);
 })
 

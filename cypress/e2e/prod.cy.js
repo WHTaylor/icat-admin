@@ -1,6 +1,6 @@
 // Login as anon on the prod ICAT server
 beforeEach(() => {
-    cy.login('prod')
+  cy.login('prod')
 })
 
 describe('Investigations are accessible', () => {

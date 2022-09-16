@@ -44,7 +44,7 @@ const EntityTable = ({icatClient, filter, handleFilterChange, openRelated, isOpe
           const signal = controller.signal;
           const getCount = async () => {
               icatClient.getCount(filter, signal)
-                  .then(d => setCount(d[0]))
+                  .then(c => setCount(c))
                   // Silently ignore errors, this is only a nice to have
                   .catch(() => {});
           };

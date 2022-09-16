@@ -109,7 +109,8 @@ class IcatClient {
                 ? res
                 : formatError(res)
                     .then(msg => Promise.reject(msg)))
-            .then(res => res.json());
+            .then(res => res.json())
+            .then(json => json[0]);
     }
 
     async getById(entityType, id) {

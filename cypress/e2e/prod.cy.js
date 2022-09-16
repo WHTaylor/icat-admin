@@ -21,3 +21,16 @@ describe('Can open a table by typing the entity name', () => {
     cy.contains(/^ISIS$/);
   })
 })
+
+// We don't test opening _all_ tables, because around the 80% mark they get quite slow
+describe('Can open many tables at once', () => {
+    it('passes', () => {
+      const buttons = cy.get('.leftColumn ul li:nth-child(odd) button');
+      buttons.should('have.length.greaterThan', 0);
+      const numButtons = buttons.click({multiple: true})
+        .then($b => {
+          const tabs = cy.get('[class*="tabSwitcher"] button');
+          tabs.should('have.length', $b.length);
+        });
+    })
+})

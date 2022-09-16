@@ -203,6 +203,7 @@ const oneToX = {
     Instrument: ["facility"],
     InstrumentScientist: ["instrument", "user"],
     Investigation: ["type", "facility"],
+    InvestigationFacilityCycle: ["investigation", "facilityCycle"],
     InvestigationGroup: ["grouping", "investigation"],
     InvestigationInstrument: ["instrument", "investigation"],
     InvestigationParameter: ["investigation", "type"],

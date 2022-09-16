@@ -66,8 +66,8 @@ function getServerNumberByName(serverName) {
     if (match.length === 0) return null;
     else if (match.length === 1) return match[0];
 
-    console.error(`Several results in getServerNumberByName for ${serverName}`);
-    console.log(match);
+    log.error(`Several results in getServerNumberByName for ${serverName}`);
+    log.info(match);
     return match[0]
 }
 

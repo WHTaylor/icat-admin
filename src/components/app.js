@@ -9,6 +9,18 @@ import EntityViewer from './entity-viewer';
 import ServerConnector from './server-connector';
 import {getLastLogin, saveLogin, invalidateLogin} from '../servercache.js';
 
+import dayjs from 'dayjs';
+
+function formatLog(level, msg) {
+    return `${dayjs().format()} ${level} - ${msg}`;
+}
+
+global.log = {
+    info: msg => console.log(formatLog("INFO", msg)),
+    warn: msg => console.warn(formatLog("WARN", msg)),
+    error: msg => console.error(formatLog("ERROR", msg)),
+}
+
 const App = () => {
     const [connections, setConnections] = useState([]);
     // activePage is one of

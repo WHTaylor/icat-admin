@@ -53,7 +53,7 @@ const EntityViewer = ({icatClient, visible}) => {
     const openRelated = (related, origin, relationId, oneToMany, fromType) => {
         // This happens if no matching table is found in joinAttributeToTableName
         if (related === null) {
-            console.warn("Failed to find related table to open");
+            log.warn("Failed to find related table to open");
             return;
         }
         // TODO: Document what fromType is (because I've forgotten)

@@ -57,7 +57,7 @@ const ServerLink = ({s, isActive, handleClick}) => {
     useEffect(() => {
         new IcatClient(s.server, s.sessionId).getUserName()
             .then(res => setUserName(res.userName))
-            .catch(console.error);
+            .catch(log.error);
     }, [s]);
 
     const prefix = userName === null

@@ -25,6 +25,8 @@ const Header = ({
             <nav>
                 {servers.map((s, i) =>
                     <ServerLink
+                        // This will break if we allow servers to be reordered
+                        key={s + i}
                         s={s}
                         handleClick={ev => onClickServerLink(ev, i)}
                         isActive={activePage === i} />)}
@@ -51,7 +53,7 @@ const Header = ({
 const ServerLink = ({s, isActive, handleClick}) => {
     const [userName, setUserName] = useState(null);
     useEffect(() => {
-        const ps = new IcatClient(s.server, s.sessionId).getUserName()
+        new IcatClient(s.server, s.sessionId).getUserName()
             .then(res => setUserName(res.userName))
             .catch(console.error);
     }, [s]);

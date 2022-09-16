@@ -46,12 +46,12 @@ export function tableFilter(table, offset, limit, where, sortField=null, sortAsc
     if (table === undefined) console.error("tableFilter called without args");
     return {
         key: Math.random(),
-        table: table,
-        offset: offset,
-        limit: limit,
+        table,
+        offset,
+        limit,
         where: where === undefined ? null : where,
-        sortField: sortField,
-        sortAsc: sortAsc,
+        sortField,
+        sortAsc,
     };
 }
 

@@ -12,10 +12,10 @@
 if (typeof window === 'undefined') {
   global.localStorage = {
     _data       : {},
-    setItem     : function(id, val) { return this._data[id] = String(val); },
-    getItem     : function(id) { return this._data.hasOwnProperty(id) ? this._data[id] : undefined; },
-    removeItem  : function(id) { return delete this._data[id]; },
-    clear       : function() { return this._data = {}; }
+    setItem     : (id, val) => { return this._data[id] = String(val); },
+    getItem     : id => this._data[id],
+    removeItem  : id => { return delete this._data[id]; },
+    clear       : () => { this._data = {}; }
   };
 }
 
@@ -32,7 +32,7 @@ export function saveLogin(serverName, sessionId) {
 function nextFreeServerNumber() {
     const serverNumbers = [...new Set(
         serverEntries()
-                .map(([n, k, v]) => n)
+                .map(([n, _, __]) => n)
                 .map(n => Number.parseInt(n)))]
         .sort();
     if (Math.min(...serverNumbers) > 1) return 1;
@@ -56,15 +56,15 @@ export function deleteServer(name) {
 
 function getServerNumberByName(serverName) {
     const match = serverEntries()
-        .filter(([n, k, v]) => k === "name" && v === serverName)
-        .map(([n, k, v]) => n);
+        .filter(([_, k, v]) => k === "name" && v === serverName)
+        .map(([n, _, __]) => n);
+
     if (match.length === 0) return null;
     else if (match.length === 1) return match[0];
-    else {
-        console.error(`Several results in getServerNumberByName for ${serverName}`);
-        console.log(match);
-        return match[0]
-    }
+
+    console.error(`Several results in getServerNumberByName for ${serverName}`);
+    console.log(match);
+    return match[0]
 }
 
 export function getLastLogin() {
@@ -73,19 +73,11 @@ export function getLastLogin() {
     return info === null ? [null, null] : [info.name, info.sessionId || null];
 }
 
-export function getCachedSessionId() {
-    const login = getLastLogin()
-    if (login === null) return null;
-    const [server, sessionId] = login;
-    if (sessionId === undefined) return null;
-    return sessionId;
-}
-
 function getServer(serverNumber) {
     const serverKVs = serverEntries()
-        .filter(([n, k, v]) => n === serverNumber);
+        .filter(([n, _, __]) => n === serverNumber);
     if (serverKVs.length === 0) return null;
-    return serverKVs.reduce((o, [n, k, v]) => ({...o, [k]: v}), {});
+    return serverKVs.reduce((o, [_, k, v]) => ({...o, [k]: v}), {});
 }
 
 function serverEntries() {
@@ -96,6 +88,6 @@ function serverEntries() {
 
 export function serverNames() {
     return serverEntries()
-        .filter(([n, k, v]) => k == "name")
-        .map(([n, k, v]) => v);
+        .filter(([_, k, __]) => k == "name")
+        .map(([_, __, v]) => v);
 }

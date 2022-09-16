@@ -44,7 +44,7 @@ const TableList = ({openTab}) => {
         <h2>ICAT tables</h2>
         <ul>
             {entityNames.map(en =>
-                <li>
+                <li key={en}>
                     <button
                         class="entityButton"
                         onClick={() => openTab(tableFilter(en, 0, 50))}>
@@ -52,7 +52,7 @@ const TableList = ({openTab}) => {
                     </button>
                 </li>)}
         </ul>
-        <TypingPreview current={typed} match={getTable(typed)}/>
+        <TypingPreview current={typed} match={getTable(typed)} />
         </>
     );
 }

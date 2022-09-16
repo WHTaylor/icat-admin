@@ -229,7 +229,7 @@ const PaginationControl = ({isActive, pageNumber, handleSetPage, handleLimitChan
             <span>
                 <label for="pageSizeInput">Per page:</label>
                 <select name="pageSizeInput" onChange={
-                        ev => handleLimitChange(Number.parseInt(ev.target.value, 10))}>
+                        ev => handleLimitChange(Number.parseInt(ev.target.value))}>
                     <option value="20">20</option>
                     <option value="50" selected>50</option>
                     <option value="100">100</option>

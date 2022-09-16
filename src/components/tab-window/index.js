@@ -1,4 +1,3 @@
-import {useState, useEffect} from "preact/hooks";
 import style from './style.css';
 
 const TabWindow = props => {
@@ -33,8 +32,11 @@ const TabWindow = props => {
                 class={style.tabSwitcher}
                 ondragover={ev => ev.preventDefault()}
                 ondrop={endDrag} >
-                {props.children.map(([name, c], i) =>
+                {props.children.map(([name], i) =>
                     <button
+                        // This key relies on order, so isn't great, but better than
+                        // nothing
+                        key={name + i}
                         onClick={() => props.handleChangeTab(i)}
                         onMouseDown={ev => handleMouseDown(ev, i)}
                         class={`entityButton
@@ -44,8 +46,12 @@ const TabWindow = props => {
                         {name}
                     </button>)}
             </div>
-            {props.children.map(([name, c], i) =>
-                <div class={i === props.activeTab ? "" : "hidden"}>{c}</div>)}
+            {props.children.map(([name, child], i) =>
+                <div
+                    // This key relies on order, so isn't great, but better than
+                    // nothing
+                    key={name + i}
+                    class={i === props.activeTab ? "" : "hidden"}>{child}</div>)}
         </div>
     );
 }

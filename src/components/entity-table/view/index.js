@@ -92,6 +92,7 @@ const EntityTableView = ({
                     .filter(vk => typeof v[vk] !== "object")
                     .map(vk =>
                 <option
+                    key={vk}
                     value={vk}
                     selected={relatedDisplayFields[k] === vk}>{vk}</option>)}
         </select>);
@@ -101,7 +102,7 @@ const EntityTableView = ({
         const isNewRow = e.id === undefined;
         const key = isNewRow ? "thisIsABadKeyToUse" + i : e.id;
         const makeEdit = (k, v) => {
-            var fieldIsEntity = joinAttributeToTableName(tableName, k) !== null;
+            const fieldIsEntity = joinAttributeToTableName(tableName, k) !== null;
             const newValue = fieldIsEntity
                 // TODO: Don't hardcode this to id, and should probably validate it
                 ? { id: Number.parseInt(v) }

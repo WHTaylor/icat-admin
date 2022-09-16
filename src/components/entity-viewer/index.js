@@ -37,7 +37,7 @@ const EntityViewer = ({icatClient, visible}) => {
             rearranged[a] = rearranged[b];
             rearranged[b] = temp;
             setTabFilters(rearranged);
-        };
+        }
     };
 
     /* related    - the table to open
@@ -77,10 +77,10 @@ const EntityViewer = ({icatClient, visible}) => {
     const toggleSortBy = (i, k, sortAsc) => {
         const f = tabFilters[i];
         const newFilter = f.sortField !== k || f.sortAsc !== sortAsc
-            ? {...f, sortField: k, sortAsc: sortAsc }
+            ? {...f, sortField: k, sortAsc }
             : f.sortAsc === sortAsc
                 ? {...f, sortField: null}
-                : {...f, sortAsc: sortAsc};
+                : {...f, sortAsc};
         handleFilterChange(i, newFilter);
     };
 
@@ -105,7 +105,7 @@ const EntityViewer = ({icatClient, visible}) => {
                 the active server.
             */}
             {visible && <div class="leftColumn">
-                <TableList openTab={openTab}/>
+                <TableList openTab={openTab} />
             </div>}
             <TabWindow
                 activeTab={activeTab}
@@ -113,7 +113,8 @@ const EntityViewer = ({icatClient, visible}) => {
                 handleChangeTab={setActiveTab}
                 swapTabs={swapTabs}>
                 {tabFilters.map((f, i) =>
-                    [f.table,
+                    [
+                        f.table,
                         <EntityTable
                             icatClient={icatClient}
                             filter={f}
@@ -123,7 +124,8 @@ const EntityViewer = ({icatClient, visible}) => {
                             toggleSortBy={(k, sortAsc) => toggleSortBy(i, k, sortAsc)}
                             isOpen={i === activeTab}
                             refreshData={() => refreshTab(i)}
-                            key={f.key} />])}
+                            key={f.key} />
+                    ])}
             </TabWindow>
         </div>
     );

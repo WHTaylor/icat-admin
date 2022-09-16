@@ -1,5 +1,3 @@
-import style from './style.css';
-
 const About = () => (
     <div class="page">
         <h2 class="leftColumn">About ICAT Admin</h2>

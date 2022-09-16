@@ -1,5 +1,5 @@
 import { h } from 'preact';
-import { useLayoutEffect, useEffect, useState } from "preact/hooks";
+import { useLayoutEffect, useState } from "preact/hooks";
 
 import IcatClient from '../icat.js';
 import About from './about';
@@ -22,7 +22,7 @@ const App = () => {
     const createConnection = (server, sessionId) => {
         const numConnections = connections.length;
         setConnections(
-            connections.concat({"server": server, "sessionId": sessionId}));
+            connections.concat({server, sessionId}));
         setActivePage(numConnections);
         saveLogin(server, sessionId);
     };

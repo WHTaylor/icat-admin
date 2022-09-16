@@ -55,7 +55,7 @@ const ServerSelector = () => {
     const [addingServer, setAddingServer] = useState(serverOptions.length === 0);
 
     const input = addingServer
-        ? <input id="serverInput" type="text" class={style.inline}/>
+        ? <input id="serverInput" type="text" class={style.inline} />
         : <select id="serverInput" class={style.inline}>{serverOptions}</select>;
 
     const button = <button

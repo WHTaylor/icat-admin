@@ -15,7 +15,14 @@
     "extends": "preact",
     "ignorePatterns": [
       "build/"
-    ]
+    ],
+    "rules": {
+      "prefer-template": "off",
+      "radix": "off",
+      "no-unused-vars": ["error", {
+        "argsIgnorePattern": "_+"
+      }]
+    }
   },
   "devDependencies": {
     "cypress": "^10.8.0",

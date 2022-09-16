@@ -59,10 +59,10 @@ class IcatClient {
 
     async login(plugin, username, password) {
         const creds = {
-            "plugin": plugin,
-            "credentials": [
-                {"username": username},
-                {"password": password}]};
+            plugin,
+            credentials: [
+                {username},
+                {password}]};
         const form = new FormData();
         form.append('json', JSON.stringify(creds));
         const url = new URL("icat/session", this.hostUrl);
@@ -86,8 +86,8 @@ class IcatClient {
     async getEntries(filter, signal) {
         const query = buildQuery(filter);
         const params = {
-            "sessionId": this.sessionId,
-            "query": query,
+            sessionId: this.sessionId,
+            query,
         }
         return fetch(this.entityUrl(params), {signal})
             .then(res => res.ok
@@ -102,8 +102,8 @@ class IcatClient {
         const where = queryWhereFromInput(filter.where);
         const query = `select count(e) from ${filter.table} e ${where}`;
         const params = {
-            "sessionId": this.sessionId,
-            "query": query,
+            sessionId: this.sessionId,
+            query,
         }
         return fetch(this.entityUrl(params), {signal})
             .then(res => res.ok
@@ -116,9 +116,9 @@ class IcatClient {
     async getById(entityType, id) {
         const query = `${entityType} e ${queryIncludeClause(entityType)}`;
         const params = {
-            "sessionId": this.sessionId,
-            "query": query,
-            "id": id
+            sessionId: this.sessionId,
+            query,
+            id
         };
         return fetch(this.entityUrl(params))
             .then(res => res.ok
@@ -162,10 +162,10 @@ class IcatClient {
     }
 
     async deleteEntities(entityType, ids) {
-        const entities = ids.map(id => ({[entityType]: {"id": id}}));
+        const entities = ids.map(id => ({[entityType]: {id}}));
         const params = {
-            "sessionId": this.sessionId,
-            "entities": JSON.stringify(entities)
+            sessionId: this.sessionId,
+            entities: JSON.stringify(entities)
         };
         return fetch(this.entityUrl(params), {method: "DELETE"})
             .then(res => res.ok
@@ -182,38 +182,38 @@ class IcatClient {
 export const entityNames = ["Affiliation", "Application", "DataCollection", "DataCollectionDatafile", "DataCollectionDataset", "DataCollectionInvestigation", "DataCollectionParameter", "DataPublication", "DataPublicationDate", "DataPublicationFunding", "DataPublicationType", "DataPublicationUser", "Datafile", "DatafileFormat", "DatafileParameter", "Dataset", "DatasetInstrument", "DatasetParameter", "DatasetTechnique", "DatasetType", "Facility", "FacilityCycle", "FundingReference", "Grouping", "Instrument", "InstrumentScientist", "Investigation", "InvestigationFacilityCycle", "InvestigationFunding", "InvestigationGroup", "InvestigationInstrument", "InvestigationParameter", "InvestigationType", "InvestigationUser", "Job", "Keyword", "ParameterType", "PermissibleStringValue", "PublicStep", "Publication", "RelatedDatafile", "RelatedItem", "Rule", "Sample", "SampleParameter", "SampleType", "Shift", "Study", "StudyInvestigation", "Technique", "User", "UserGroup"]
 
 export const oneToX = {
-    "Application": ["facility"],
-    "DataCollectionDatafile": ["dataCollection", "datafile"],
-    "DataCollectionDataset": ["dataCollection", "dataset"],
-    "DataCollectionParameter": ["dataCollection", "type"],
-    "Datafile": ["datafileFormat", "dataset"],
-    "DatafileFormat": ["facility"],
-    "DatafileParameter": ["type", "datafile"],
-    "Dataset": ["sample", "type", "investigation"],
-    "DatasetParameter": ["type", "dataset"],
-    "DatasetType": ["facility"],
-    "FacilityCycle": ["facility"],
-    "Instrument": ["facility"],
-    "InstrumentScientist": ["instrument", "user"],
-    "Investigation": ["type", "facility"],
-    "InvestigationGroup": ["grouping", "investigation"],
-    "InvestigationInstrument": ["instrument", "investigation"],
-    "InvestigationParameter": ["investigation", "type"],
-    "InvestigationType": ["facility"],
-    "InvestigationUser": ["user", "investigation"],
-    "Job": ["inputDataCollection", "outputDataCollection", "application"],
-    "Keyword": ["investigation"],
-    "ParameterType": ["facility"],
-    "PermissibleStringValue": ["type"],
-    "Publication": ["investigation"],
-    "RelatedDatafile": ["sourceDatafile", "destDatafile"],
-    "Rule": ["grouping"],
-    "Sample": ["investigation", "type"],
-    "SampleParameter": ["sample", "type"],
-    "SampleType": ["facility"],
-    "Shift": ["investigation", "instrument"],
-    "Study": ["user"],
-    "StudyInvestigation": ["study", "investigation"],
-    "UserGroup": ["user", "grouping"]
+    Application: ["facility"],
+    DataCollectionDatafile: ["dataCollection", "datafile"],
+    DataCollectionDataset: ["dataCollection", "dataset"],
+    DataCollectionParameter: ["dataCollection", "type"],
+    Datafile: ["datafileFormat", "dataset"],
+    DatafileFormat: ["facility"],
+    DatafileParameter: ["type", "datafile"],
+    Dataset: ["sample", "type", "investigation"],
+    DatasetParameter: ["type", "dataset"],
+    DatasetType: ["facility"],
+    FacilityCycle: ["facility"],
+    Instrument: ["facility"],
+    InstrumentScientist: ["instrument", "user"],
+    Investigation: ["type", "facility"],
+    InvestigationGroup: ["grouping", "investigation"],
+    InvestigationInstrument: ["instrument", "investigation"],
+    InvestigationParameter: ["investigation", "type"],
+    InvestigationType: ["facility"],
+    InvestigationUser: ["user", "investigation"],
+    Job: ["inputDataCollection", "outputDataCollection", "application"],
+    Keyword: ["investigation"],
+    ParameterType: ["facility"],
+    PermissibleStringValue: ["type"],
+    Publication: ["investigation"],
+    RelatedDatafile: ["sourceDatafile", "destDatafile"],
+    Rule: ["grouping"],
+    Sample: ["investigation", "type"],
+    SampleParameter: ["sample", "type"],
+    SampleType: ["facility"],
+    Shift: ["investigation", "instrument"],
+    Study: ["user"],
+    StudyInvestigation: ["study", "investigation"],
+    UserGroup: ["user", "grouping"]
 };
 export default IcatClient;

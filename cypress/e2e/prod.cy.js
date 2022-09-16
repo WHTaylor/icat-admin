@@ -13,24 +13,45 @@ describe('Investigations are accessible', () => {
 
 describe('Can open a table by typing the entity name', () => {
   it('passes', () => {
-    cy.contains(/^Facility$/);
-    // Typing too fast makes this flaky, so delay between characters (default is 10).
-    // Seems like cypress has some heisenbugs with this kind of thing, ie.
-    // https://github.com/cypress-io/cypress/issues/5480
-    cy.get('body').type('Facility{enter}', {delay: 50});
+    cy.openEntityByTyping('Facility');
     cy.contains(/^ISIS$/);
+  })
+})
+
+describe('Fields can be edited', () => {
+  it('passes', () => {
+    cy.openEntityByTyping('Facility');
+    cy.get('[class*="entityRow"]')
+      .contains(/^ISIS$/)
+      .click()
+      .type('{selectAll}{backspace}changed{enter}');
+    cy.get('[class*="entityRow"]')
+      .contains(/^changed$/);
+  })
+})
+
+describe('Read more works', () => {
+  it('passes', () => {
+    cy.openEntityByTyping('Facility');
+    cy.get('[class*="entityRow"]')
+      .contains('show more');
+
+    cy.get('[class*="readMoreBtn"]').click();
+
+    cy.get('[class*="entityRow"]')
+      .contains('less');
   })
 })
 
 // We don't test opening _all_ tables, because around the 80% mark they get quite slow
 describe('Can open many tables at once', () => {
-    it('passes', () => {
-      const buttons = cy.get('.leftColumn ul li:nth-child(odd) button');
-      buttons.should('have.length.greaterThan', 0);
-      const numButtons = buttons.click({multiple: true})
-        .then($b => {
-          const tabs = cy.get('[class*="tabSwitcher"] button');
-          tabs.should('have.length', $b.length);
-        });
-    })
+  it('passes', () => {
+    const buttons = cy.get('.leftColumn ul li:nth-child(odd) button');
+    buttons.should('have.length.greaterThan', 0);
+    const numButtons = buttons.click({multiple: true})
+      .then($b => {
+        const tabs = cy.get('[class*="tabSwitcher"] button');
+        tabs.should('have.length', $b.length);
+      });
+  })
 })

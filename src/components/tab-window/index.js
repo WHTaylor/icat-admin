@@ -30,6 +30,7 @@ const TabWindow = props => {
 
     return (
         <div class="mainContentAndRightColumn">
+            {props.children.length > 0 &&
             <div
                 class={style.tabSwitcher}
                 ondragover={ev => ev.preventDefault()}
@@ -47,7 +48,7 @@ const TabWindow = props => {
                         ondragstart={ev => startDrag(ev, i)} >
                         {name}
                     </button>)}
-            </div>
+            </div> }
             {props.children.map(([name, child], i) =>
                 <div
                     // This key relies on order, so isn't great, but better than

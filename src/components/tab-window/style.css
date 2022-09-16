@@ -1,6 +1,7 @@
 .tabSwitcher {
-    display: flex;
-    flex-direction: row;
+    display: inline-block;
+    background-color: #bbb;
+    padding: 0.2em;
 }
 
 .tabSwitcher button {

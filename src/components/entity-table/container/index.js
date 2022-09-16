@@ -132,7 +132,7 @@ const EntityTable = ({icatClient, filter, handleFilterChange, openRelated, isOpe
     return (
         <>
         <span class={style.tableTitleBar}>
-            <h1>{filter.table}</h1>
+            <h2>{filter.table}</h2>
             <input
                 type="text"
                 class={style.filterInput}

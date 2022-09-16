@@ -1,3 +1,24 @@
+html {
+    --color-default-text: #444;
+
+    --color-banner-blue: #008fbb;
+
+    --color-blue-light-pale: #ebfefb;
+
+    --color-green-light: #d4fdd6;
+    --color-green-light: #d4fdd6;
+
+    --color-red-light: #f4c4c6;
+    --color-red-very-light: #f4cbcd;
+
+    --color-grey-dark: #666;
+    --color-grey-slightly-dark: #b8b8b8;
+    --color-grey: #ddd;
+    --color-grey-slightly-light: #e6e6e6;
+    --color-grey-light: #f3f3f3;
+    --color-grey-very-light: #fafafa;
+}
+
 html, body {
 	height: 100%;
 	width: 100%;
@@ -6,7 +27,7 @@ html, body {
 	background: #FAFAFA;
 	font-family: 'Helvetica Neue', arial, sans-serif;
 	font-weight: 400;
-	color: #444;
+	color: var(--color-default-text);
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
 }
@@ -44,7 +65,8 @@ html, body {
 }
 
 .entityButton {
-    border: none;
+    border: 0;
+    border-radius: 2px;
     padding: 0.08em 0.3em;
 }
 

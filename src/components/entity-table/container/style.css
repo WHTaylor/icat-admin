@@ -1,6 +1,13 @@
 .tableTitleBar {
     display: flex;
     align-items: center;
+    margin-top: -0.5em;
+    margin-bottom: -0.5em;
+}
+
+.tableTitleBar h2 {
+    margin-right: 0.2em;
+    cursor: default;
 }
 
 .tableTitleBar > *:not(:first-child) {
@@ -23,6 +30,7 @@
 .tableTitleCount {
     color: grey;
     font-size: small;
+    cursor: default;
 }
 
 .paginationControl {

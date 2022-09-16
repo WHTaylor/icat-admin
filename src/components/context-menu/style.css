@@ -1,9 +1,9 @@
 .contextMenu {
     position: absolute;
-    background-color: #e8e8e8;
+    background-color: var(--color-grey-slightly-light);
     top: 200px;
     left: 200px;
-    border: solid #777 2px;
+    border: solid var(--color-grey-dark) 2px;
 }
 
 .contextMenu h3 {
@@ -13,12 +13,12 @@
 
 .contextMenuRow {
     background-color: white;
-    margin-top: 0.05em;
-    padding: 0.1em;
+    margin-top: 0.06em;
+    padding: 0 0.1em;
 }
 
 .contextMenuRow:hover {
-    background-color: #ddd;
+    background-color: var(--color-grey);
     user-select: none;
 }
 

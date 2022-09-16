@@ -22,15 +22,15 @@ table {
     padding: 0.5em 0.5em 0.5em 0;
 }
 
-.tableHeading button {
+.sortButton {
     font-size: xx-small;
     border: none;
     background: none;
-    color: #d5d5d5;
+    color: var(--color-grey-slightly-light);
     cursor: pointer;
 }
 
-.tableHeading button.activeSort {
+.sortButton.activeSort {
     color: black;
 }
 

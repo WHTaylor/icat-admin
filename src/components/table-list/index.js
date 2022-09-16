@@ -42,7 +42,7 @@ const TableList = ({openTab}) => {
     return (
         <>
         <h2>ICAT tables</h2>
-        <ul>
+        <ul class={style.tableList}>
             {entityNames.map(en =>
                 <li key={en}>
                     <button

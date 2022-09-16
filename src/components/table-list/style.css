@@ -1,11 +1,11 @@
-ul {
+.tableList {
     list-style: none;
-    margin-left: -1.8em;
+    margin-left: -2.3em;
     margin-right: 0.4em;
-    margin-top: -0.5em;
+    margin-top: -0.8em;
 }
 
-ul li {
+.tableList li {
     margin: 0.1em 0;
 }
 

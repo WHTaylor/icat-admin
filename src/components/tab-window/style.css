@@ -1,6 +1,6 @@
 .tabSwitcher {
     display: inline-block;
-    background-color: #bbb;
+    background-color: var(--color-grey-slightly-dark);
     padding: 0.2em;
 }
 
@@ -9,5 +9,5 @@
 }
 
 .selectedTab {
-    background-color: #e1f9fb
+    background-color: var(--color-blue-light-pale);
 }

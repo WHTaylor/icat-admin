@@ -168,15 +168,19 @@ const EntityTableView = ({
                                 {k}
                                 <span>
                                     <button
-                                        class={sortingBy.field === k && sortingBy.asc
-                                            && style.activeSort}
+                                        className={
+                                            `${style.sortButton}
+                                            ${sortingBy.field === k && sortingBy.asc
+                                            ? style.activeSort : '' }`}
                                         onClick={() => toggleSortBy(k, true)}
                                         title={`Sort by ${k}, ascending`}>
                                         ▲
                                     </button>
                                     <button
-                                        class={sortingBy.field === k && !sortingBy.asc
-                                            && style.activeSort}
+                                        className={
+                                            `${style.sortButton}
+                                            ${sortingBy.field === k && !sortingBy.asc
+                                            ? style.activeSort : '' }`}
                                         onClick={() => toggleSortBy(k, false)}
                                         title={`Sort by ${k}, descending`}>
                                         ▼

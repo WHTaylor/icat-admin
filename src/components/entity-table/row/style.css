@@ -1,9 +1,9 @@
 .entityRow:nth-child(even) {
-    background-color: #f3f3f3;
+    background-color: var(--color-grey-light);
 }
 
 .entityRow:nth-child(odd) {
-    background-color: #fafafa;
+    background-color: var(--color-grey-very-light);
 }
 
 .markedForDeletion {
@@ -11,19 +11,19 @@
 }
 
 .entityRow:nth-child(even) .markedForDeletion {
-    background-color: #f4c3c6;
+    background-color: var(--color-red-light);
 }
 
 .entityRow:nth-child(odd) .markedForDeletion {
-    background-color: #f4cbcd;
+    background-color: var(--color-red-very-light);
 }
 
 .entityRow:nth-child(even) .newRow {
-    background-color: #d4fdd6;
+    background-color: var(--color-green-light);
 }
 
 .entityRow:nth-child(odd) .newRow {
-    background-color: #e1ffe2;
+    background-color: var(--color-green-very-light);
 }
 
 .editInput {

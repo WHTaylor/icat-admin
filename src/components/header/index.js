@@ -7,6 +7,8 @@ function stripProtocol(s) {
     return s.split("://").slice(-1);
 }
 
+/* The header nav bar for the site, with links to active servers and static pages
+ * */
 const Header = ({
     servers, activePage,
     setActiveServer, closeServer, showLoginForm, showTips, showAbout}) =>

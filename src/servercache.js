@@ -1,9 +1,12 @@
-/* Information about servers is kept in local storage in key-value pairs.
+/* Functions for accessing information about servers saved in local storage.
+ *
+ * The data is stored in local storage as key-value pairs.
+ *
  * Format: 'servers|<N>|<key>': '<value>'
  *
  * Keys include:
- *  - name -
- *  - sessionId - the last sessionId we
+ *  - name - the URL of the server
+ *  - sessionId - the last sessionId that was used for the server
  *
  * There is also a 'lastServerAccessed' item which stores the number of the
  * server the user last logged onto. We retry that server on the home page.

@@ -46,6 +46,12 @@ const LoginForm = ({doLogin, errMsg, isLoggingIn}) => {
         </form>);
 }
 
+/* Input for the server to connect to.
+ *
+ * If there are servers stored in localStorage, will be a dropdown list of those
+ * servers and a button to allow adding a new server. If there are no stored
+ * servers, or the user clicks the button, will be a text input.
+ */
 const ServerSelector = () => {
     const [lastServer, ] = getLastLogin();
     const serverOptions = serverNames()

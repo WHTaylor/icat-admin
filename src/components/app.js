@@ -53,6 +53,7 @@ const App = () => {
         }
     }
 
+    // If no servers are currently active, try to login to the last active server
     useLayoutEffect(() => {
         if (connections.length > 0) return;
         const [server, sessionId] = getLastLogin();

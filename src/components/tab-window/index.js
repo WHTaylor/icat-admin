@@ -1,5 +1,7 @@
 import style from './style.css';
 
+/* Displays the list of tabs for open entity tables, and the active table
+ */
 const TabWindow = props => {
     const handleMouseDown = (ev, i) => {
         // Only want middle mouse clicks

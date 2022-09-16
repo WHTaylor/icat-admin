@@ -1,3 +1,10 @@
+/* Functionality for interacting with ICAT servers.
+ *
+ * All queries to ICAT should go through the IcatClient class defined here, and
+ * any data concerning ICAT (ie. the names of entities) should be kept in this
+ * module.
+ */
+
 import {queryWhereFromInput} from './utils.js';
 
 // Unpack the entries returned from the API, because they are formatted like

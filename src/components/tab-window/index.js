@@ -35,11 +35,9 @@ const TabWindow = props => {
                 class={style.tabSwitcher}
                 ondragover={ev => ev.preventDefault()}
                 ondrop={endDrag} >
-                {props.children.map(([name], i) =>
+                {props.children.map(([name, key, ], i) =>
                     <button
-                        // This key relies on order, so isn't great, but better than
-                        // nothing
-                        key={name + i}
+                        key={key}
                         onClick={() => props.handleChangeTab(i)}
                         onMouseDown={ev => handleMouseDown(ev, i)}
                         class={`entityButton
@@ -49,11 +47,9 @@ const TabWindow = props => {
                         {name}
                     </button>)}
             </div> }
-            {props.children.map(([name, child], i) =>
+            {props.children.map(([, key, child], i) =>
                 <div
-                    // This key relies on order, so isn't great, but better than
-                    // nothing
-                    key={name + i}
+                    key={key}
                     class={i === props.activeTab ? "" : "hidden"}>{child}</div>)}
         </div>
     );

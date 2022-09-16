@@ -38,6 +38,8 @@ const EntityViewer = ({icatClient, visible}) => {
             rearranged[b] = temp;
             setTabFilters(rearranged);
         }
+        // If active tab is the one that got moved, keep it active
+        if (activeTab == a) setActiveTab(b);
     };
 
     /* related    - the table to open
@@ -115,6 +117,7 @@ const EntityViewer = ({icatClient, visible}) => {
                 {tabFilters.map((f, i) =>
                     [
                         f.table,
+                        f.key,
                         <EntityTable
                             icatClient={icatClient}
                             filter={f}

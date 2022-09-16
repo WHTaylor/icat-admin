@@ -28,13 +28,6 @@ async function formatError(errResponse) {
         .then(r => `${header}: ${r["message"]}`);
 }
 
-function queryIncludeClause(table) {
-    const relatedEntities = oneToX[table];
-    return (relatedEntities === undefined || relatedEntities.length == 0)
-        ? ""
-        : `include ${relatedEntities.map(a => "e." + a).join(', ')}`;
-}
-
 function buildQuery(filter) {
     const where = queryWhereFromInput(filter.where);
     const limit =
@@ -44,8 +37,7 @@ function buildQuery(filter) {
     const order = filter.sortField === null
         ? ""
         : `order by e.${filter.sortField} ${filter.sortAsc ? "asc" : "desc"}`;
-    const includes = queryIncludeClause(filter.table);
-    return `select e from ${filter.table} e ${where} ${order} ${limit} ${includes}`;
+    return `select e from ${filter.table} e ${where} ${order} ${limit} include 1`;
 }
 
 class IcatClient {
@@ -121,7 +113,7 @@ class IcatClient {
     }
 
     async getById(entityType, id) {
-        const query = `${entityType} e ${queryIncludeClause(entityType)}`;
+        const query = `${entityType} e include 1`;
         const params = {
             sessionId: this.sessionId,
             query,
@@ -180,48 +172,8 @@ class IcatClient {
                 : formatError(res)
                     .then(msg => Promise.reject(msg)));
     }
-
-    get loggedIn() {
-        return this.sessionId !== undefined;
-    }
 }
 
 export const entityNames = ["Affiliation", "Application", "DataCollection", "DataCollectionDatafile", "DataCollectionDataset", "DataCollectionInvestigation", "DataCollectionParameter", "DataPublication", "DataPublicationDate", "DataPublicationFunding", "DataPublicationType", "DataPublicationUser", "Datafile", "DatafileFormat", "DatafileParameter", "Dataset", "DatasetInstrument", "DatasetParameter", "DatasetTechnique", "DatasetType", "Facility", "FacilityCycle", "FundingReference", "Grouping", "Instrument", "InstrumentScientist", "Investigation", "InvestigationFacilityCycle", "InvestigationFunding", "InvestigationGroup", "InvestigationInstrument", "InvestigationParameter", "InvestigationType", "InvestigationUser", "Job", "Keyword", "ParameterType", "PermissibleStringValue", "PublicStep", "Publication", "RelatedDatafile", "RelatedItem", "Rule", "Sample", "SampleParameter", "SampleType", "Shift", "Study", "StudyInvestigation", "Technique", "User", "UserGroup"]
 
-const oneToX = {
-    Application: ["facility"],
-    DataCollectionDatafile: ["dataCollection", "datafile"],
-    DataCollectionDataset: ["dataCollection", "dataset"],
-    DataCollectionParameter: ["dataCollection", "type"],
-    Datafile: ["datafileFormat", "dataset"],
-    DatafileFormat: ["facility"],
-    DatafileParameter: ["type", "datafile"],
-    Dataset: ["sample", "type", "investigation"],
-    DatasetParameter: ["type", "dataset"],
-    DatasetType: ["facility"],
-    FacilityCycle: ["facility"],
-    Instrument: ["facility"],
-    InstrumentScientist: ["instrument", "user"],
-    Investigation: ["type", "facility"],
-    InvestigationFacilityCycle: ["investigation", "facilityCycle"],
-    InvestigationGroup: ["grouping", "investigation"],
-    InvestigationInstrument: ["instrument", "investigation"],
-    InvestigationParameter: ["investigation", "type"],
-    InvestigationType: ["facility"],
-    InvestigationUser: ["user", "investigation"],
-    Job: ["inputDataCollection", "outputDataCollection", "application"],
-    Keyword: ["investigation"],
-    ParameterType: ["facility"],
-    PermissibleStringValue: ["type"],
-    Publication: ["investigation"],
-    RelatedDatafile: ["sourceDatafile", "destDatafile"],
-    Rule: ["grouping"],
-    Sample: ["investigation", "type"],
-    SampleParameter: ["sample", "type"],
-    SampleType: ["facility"],
-    Shift: ["investigation", "instrument"],
-    Study: ["user"],
-    StudyInvestigation: ["study", "investigation"],
-    UserGroup: ["user", "grouping"]
-};
 export default IcatClient;

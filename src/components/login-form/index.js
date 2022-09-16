@@ -9,7 +9,7 @@ function processServerName(name) {
     if (name.split("://").length === 1) {
         processed = "https://" + processed;
     }
-    return new URL(processed).origin
+    return new URL(processed).origin;
 }
 
 const LoginForm = ({doLogin, errMsg, isLoggingIn}) => {
@@ -47,7 +47,7 @@ const LoginForm = ({doLogin, errMsg, isLoggingIn}) => {
 }
 
 const ServerSelector = () => {
-    const lastServer = getLastLogin()[0];
+    const [lastServer, ] = getLastLogin();
     const serverOptions = serverNames()
         .map(s => s === lastServer
             ? <option key={s} selected>{s}</option>

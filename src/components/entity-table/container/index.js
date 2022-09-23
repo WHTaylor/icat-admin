@@ -198,23 +198,16 @@ const PaginationControl = ({isActive, pageNumber, handleSetPage, handleLimitChan
     };
 
     useEffect(() => {
-        const left = ev => {
+        const changePage = ev => {
             if (!focusOkForPageChange()) return;
-            if (ev.key !== "ArrowLeft") return;
+            if (ev.key !== "ArrowLeft" && ev.key !== "ArrowRight") return;
             ev.preventDefault();
-            document.getElementById(prevId).click();
+            if (ev.key === "ArrowLeft") document.getElementById(prevId).click();
+            else document.getElementById(nextId).click();
         };
-        const right = ev => {
-            if (!focusOkForPageChange()) return;
-            if (ev.key !== "ArrowRight") return;
-            ev.preventDefault();
-            document.getElementById(nextId).click();
-        };
-        document.addEventListener("keydown", left);
-        document.addEventListener("keydown", right);
+        document.addEventListener("keydown", changePage);
         return () => {
-            document.removeEventListener("keydown", left);
-            document.removeEventListener("keydown", right);
+            document.removeEventListener("keydown", changePage);
         }
     });
 

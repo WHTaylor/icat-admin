@@ -12,8 +12,7 @@ const EntityTableView = ({
     editCreation, cancelCreate, insertCreation
 }) =>
 {
-    const [contextMenuPos, setContextMenuPos] =  useState(null);
-    const [contextMenuItems, setContextMenuItems] =  useState(null);
+    const [contextMenuProps, setContextMenuProps] =  useState(null);
     // Locally saved changes to entities
     const [entityModifications, setEntityModifications] = useState({});
     // fieldBeing edited is:
@@ -26,14 +25,10 @@ const EntityTableView = ({
     // Field to show for each related entity in table
     const [relatedDisplayFields, setRelatedDisplayFields] = useState({});
 
-    const clearContextMenu = () => {
-        setContextMenuPos(null);
-        setContextMenuItems(null);
-    };
+    const clearContextMenu = () => setContextMenuProps(null);
 
-    const openContextMenu = (x, y, callbacks) => {
-        setContextMenuPos([x, y]);
-        setContextMenuItems(callbacks);
+    const openContextMenu = (props) => {
+        setContextMenuProps(props);
         stopEditing();
     };
 
@@ -194,8 +189,7 @@ const EntityTableView = ({
             </tr>
             {creations.concat(data).map((e, i) => buildEntityRow(e, i))}
         </table>
-        {contextMenuPos !== null &&
-            <ContextMenu items={contextMenuItems} pos={contextMenuPos} />}
+        {contextMenuProps !== null && <ContextMenu {...contextMenuProps} />}
         </>
     );
 }

@@ -1,7 +1,7 @@
 import {useEffect, useState, useRef} from "preact/hooks";
 import style from './style.css';
 
-import {icatAttributeToTableName, joinAttributeToTableName, parseISODate, commonFields} from '../../../utils.js';
+import {parseISODate, commonFields} from '../../../utils.js';
 import ReadMore from '../../generic/read-more';
 
 function formatCellContent(cellContent) {
@@ -27,31 +27,15 @@ const EntityRow = ({
     const [isSaving, setIsSaving] = useState(false);
     const [saveSuccess, setSaveSuccess] = useState(null);
 
-    // Pairs of (relatedTable, openFunction) for all relatedTables which are
-    // many-one with tableName (ie. investigation -> datasets)
-    const relatedArrayCallbacks = Object.keys(entity)
-        .filter(k => Array.isArray(entity[k]))
-        .map(k => [k, () =>
-            showRelatedEntities(
-                icatAttributeToTableName(tableName, k),
-                entity.id,
-                true,
-                tableName.endsWith("Type"))]);
-
-    // Pairs of (relatedTable, openFunction) for all relatedTables which tableName is
-    // one-X (ie. datafile -> dataset)
-    const relatedSingleCallbacks = Object.keys(entity)
-        .filter(k => !Array.isArray(entity[k]) && typeof entity[k] === "object")
-        .map(k => [k, () =>
-            showRelatedEntities(
-                joinAttributeToTableName(tableName, k),
-                entity[k].id,
-                false, false)]);
-
-    const relatedEntityCallbacks = relatedArrayCallbacks.concat(relatedSingleCallbacks);
     const doOpenContextMenu = ev => {
         ev.preventDefault();
-        openContextMenu(ev.pageX, ev.pageY, relatedEntityCallbacks);
+        openContextMenu({
+            x: ev.pageX,
+            y: ev.pageY,
+            entityType: tableName,
+            entity,
+            showRelatedEntities
+        });
     };
 
     useEffect(() => {

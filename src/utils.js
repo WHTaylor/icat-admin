@@ -55,7 +55,7 @@ export function tableFilter(table, offset, limit, where, sortField=null, sortAsc
     };
 }
 
-// By default, sort the common fields to the end
+// By default, sort id to the beginning and the other common fields to the end
 const sortToEnd = ["createId", "createTime", "modId", "modTime"];
 export function defaultHeaderSort(headers) {
     const end = headers.filter(h => sortToEnd.includes(h)).sort();

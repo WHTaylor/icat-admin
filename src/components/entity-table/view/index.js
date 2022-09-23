@@ -6,8 +6,8 @@ import ContextMenu from '../../context-menu';
 import {defaultHeaderSort, joinAttributeToTableName} from '../../../utils.js';
 
 const EntityTableView = ({
-    data, tableName, sortingBy, deletions, creations,
-    openRelated, toggleSortBy, saveEntity, modifyDataRow,
+    data, entityType, sortingBy, deletions, creations,
+    openRelated, setSortingBy, saveEntity, modifyDataRow,
     markToDelete, cancelDeletion, doDelete,
     editCreation, cancelCreate, insertCreation
 }) =>
@@ -27,8 +27,8 @@ const EntityTableView = ({
 
     const clearContextMenu = () => setContextMenuProps(null);
 
-    const openContextMenu = (props) => {
-        setContextMenuProps(props);
+    const openContextMenu = (x, y, entity) => {
+        setContextMenuProps({x, y, entity, openRelated, entityType});
         stopEditing();
     };
 
@@ -97,7 +97,7 @@ const EntityTableView = ({
         const isNewRow = e.id === undefined;
         const key = isNewRow ? "thisIsABadKeyToUse" + i : e.id;
         const makeEdit = (k, v) => {
-            const fieldIsEntity = joinAttributeToTableName(tableName, k) !== null;
+            const fieldIsEntity = joinAttributeToTableName(entityType, k) !== null;
             const newValue = fieldIsEntity
                 // TODO: Don't hardcode this to id, and should probably validate it
                 ? { id: Number.parseInt(v) }
@@ -116,7 +116,7 @@ const EntityTableView = ({
             : () => removeModifications(e.id);
         return <EntityRow
             key={key}
-            tableName={tableName}
+            entityType={entityType}
             headers={keys}
             entity={e}
             modifications={isNewRow ? undefined : entityModifications[e.id]}
@@ -133,7 +133,6 @@ const EntityTableView = ({
                             : null
                         : null} // This is insane
             relatedEntityDisplayFields={relatedDisplayFields}
-            showRelatedEntities={openRelated}
             openContextMenu={openContextMenu}
             startEditing={field => {
                 clearContextMenu();
@@ -167,7 +166,7 @@ const EntityTableView = ({
                                             `${style.sortButton}
                                             ${sortingBy.field === k && sortingBy.asc
                                             ? style.activeSort : '' }`}
-                                        onClick={() => toggleSortBy(k, true)}
+                                        onClick={() => setSortingBy(k, true)}
                                         title={`Sort by ${k}, ascending`}>
                                         ▲
                                     </button>
@@ -176,7 +175,7 @@ const EntityTableView = ({
                                             `${style.sortButton}
                                             ${sortingBy.field === k && !sortingBy.asc
                                             ? style.activeSort : '' }`}
-                                        onClick={() => toggleSortBy(k, false)}
+                                        onClick={() => setSortingBy(k, false)}
                                         title={`Sort by ${k}, descending`}>
                                         ▼
                                     </button>

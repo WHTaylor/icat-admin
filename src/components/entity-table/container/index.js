@@ -5,7 +5,7 @@ import {simplifyIcatErrMessage} from '../../../icatErrorHandling.js';
 import EntityTableView from '../view';
 import {randomSuffix, joinAttributeToTableName, difference} from '../../../utils.js';
 
-const EntityTable = ({icatClient, filter, handleFilterChange, openRelated, isOpen, toggleSortBy, refreshData}) => {
+const EntityTable = ({icatClient, filter, handleFilterChange, openRelated, isOpen, setSortingBy, refreshData}) => {
     const [data, setData] = useState(null);
     const [errMsg, setErrMsg] = useState(null);
     const [count, setCount] = useState(null);
@@ -162,12 +162,12 @@ const EntityTable = ({icatClient, filter, handleFilterChange, openRelated, isOpe
         {errMsg ? <p>{errMsg}</p>
             : <EntityTableView
                 data={data}
-                tableName={filter.table}
+                entityType={filter.table}
                 sortingBy={{field: filter.sortField, asc: filter.sortAsc}}
                 deletions={rowsToDelete}
                 creations={rowsToCreate}
                 openRelated={openRelated}
-                toggleSortBy={toggleSortBy}
+                setSortingBy={setSortingBy}
                 saveEntity={e =>
                     icatClient.writeEntity(filter.table, e)}
                 modifyDataRow={changeData}

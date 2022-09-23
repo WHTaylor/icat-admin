@@ -18,9 +18,11 @@ function formatCellContent(cellContent) {
 }
 
 const EntityRow = ({
-    tableName, entity, modifications, headers, editingField, relatedEntityDisplayFields, markedForDeletion,
-    showRelatedEntities, openContextMenu,
-    startEditing, stopEditing, makeEdit, saveEntity, revertChanges, syncModifications,
+    entity, modifications, headers,
+    editingField, relatedEntityDisplayFields, markedForDeletion,
+    openContextMenu,
+    startEditing, stopEditing, makeEdit,
+    saveEntity, revertChanges, syncModifications,
     markToDelete, cancelDeletion, doDelete}) =>
 {
     const inputEl = useRef(null);
@@ -29,13 +31,7 @@ const EntityRow = ({
 
     const doOpenContextMenu = ev => {
         ev.preventDefault();
-        openContextMenu({
-            x: ev.pageX,
-            y: ev.pageY,
-            entityType: tableName,
-            entity,
-            showRelatedEntities
-        });
+        openContextMenu(ev.pageX, ev.pageY, entity);
     };
 
     useEffect(() => {
@@ -116,6 +112,7 @@ const EntityRow = ({
     };
 
     const handleFieldClick = (ev, k) => {
+        // All entities have some common fields which can't be edited
         if (commonFields.includes(k)) return;
         ev.stopPropagation();
         startEditing(k);

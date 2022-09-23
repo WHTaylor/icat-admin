@@ -76,7 +76,7 @@ const EntityViewer = ({icatClient, visible}) => {
         }
     };
 
-    const toggleSortBy = (i, k, sortAsc) => {
+    const setSortingBy = (i, k, sortAsc) => {
         const f = tabFilters[i];
         const newFilter = f.sortField !== k || f.sortAsc !== sortAsc
             ? {...f, sortField: k, sortAsc }
@@ -124,7 +124,7 @@ const EntityViewer = ({icatClient, visible}) => {
                             handleFilterChange={f => handleFilterChange(i, f)}
                             openRelated={(e, id, isOneToMany, fromType) =>
                                 openRelated(e, f.table, id, isOneToMany, fromType)}
-                            toggleSortBy={(k, sortAsc) => toggleSortBy(i, k, sortAsc)}
+                            setSortingBy={(k, sortAsc) => setSortingBy(i, k, sortAsc)}
                             isOpen={i === activeTab}
                             refreshData={() => refreshTab(i)}
                             key={f.key} />

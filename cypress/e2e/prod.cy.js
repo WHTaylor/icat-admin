@@ -11,13 +11,6 @@ describe('Investigations are accessible', () => {
   })
 })
 
-describe('Can open a table by typing the entity name', () => {
-  it('passes', () => {
-    cy.openEntityByTyping('Facility');
-    cy.contains(/^ISIS$/);
-  })
-})
-
 describe('Fields can be edited', () => {
   it('passes', () => {
     cy.openEntityByTyping('Facility');

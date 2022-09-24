@@ -61,6 +61,14 @@ export function defaultHeaderSort(headers) {
     const end = headers.filter(h => sortToEnd.includes(h)).sort();
     const start = ["id"];
     const middle = headers.filter(h => h !== "id" && !sortToEnd.includes(h)).sort();
+    // If the entity has start and end date fields, put the start date immediately
+    // before the end date (they can be far apart when sorted alphabetically)
+    if (middle.includes("startDate") && middle.includes("endDate")) {
+        let startIndex = middle.findIndex(e => e === "startDate");
+        let endIndex = middle.findIndex(e => e === "endDate");
+        middle.splice(startIndex, 1);
+        middle.splice(endIndex, 0, "startDate");
+    }
     return start.concat(middle).concat(end);
 }
 export const commonFields = ["id", ...sortToEnd];

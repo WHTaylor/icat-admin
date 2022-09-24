@@ -19,9 +19,12 @@
     "rules": {
       "prefer-template": "off",
       "radix": "off",
-      "no-unused-vars": ["error", {
-        "argsIgnorePattern": "_+"
-      }]
+      "no-unused-vars": [
+        "error",
+        {
+          "argsIgnorePattern": "_+"
+        }
+      ]
     }
   },
   "devDependencies": {

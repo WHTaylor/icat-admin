@@ -97,7 +97,7 @@ const EntityViewer = ({server, sessionId, visible}) => {
         const twentyMinutes = 1000 * 60 * 20;
         const id = setInterval(() => icatClient.refresh(), twentyMinutes);
         return () => clearInterval(id);
-    }, [server, sessionId]);
+    }, [server, sessionId]); // eslint-disable-line react-hooks/exhaustive-deps
 
     return (
         <div class={visible ? "page" : "hidden"}>

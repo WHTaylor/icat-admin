@@ -37,7 +37,7 @@ const EntityTable = ({server, sessionId, filter, handleFilterChange, openRelated
       }
 
         return retrieveData();
-    }, [filter, server, sessionId]);
+    }, [filter, server, sessionId]); // eslint-disable-line react-hooks/exhaustive-deps
 
     useEffect(() => {
       const retrieveCount = () => {
@@ -55,7 +55,7 @@ const EntityTable = ({server, sessionId, filter, handleFilterChange, openRelated
       }
 
         return retrieveCount();
-    }, [filter, server, sessionId]);
+    }, [filter, server, sessionId]); // eslint-disable-line react-hooks/exhaustive-deps
 
     const changeWhere = w => handleFilterChange({...filter, where: w});
     const changeLimit = l => handleFilterChange({...filter, limit: l});

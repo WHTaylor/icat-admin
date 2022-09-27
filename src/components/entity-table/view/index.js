@@ -15,7 +15,7 @@ const EntityTableView = ({
     const [contextMenuProps, setContextMenuProps] =  useState(null);
     // Locally saved changes to entities
     const [entityModifications, setEntityModifications] = useState({});
-    // fieldBeing edited is:
+    // fieldBeingEdited is:
     // [null, null] - nothing being edited
     // if editingNewRow, [index in creations, field]
     // else [entity id, field]
@@ -95,11 +95,10 @@ const EntityTableView = ({
 
     const buildEntityRow = (e, i) => {
         const isNewRow = e.id === undefined;
-        const key = isNewRow ? "thisIsABadKeyToUse" + i : e.id;
         const makeEdit = (k, v) => {
             const fieldIsEntity = joinAttributeToTableName(entityType, k) !== null;
             const newValue = fieldIsEntity
-                // TODO: Don't hardcode this to id, and should probably validate it
+                // TODO: Validate whether the selected entity exists
                 ? { id: Number.parseInt(v) }
                 : v;
             isNewRow
@@ -115,7 +114,7 @@ const EntityTableView = ({
             ? () => cancelCreate(i)
             : () => removeModifications(e.id);
         return <EntityRow
-            key={key}
+            key={isNewRow ? "new-" + i : e.id}
             entityType={entityType}
             headers={keys}
             entity={e}

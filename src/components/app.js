@@ -88,7 +88,8 @@ const App = () => {
             {connections.map((c, i) =>
                 <EntityViewer
                     key={c.sessionId}
-                    icatClient={new IcatClient(c.server, c.sessionId)}
+                    server={c.server}
+                    sessionId={c.sessionId}
                     visible={aServerIsActive && i === activePage} />)}
             {activePage === "about" && <About /> }
             {activePage === "tips" && <Tips /> }

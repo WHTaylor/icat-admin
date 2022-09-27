@@ -1,13 +1,15 @@
 import {useState, useEffect} from "preact/hooks";
 
+import IcatClient from '../../icat.js';
 import {lowercaseFirst, tableFilter} from '../../utils.js';
 import EntityTable from '../../components/entity-table/container';
 import TableList from '../../components/table-list';
 import TabWindow from '../../components/tab-window';
 
-const EntityViewer = ({icatClient, visible}) => {
+const EntityViewer = ({server, sessionId, visible}) => {
     const [tabFilters, setTabFilters] = useState([]);
     const [activeTab, setActiveTab] = useState(null);
+    const icatClient = new IcatClient(server, sessionId);
 
     const handleFilterChange = (i, newFilter) =>
         setTabFilters(
@@ -97,7 +99,7 @@ const EntityViewer = ({icatClient, visible}) => {
         const twentyMinutes = 1000 * 60 * 20;
         const id = setInterval(() => icatClient.refresh(), twentyMinutes);
         return () => clearInterval(id);
-    }, [icatClient]);
+    }, [server, sessionId]);
 
     return (
         <div class={visible ? "page" : "hidden"}>
@@ -119,7 +121,8 @@ const EntityViewer = ({icatClient, visible}) => {
                         f.table,
                         f.key,
                         <EntityTable
-                            icatClient={icatClient}
+                            server={server}
+                            sessionId={sessionId}
                             filter={f}
                             handleFilterChange={f => handleFilterChange(i, f)}
                             openRelated={(e, id, isOneToMany, fromType) =>

@@ -2,10 +2,11 @@ import {useEffect, useState} from "preact/hooks";
 import style from './style.css';
 import {simplifyIcatErrMessage} from '../../../icatErrorHandling.js';
 
+import IcatClient from '../../../icat.js';
 import EntityTableView from '../view';
 import {randomSuffix, joinAttributeToTableName, difference} from '../../../utils.js';
 
-const EntityTable = ({icatClient, filter, handleFilterChange, openRelated, isOpen, setSortingBy, refreshData}) => {
+const EntityTable = ({server, sessionId, filter, handleFilterChange, openRelated, isOpen, setSortingBy, refreshData}) => {
     const [data, setData] = useState(null);
     const [errMsg, setErrMsg] = useState(null);
     const [count, setCount] = useState(null);
@@ -13,6 +14,7 @@ const EntityTable = ({icatClient, filter, handleFilterChange, openRelated, isOpe
     const [rowsToDelete, setRowsToDelete] = useState(new Set());
     // Objects without ids to be written to ICAT
     const [rowsToCreate, setRowsToCreate] = useState([]);
+    const icatClient = new IcatClient(server, sessionId);
 
     useEffect(() => {
       const retrieveData = () => {
@@ -35,7 +37,7 @@ const EntityTable = ({icatClient, filter, handleFilterChange, openRelated, isOpe
       }
 
         return retrieveData();
-    }, [filter, icatClient]);
+    }, [filter, server, sessionId]);
 
     useEffect(() => {
       const retrieveCount = () => {
@@ -53,7 +55,7 @@ const EntityTable = ({icatClient, filter, handleFilterChange, openRelated, isOpe
       }
 
         return retrieveCount();
-    }, [filter, icatClient]);
+    }, [filter, server, sessionId]);
 
     const changeWhere = w => handleFilterChange({...filter, where: w});
     const changeLimit = l => handleFilterChange({...filter, limit: l});

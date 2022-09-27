@@ -54,10 +54,8 @@ const EntityViewer = ({server, sessionId, visible}) => {
      */
     const openRelated = (related, origin, relationId, oneToMany, fromType) => {
         // This happens if no matching table is found in joinAttributeToTableName
-        if (related === null) {
-            log.warn("Failed to find related table to open");
-            return;
-        }
+        if (related === null) return;
+
         // TODO: Document what fromType is (because I've forgotten)
         const searchFor = fromType
             ? "type.id"

@@ -3,6 +3,7 @@ import style from './style.css';
 
 import {parseISODate, commonFields} from '../../../utils.js';
 import ReadMore from '../../generic/read-more';
+import SuccessIndicator from '../../success-indicator';
 
 function formatCellContent(cellContent) {
     if (cellContent === undefined || cellContent === null) return "";
@@ -26,8 +27,10 @@ const EntityRow = ({
     markToDelete, cancelDeletion, doDelete}) =>
 {
     const inputEl = useRef(null);
-    const [isSaving, setIsSaving] = useState(false);
-    const [saveSuccess, setSaveSuccess] = useState(null);
+    const [saveState, setSaveState] = useState(null);
+    const createSaveState = fields => ({
+        ...fields, clear: () => setSaveState(null)
+    });
 
     const doOpenContextMenu = ev => {
         ev.preventDefault();
@@ -49,8 +52,8 @@ const EntityRow = ({
     });
 
     const saveChanges = () => {
-        setIsSaving(true);
-        // If entity.id is undefined, this a new entity to be created
+        setSaveState(createSaveState({ isSaving: true }));
+        // If entity.id is undefined, this is a new entity to be created
         // Otherwise we just want to send modifications with the current id
         const e = entity.id === undefined
             ? entity
@@ -60,17 +63,12 @@ const EntityRow = ({
             : syncModifications;
         saveEntity(e)
             .then(successHandle)
-            .then(() => setSaveSuccess(true))
-            .catch(() => setSaveSuccess(false))
-            .finally(() => setIsSaving(false));
+            .then(() => setSaveState(createSaveState({
+                failed: false, isSaving: false})))
+            .catch(err => setSaveState(createSaveState({
+                    failed: true, message: err, isSaving: false
+                })));
     };
-
-    // Clear save success after some time
-    useEffect(() => {
-        if (saveSuccess === null) return;
-        const id = setTimeout(() => setSaveSuccess(null), 2000);
-        return () => clearTimeout(id);
-    }, [saveSuccess]);
 
     const getCurrentValue = field => {
         const isModified = modifications !== undefined
@@ -123,8 +121,7 @@ const EntityRow = ({
             <td>
                 <RowActions
                     isNewRow={entity.id === undefined}
-                    saveSuccess={saveSuccess}
-                    isSaving={isSaving}
+                    saveState={saveState}
                     isModified={modifications !== undefined}
                     markedForDeletion={markedForDeletion}
                     saveChanges={saveChanges}
@@ -159,21 +156,14 @@ const EntityRow = ({
 }
 
 const RowActions = ({
-    isNewRow, saveSuccess, isSaving, isModified, markedForDeletion,
+    isNewRow, saveState, isModified, markedForDeletion,
     revertChanges, saveChanges, markToDelete, cancelDeletion, doDelete}) =>
 {
-    // If just saved, show if successful
-    if (saveSuccess !== null) {
-        return saveSuccess ? "✔️" : "❌";
-    }
-
-    // Currently saving, may succeed or fail
-    if (isSaving) {
-        return "...";
+    if (saveState != null) {
+        return <SuccessIndicator saveState={saveState} />;
     }
 
     let actions = [];
-
     if (isNewRow) {
         actions.push({ title: "Cancel creation", ev: revertChanges, icon: "🚫"});
         actions.push({ title: "Create row", ev: saveChanges, icon: "💾"});
@@ -200,7 +190,6 @@ const RowActions = ({
                 {a.icon}
             </button>)}
     </>);
-
 }
 
 export default EntityRow;

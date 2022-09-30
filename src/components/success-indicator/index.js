@@ -21,7 +21,7 @@ const SuccessIndicator = ({saveState, clearTimeoutMs = 2000 }) => {
             if (timer.current > clearTimeoutMs) saveState.clear();
         }, INTERVAL_MS);
         return () => clearInterval(id);
-    }, [timer, saveState, mousePos]);
+    }, [timer, saveState, mousePos, clearTimeoutMs]);
 
     return (
         <>

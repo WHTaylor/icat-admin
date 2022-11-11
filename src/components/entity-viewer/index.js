@@ -2,9 +2,9 @@ import {useState, useEffect} from "preact/hooks";
 
 import IcatClient from '../../icat.js';
 import {lowercaseFirst, tableFilter} from '../../utils.js';
-import EntityTable from '../../components/entity-table/container';
-import TableList from '../../components/table-list';
-import TabWindow from '../../components/tab-window';
+import EntityTable from '../entity-table/container';
+import TableList from '../table-list';
+import TabWindow from '../tab-window';
 
 const EntityViewer = ({server, sessionId, visible}) => {
     const [tabFilters, setTabFilters] = useState([]);

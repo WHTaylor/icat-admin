@@ -38,10 +38,10 @@ const TabWindow = props => {
                 {props.children.map(([name, key, ], i) =>
                     <button
                         key={key}
-                        onClick={() => props.handleChangeTab(i)}
+                        onClick={() => props.handleChangeTabIdx(i)}
                         onMouseDown={ev => handleMouseDown(ev, i)}
                         class={`entityButton
-                            ${i === props.activeTab ? style.selectedTab : ""}`}
+                            ${i === props.activeTabIdx ? style.selectedTab : ""}`}
                         draggable="true"
                         ondragstart={ev => startDrag(ev, i)} >
                         {name}
@@ -50,7 +50,7 @@ const TabWindow = props => {
             {props.children.map(([, key, child], i) =>
                 <div
                     key={key}
-                    class={i === props.activeTab ? "" : "hidden"}>{child}</div>)}
+                    class={i === props.activeTabIdx ? "" : "hidden"}>{child}</div>)}
         </div>
     );
 }

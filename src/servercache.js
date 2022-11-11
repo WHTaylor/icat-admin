@@ -23,12 +23,13 @@ if (typeof window === 'undefined') {
   };
 }
 
-export function saveLogin(serverName, sessionId) {
+export function saveLogin(serverName, username, sessionId) {
     const existing = getServerNumberByName(serverName);
     const n = existing === null ? nextFreeServerNumber() : existing;
     if (existing === null) {
         localStorage.setItem(`servers|${n}|name`, serverName);
     }
+    localStorage.setItem(`servers|${n}|user`, username);
     localStorage.setItem(`servers|${n}|sessionId`, sessionId);
     localStorage.setItem("lastServerAccessed", n);
 }
@@ -72,7 +73,9 @@ function getServerNumberByName(serverName) {
 export function getLastLogin() {
     const n = localStorage.getItem("lastServerAccessed");
     const info = getServer(n);
-    return info === null ? [null, null] : [info.name, info.sessionId || null];
+    return info === null
+        ? [null, null, null]
+        : [info.name, info.user, info.sessionId || null];
 }
 
 function getServer(serverNumber) {

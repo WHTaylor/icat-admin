@@ -23,7 +23,8 @@ const ServerConnector = ({createConnection}) => {
         await client.login(plugin, username, password)
             .then(s => {
                 if (typeof s === "string") {
-                    createConnection(server, s);
+                    const u = plugin === "anon" ? "anon" : `${plugin}/${username}`;
+                    createConnection(server, u, s);
                 } else {
                     return Promise.reject("Failed to connect " + s.toString());
                 }

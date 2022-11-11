@@ -121,3 +121,11 @@ const dateFormats = [
 export function parseISODate(s) {
     return dayjs(s, dateFormats, true);
 }
+
+// URLSearchParams.toString doesn't seem to URL encode in an expected way
+export function encodedSearchParams(params) {
+    return Array.from(
+            params.entries(),
+            ([k, v]) => encodeURI(k) + "=" + encodeURI(v))
+        .join("&");
+}

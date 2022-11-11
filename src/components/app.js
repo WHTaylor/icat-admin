@@ -1,5 +1,6 @@
 import { h } from 'preact';
-import { useLayoutEffect, useState } from "preact/hooks";
+import { useLayoutEffect, useState } from 'preact/hooks';
+import { Router, route } from 'preact-router';
 
 import IcatClient from '../icat.js';
 import About from './about';
@@ -9,22 +10,52 @@ import EntityViewer from './entity-viewer';
 import ServerConnector from './server-connector';
 import {getLastLogin, saveLogin, invalidateLogin} from '../servercache.js';
 
-const App = () => {
-    const [connections, setConnections] = useState([]);
-    // activePage is one of
-    //  - null - show a login page
-    //  - "about" - show the about page
-    //  - "tips" - show the tips page
-    //  - A number - show EntityViewer for the corresponding server
-    const [activePage, setActivePage] = useState(null);
+function urlSearchParamsToObj(params) {
+    const res = {}
+    for (const [k, v] of params.entries()) res[k] = v;
+    return res;
+}
 
-    const aServerIsActive = () => typeof activePage === "number";
-    const createConnection = (server, sessionId) => {
+function parseUrlParams(params) {
+    if (params.server == undefined)  return [null, null];
+    const connection = {server: params.server, username: params.username};
+    const filter = params.table === null || params.table === undefined
+        ? null
+        : {
+            table: params.table,
+            where: params.where,
+            offset: params.offset,
+            limit: params.limit,
+        };
+
+    return [connection, filter];
+}
+
+function getActiveConnectionIdx(connections, activeConnection) {
+    if (activeConnection === null) return null;
+    const {server, username} = activeConnection;
+    const idx = connections.findIndex(c =>
+        c.server === server
+        && c.username === username);
+    return idx < 0 ? null : idx;
+}
+
+const App = () => {
+    const params = urlSearchParamsToObj(new URLSearchParams(window.location.search));
+    const [paramsConn, paramsFilter] = parseUrlParams(params);
+
+    const [connections, setConnections] = useState([]);
+    const initActiveServerIdx = getActiveConnectionIdx(connections, paramsConn);
+    const [activeServerIdx, setActiveServerIdx] = useState(initActiveServerIdx);
+    const [activeFilter, setActiveFilter] = useState(paramsFilter);
+
+    const createConnection = (server, username, sessionId) => {
         const numConnections = connections.length;
         setConnections(
-            connections.concat({server, sessionId}));
-        setActivePage(numConnections);
-        saveLogin(server, sessionId);
+            connections.concat({server, username, sessionId}));
+        saveLogin(server, username, sessionId);
+        setActiveServerIdx(numConnections);
+        route(`/icat?server=${server}&username=${username}`);
     };
 
     const disconnect = i => {
@@ -38,54 +69,68 @@ const App = () => {
         const numConnections = connections.length;
 
         disconnect(i);
+        if (activeServerIdx === null) return;
 
-        // Select correct page
-        if (!aServerIsActive) return;
-
-        if (i < activePage) {
-            setActivePage(activePage - 1);
-        } else if (i === activePage) {
+        if (i < activeServerIdx) {
+            setActiveServerIdx(activeServerIdx - 1);
+        } else if (i === activeServerIdx) {
             if (i === 0) {
-                if (numConnections === 1) setActivePage(null);
-                else setActivePage(-1);
-            }
-            else if (i === numConnections - 1) setActivePage(activePage - 1);
+                if (numConnections === 1) setActiveServerIdx(null);
+                else setActiveServerIdx(-1);
+            } else if (i === numConnections - 1) {
+                setActiveServerIdx(activeServerIdx - 1)
+            };
         }
     }
 
     // If no servers are currently active, try to login to the last active server
+    // TODO: Make this take into account the URL - if on tips/about don't load,
+    // if has a server set load that one rather than last logged in one.
     useLayoutEffect(() => {
         if (connections.length > 0) return;
-        const [server, sessionId] = getLastLogin();
+        const [server, username, sessionId] = getLastLogin();
         if (server == null || sessionId === null) return;
         const client = new IcatClient(server);
         client.isValidSession(sessionId)
-            .then(res => {if (res) createConnection(server, sessionId)});
+            .then(res => {if (res) createConnection(server, username, sessionId)});
     });
+
+    const handleIcatRoute = e => {
+        if (e.path != "/icat") setActiveServerIdx(null);
+        else {
+            const params = e.matches;
+            const [activeConn, activeFilter] = parseUrlParams(params);
+            const idx = getActiveConnectionIdx(connections, activeConn)
+            setActiveServerIdx(idx);
+            setActiveFilter(activeFilter);
+        }
+    }
 
     return (
         <>
             <Header
                 servers={connections}
-                activePage={activePage}
-                setActiveServer={i => setActivePage(i)}
                 closeServer={removeConnection}
-                showAbout={() => setActivePage("about")}
-                showTips={() => setActivePage("tips")}
-                showLoginForm={() => setActivePage(null)} />
+                activeServerIdx={activeServerIdx} />
+
+            <Router onChange={handleIcatRoute}>
+                <Tips path="/tips" />
+                <About path="/about" />
+                <Nothing path="/icat" />
+                <ServerConnector createConnection={createConnection} path="/" />
+            </Router>
+
             {connections.map((c, i) =>
                 <EntityViewer
                     key={c.sessionId}
                     server={c.server}
                     sessionId={c.sessionId}
-                    visible={aServerIsActive && i === activePage} />)}
-            {activePage === "about" && <About /> }
-            {activePage === "tips" && <Tips /> }
-            {activePage === null &&
-                <ServerConnector
-                    createConnection={createConnection} />}
+                    visible={i === activeServerIdx}
+                    activeFilter={i === activeServerIdx ? activeFilter : null} />) }
         </>
     );
 }
+
+const Nothing = () => {};
 
 export default App;

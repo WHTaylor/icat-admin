@@ -36,10 +36,6 @@ html, body {
 	box-sizing: border-box;
 }
 
-#app {
-	height: 100%;
-}
-
 .page {
     display: grid;
     grid-template-columns: 2fr 8fr 5fr;

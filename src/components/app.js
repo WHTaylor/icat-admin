@@ -64,7 +64,7 @@ const App = () => {
     });
 
     return (
-        <div id="app">
+        <>
             <Header
                 servers={connections}
                 activePage={activePage}
@@ -84,7 +84,7 @@ const App = () => {
             {activePage === null &&
                 <ServerConnector
                     createConnection={createConnection} />}
-        </div>
+        </>
     );
 }
 

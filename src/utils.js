@@ -123,9 +123,30 @@ export function parseISODate(s) {
 }
 
 // URLSearchParams.toString doesn't seem to URL encode in an expected way
-export function encodedSearchParams(params) {
+function encodedSearchParams(params) {
     return Array.from(
             params.entries(),
             ([k, v]) => encodeURI(k) + "=" + encodeURI(v))
         .join("&");
+}
+
+export function mergeFilterIntoParams(params, filter) {
+    if (params == null) return "";
+
+    if (filter === null) {
+        params.delete("table");
+        params.delete("where");
+        params.delete("offset");
+        params.delete("limit");
+    } else {
+        for (const k of ["table", "where", "offset", "limit"]) {
+            if (filter[k] != null) {
+                params.set(k, filter[k]);
+            } else {
+                params.delete(k);
+            }
+        }
+    }
+
+    return encodedSearchParams(params);
 }

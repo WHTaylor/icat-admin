@@ -2,7 +2,7 @@ import {useState, useEffect} from "preact/hooks";
 import { route } from 'preact-router';
 
 import IcatClient from '../../icat.js';
-import {lowercaseFirst, tableFilter, encodedSearchParams} from '../../utils.js';
+import {lowercaseFirst, tableFilter, mergeFilterIntoParams } from '../../utils.js';
 import EntityTable from '../entity-table/container';
 import TableList from '../table-list';
 import TabWindow from '../tab-window';
@@ -24,21 +24,7 @@ const EntityViewer = ({server, sessionId, visible, activeFilter}) => {
 
     const routeToNewFilter = f => {
         const params = new URLSearchParams(window.location.search);
-        if (f === null) {
-            params.delete("table");
-            params.delete("where");
-            params.delete("offset");
-            params.delete("limit");
-        } else {
-            for (const k of ["table", "where", "offset", "limit"]) {
-                if (f[k] != null) {
-                    params.set(k, f[k]);
-                } else {
-                    params.delete(k);
-                }
-            }
-        }
-        route(window.location.pathname + "?" + encodedSearchParams(params));
+        route(window.location.pathname + "?" + mergeFilterIntoParams(params, f));
     };
 
     const handleFilterChange = (i, newFilter) => {

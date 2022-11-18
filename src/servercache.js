@@ -1,15 +1,16 @@
-/* Functions for accessing information about servers saved in local storage.
+/* Functions for saving/loading local storage connection information.
  *
  * The data is stored in local storage as key-value pairs.
  *
- * Format: 'servers|<N>|<key>': '<value>'
+ * Format: 'connection|<N>|<key>': '<value>'
  *
  * Keys include:
- *  - name - the URL of the server
- *  - sessionId - the last sessionId that was used for the server
+ *  - server - the URL of the server
+ *  - username - the username that was used
+ *  - sessionId - the sessionId that was used for the connection
  *
- * There is also a 'lastServerAccessed' item which stores the number of the
- * server the user last logged onto. We retry that server on the home page.
+ * There is also a 'lastConnection' item which stores the number of the last
+ * active connection. We try to reuse that connection on the home page by default.
  */
 
 if (typeof window === 'undefined') {
@@ -23,76 +24,68 @@ if (typeof window === 'undefined') {
   };
 }
 
-export function saveLogin(serverName, username, sessionId) {
-    const existing = getServerNumberByName(serverName);
+export function saveLogin(server, username, sessionId) {
+    const existing = getConnectionNumber(server, username);
     const n = existing === null ? nextFreeServerNumber() : existing;
     if (existing === null) {
-        localStorage.setItem(`servers|${n}|name`, serverName);
+        localStorage.setItem(`connection|${n}|server`, server);
+        localStorage.setItem(`connection|${n}|username`, username);
     }
-    localStorage.setItem(`servers|${n}|user`, username);
-    localStorage.setItem(`servers|${n}|sessionId`, sessionId);
-    localStorage.setItem("lastServerAccessed", n);
+    localStorage.setItem(`connection|${n}|sessionId`, sessionId);
+    localStorage.setItem("lastConnection", n);
 }
 
 function nextFreeServerNumber() {
     const serverNumbers = [...new Set(
-        serverEntries()
+        connectionEntries()
                 .map(([n, _, __]) => n)
                 .map(n => Number.parseInt(n)))]
         .sort();
     if (Math.min(...serverNumbers) > 1) return 1;
     for (const n of serverNumbers) {
-        if (!(n + 1 in serverNumbers)) return n + 1
+        if (!(serverNumbers.includes(n + 1))) return n + 1
     }
 }
 
-export function invalidateLogin(serverName) {
-    const n = getServerNumberByName(serverName);
-    localStorage.removeItem(`servers|${n}|sessionId`);
+export function invalidateLogin(serverName, username) {
+    const n = getConnectionNumber(serverName, username);
+    localStorage.removeItem(`connection|${n}|sessionId`);
 }
 
-export function deleteServer(name) {
-    const n = getServerNumberByName(name);
-    Object.keys(localStorage)
-        .filter(k => k.startsWith("servers"))
-        .filter(k => k.split("|")[1] === n)
-        .forEach(m => localStorage.removeItem(m));
-}
-
-function getServerNumberByName(serverName) {
-    const match = serverEntries()
-        .filter(([_, k, v]) => k === "name" && v === serverName)
+function getConnectionNumber(server, username) {
+    const matchingNs = connectionEntries()
+        .filter(([_, k, v]) =>
+            (k == "server" && v == server)
+            || (k == "username" && v == username))
         .map(([n, _, __]) => n);
-
-    if (match.length === 0) return null;
-    else if (match.length === 1) return match[0];
-
-    return match[0]
+    // If any n appears more than once, there are entries for both server and username
+    const nonUnique = matchingNs.find((n, i) => matchingNs.lastIndexOf(n) !== i);
+    return nonUnique === undefined ? null : nonUnique;
 }
 
 export function getLastLogin() {
-    const n = localStorage.getItem("lastServerAccessed");
-    const info = getServer(n);
+    const n = localStorage.getItem("lastConnection");
+    const info = getConnection(n);
     return info === null
         ? [null, null, null]
-        : [info.name, info.user, info.sessionId || null];
+        : [info.server, info.username, info.sessionId || null];
 }
 
-function getServer(serverNumber) {
-    const serverKVs = serverEntries()
-        .filter(([n, _, __]) => n === serverNumber);
+function getConnection(connectionNumber) {
+    const serverKVs = connectionEntries()
+        .filter(([n, _, __]) => n === connectionNumber);
     if (serverKVs.length === 0) return null;
     return serverKVs.reduce((o, [_, k, v]) => ({...o, [k]: v}), {});
 }
 
-function serverEntries() {
+function connectionEntries() {
     return Object.keys(localStorage)
-        .filter(k => k.startsWith("servers"))
+        .filter(k => k.startsWith("connection"))
         .map(k => [...k.split("|").slice(1), localStorage[k]]);
 }
 
 export function serverNames() {
-    return serverEntries()
-        .filter(([_, k, __]) => k == "name")
-        .map(([_, __, v]) => v);
+    return [...new Set(connectionEntries()
+        .filter(([_, k, __]) => k == "server")
+        .map(([_, __, v]) => v))];
 }

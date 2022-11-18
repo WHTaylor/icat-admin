@@ -64,7 +64,7 @@ const App = () => {
 
     const disconnect = i => {
         const c = connections[i];
-        invalidateLogin(c.server);
+        invalidateLogin(c.server, c.username);
         new IcatClient(c.server, c.sessionId).logout();
         setConnections(connections.slice(0, i).concat(connections.slice(i + 1)));
     };

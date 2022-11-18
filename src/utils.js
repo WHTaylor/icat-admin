@@ -142,8 +142,10 @@ export function mergeFilterIntoParams(params, filter) {
         params.delete("where");
         params.delete("offset");
         params.delete("limit");
+        params.delete("sortField");
+        params.delete("sortAsc");
     } else {
-        for (const k of ["table", "where", "offset", "limit"]) {
+        for (const k of ["table", "where", "offset", "limit", "sortField", "sortAsc"]) {
             if (filter[k] != null) {
                 params.set(k, filter[k]);
             } else {

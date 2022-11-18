@@ -12,8 +12,10 @@ function getActiveFilterIdx(filters, activeFilter) {
     const idx = filters.findIndex(f =>
         f.table == activeFilter.table
             && f.where == activeFilter.where
-            && f.offset.toString() == activeFilter.offset
-            && f.limit.toString() == activeFilter.limit);
+            && f.offset?.toString() == activeFilter.offset
+            && f.limit?.toString() == activeFilter.limit
+            && f.sortField == activeFilter.sortField
+            && f.sortAsc?.toString() == activeFilter.sortAsc);
     return idx < 0 ? null : idx;
 }
 

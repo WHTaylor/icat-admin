@@ -21,13 +21,15 @@ function urlSearchParamsToObj(params) {
 function parseUrlParams(params) {
     if (params == null || params.server == undefined)  return [null, null];
     const connection = {server: params.server, username: params.username};
-    const filter = params.table === null || params.table === undefined
+    const filter = params.table == null
         ? null
         : {
             table: params.table,
             where: params.where,
             offset: params.offset,
             limit: params.limit,
+            sortField: params.sortField,
+            sortAsc: params.sortAsc,
         };
 
     return [connection, filter];

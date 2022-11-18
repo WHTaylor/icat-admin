@@ -51,7 +51,7 @@ function toURLParams(connection, filter) {
 }
 
 function getActiveConnectionIdx(connections, activeConnection) {
-    if (activeConnection === null) return null;
+    if (activeConnection == null) return null;
     const {server, username} = activeConnection;
     const idx = connections.findIndex(c =>
         c.server === server && c.username === username);
@@ -77,7 +77,6 @@ const App = () => {
         setConnections(connections.concat(newConnection));
         setActiveConnection(newConnection);
         const params = toURLParams(newConnection, activeFilter);
-        console.log(params);
         route(`/icat?${encodedSearchParams(params)}`);
     };
 
@@ -94,15 +93,18 @@ const App = () => {
         disconnect(i);
         if (activeConnectionIdx === null) return;
 
-        if (i < activeConnectionIdx) {
-            setActiveServerIdx(activeConnectionIdx - 1);
-        } else if (i === activeConnectionIdx) {
-            if (i === 0) {
-                if (numConnections === 1) setActiveServerIdx(null);
-                else setActiveServerIdx(-1);
+        if (i === activeConnectionIdx) {
+            var newActiveConnection;
+            if (numConnections == 1) {
+                route('/');
+                return;
             } else if (i === numConnections - 1) {
-                setActiveServerIdx(activeConnectionIdx - 1)
-            };
+                newActiveConnection = connections[numConnections - 2];
+            } else {
+                newActiveConnection = connections[activeConnectionIdx + 1];
+            }
+            const params = toURLParams(newActiveConnection, null);
+            route(`/icat?${encodedSearchParams(params)}`);
         }
     }
 

@@ -55,6 +55,10 @@ export function tableFilter(table, offset, limit, where, sortField=null, sortAsc
     };
 }
 
+export function assignKey(filter) {
+    return {key: Math.random(), ...filter};
+}
+
 // By default, sort id to the beginning and the other common fields to the end
 const sortToEnd = ["createId", "createTime", "modId", "modTime"];
 export function defaultHeaderSort(headers) {
@@ -123,7 +127,7 @@ export function parseISODate(s) {
 }
 
 // URLSearchParams.toString doesn't seem to URL encode in an expected way
-function encodedSearchParams(params) {
+export function encodedSearchParams(params) {
     return Array.from(
             params.entries(),
             ([k, v]) => encodeURI(k) + "=" + encodeURI(v))

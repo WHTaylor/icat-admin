@@ -2,7 +2,7 @@ import {useState, useEffect} from "preact/hooks";
 import { route } from 'preact-router';
 
 import IcatClient from '../../icat.js';
-import {lowercaseFirst, tableFilter, mergeFilterIntoParams } from '../../utils.js';
+import {lowercaseFirst, tableFilter, assignKey, mergeFilterIntoParams } from '../../utils.js';
 import EntityTable from '../entity-table/container';
 import TableList from '../table-list';
 import TabWindow from '../tab-window';
@@ -19,8 +19,16 @@ function getActiveFilterIdx(filters, activeFilter) {
 
 const EntityViewer = ({server, sessionId, visible, activeFilter}) => {
     const [tabFilters, setTabFilters] = useState([]);
-    const icatClient = new IcatClient(server, sessionId);
+    const activeTabIdx = getActiveFilterIdx(tabFilters, activeFilter);
 
+    // If we've been given a filter that doesn't have a tab yet, create it
+    // This happens when opening a filter directly from a URL
+    if (activeFilter != null && activeTabIdx === null) {
+        setTabFilters(tabFilters.concat([assignKey(activeFilter)]));
+        console.log(activeFilter);
+    }
+
+    const icatClient = new IcatClient(server, sessionId);
 
     const routeToNewFilter = f => {
         const params = new URLSearchParams(window.location.search);
@@ -120,7 +128,6 @@ const EntityViewer = ({server, sessionId, visible, activeFilter}) => {
         return () => clearInterval(id);
     }, [server, sessionId]); // eslint-disable-line react-hooks/exhaustive-deps
 
-    const activeTabIdx = getActiveFilterIdx(tabFilters, activeFilter);
     return (
         <div class={visible ? "page" : "hidden"}>
             { /*

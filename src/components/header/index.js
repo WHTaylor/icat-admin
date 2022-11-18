@@ -8,7 +8,7 @@ function stripProtocol(s) {
 
 /* The header nav bar for the site, with links to active servers and static pages
  * */
-const Header = ({ servers, closeServer, activeServerIdx }) => {
+const Header = ({ servers, closeServer, activeConnectionIdx }) => {
     const onClickServerLink = (ev, i, server) => {
         // Middle click to close, left click to activate
         if (ev.buttons !== 4 && ev.buttons !== 1) return
@@ -27,7 +27,7 @@ const Header = ({ servers, closeServer, activeServerIdx }) => {
                         key={s + i}
                         s={s}
                         handleClick={ev => onClickServerLink(ev, i, s)}
-                        isActive={i === activeServerIdx} />)}
+                        isActive={i === activeConnectionIdx} />)}
                 <Link activeClassName={style.active} href="/">
                     +
                 </Link>

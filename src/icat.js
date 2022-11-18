@@ -31,10 +31,10 @@ async function formatError(errResponse) {
 function buildQuery(filter) {
     const where = queryWhereFromInput(filter.where);
     const limit =
-        (filter.limit === null || filter.limit === undefined)
+        filter.limit == null
         ? ""
         : ` limit ${filter.offset}, ${filter.limit}`;
-    const order = filter.sortField === null
+    const order = filter.sortField == null
         ? ""
         : `order by e.${filter.sortField} ${filter.sortAsc ? "asc" : "desc"}`;
     return `select e from ${filter.table} e ${where} ${order} ${limit} include 1`;

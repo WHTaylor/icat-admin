@@ -2,6 +2,7 @@ import { h } from 'preact';
 import { useLayoutEffect, useState } from 'preact/hooks';
 import { Router, route } from 'preact-router';
 
+import {encodedSearchParams} from '../utils.js';
 import IcatClient from '../icat.js';
 import About from './about';
 import Tips from './tips';
@@ -32,12 +33,26 @@ function parseUrlParams(params) {
     return [connection, filter];
 }
 
+function toURLParams(connection, filter) {
+    const usp = new URLSearchParams();
+    if (connection != null) {
+        Object.entries(connection)
+            .filter(([k, v]) => k != "sessionId" && v != null)
+            .forEach(([k, v]) => usp.append(k, v));
+    }
+    if (filter != null) {
+        Object.entries(filter)
+            .filter(([k, v]) => v != null)
+            .forEach(([k, v]) => usp.append(k, v));
+    }
+    return usp;
+}
+
 function getActiveConnectionIdx(connections, activeConnection) {
     if (activeConnection === null) return null;
     const {server, username} = activeConnection;
     const idx = connections.findIndex(c =>
-        c.server === server
-        && c.username === username);
+        c.server === server && c.username === username);
     return idx < 0 ? null : idx;
 }
 
@@ -49,17 +64,19 @@ const App = () => {
     const [paramsConn, paramsFilter] = parseUrlParams(urlSearchParamsToObj(usps));
 
     const [connections, setConnections] = useState([]);
-    const initActiveServerIdx = getActiveConnectionIdx(connections, paramsConn);
-    const [activeServerIdx, setActiveServerIdx] = useState(initActiveServerIdx);
+    const [activeConnection, setActiveConnection] = useState(paramsConn);
     const [activeFilter, setActiveFilter] = useState(paramsFilter);
 
+    const activeConnectionIdx = getActiveConnectionIdx(connections, activeConnection);
+
     const createConnection = (server, username, sessionId) => {
-        const numConnections = connections.length;
-        setConnections(
-            connections.concat({server, username, sessionId}));
+        const newConnection = {server, username, sessionId};
         saveLogin(server, username, sessionId);
-        setActiveServerIdx(numConnections);
-        route(`/icat?server=${server}&username=${username}`);
+        setConnections(connections.concat(newConnection));
+        setActiveConnection(newConnection);
+        const params = toURLParams(newConnection, activeFilter);
+        console.log(params);
+        route(`/icat?${encodedSearchParams(params)}`);
     };
 
     const disconnect = i => {
@@ -73,16 +90,16 @@ const App = () => {
         const numConnections = connections.length;
 
         disconnect(i);
-        if (activeServerIdx === null) return;
+        if (activeConnectionIdx === null) return;
 
-        if (i < activeServerIdx) {
-            setActiveServerIdx(activeServerIdx - 1);
-        } else if (i === activeServerIdx) {
+        if (i < activeConnectionIdx) {
+            setActiveServerIdx(activeConnectionIdx - 1);
+        } else if (i === activeConnectionIdx) {
             if (i === 0) {
                 if (numConnections === 1) setActiveServerIdx(null);
                 else setActiveServerIdx(-1);
             } else if (i === numConnections - 1) {
-                setActiveServerIdx(activeServerIdx - 1)
+                setActiveServerIdx(activeConnectionIdx - 1)
             };
         }
     }
@@ -101,12 +118,11 @@ const App = () => {
     });
 
     const handleIcatRoute = e => {
-        if (e.path != "/icat") setActiveServerIdx(null);
+        if (e.path != "/icat") setActiveConnection(null);
         else {
             const params = e.matches;
             const [activeConn, activeFilter] = parseUrlParams(params);
-            const idx = getActiveConnectionIdx(connections, activeConn)
-            setActiveServerIdx(idx);
+            setActiveConnection(activeConn);
             setActiveFilter(activeFilter);
         }
     }
@@ -116,7 +132,7 @@ const App = () => {
             <Header
                 servers={connections}
                 closeServer={removeConnection}
-                activeServerIdx={activeServerIdx} />
+                activeConnectionIdx={activeConnectionIdx} />
 
             <Router onChange={handleIcatRoute}>
                 <Tips path="/tips" />
@@ -130,8 +146,8 @@ const App = () => {
                     key={c.sessionId}
                     server={c.server}
                     sessionId={c.sessionId}
-                    visible={i === activeServerIdx}
-                    activeFilter={i === activeServerIdx ? activeFilter : null} />) }
+                    visible={i === activeConnectionIdx}
+                    activeFilter={i === activeConnectionIdx ? activeFilter : null} />) }
         </>
     );
 }

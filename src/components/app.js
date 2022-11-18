@@ -11,13 +11,14 @@ import ServerConnector from './server-connector';
 import {getLastLogin, saveLogin, invalidateLogin} from '../servercache.js';
 
 function urlSearchParamsToObj(params) {
+    if (params == null) return null;
     const res = {}
     for (const [k, v] of params.entries()) res[k] = v;
     return res;
 }
 
 function parseUrlParams(params) {
-    if (params.server == undefined)  return [null, null];
+    if (params == null || params.server == undefined)  return [null, null];
     const connection = {server: params.server, username: params.username};
     const filter = params.table === null || params.table === undefined
         ? null
@@ -41,8 +42,11 @@ function getActiveConnectionIdx(connections, activeConnection) {
 }
 
 const App = () => {
-    const params = urlSearchParamsToObj(new URLSearchParams(window.location.search));
-    const [paramsConn, paramsFilter] = parseUrlParams(params);
+    // Skip during node prerender
+    const usps = typeof window === "undefined"
+        ? null
+        : new URLSearchParams(window.location.search);
+    const [paramsConn, paramsFilter] = parseUrlParams(urlSearchParamsToObj(usps));
 
     const [connections, setConnections] = useState([]);
     const initActiveServerIdx = getActiveConnectionIdx(connections, paramsConn);

@@ -21,6 +21,7 @@ const EntityViewer = ({server, sessionId, visible, activeFilter}) => {
     const [tabFilters, setTabFilters] = useState([]);
     const icatClient = new IcatClient(server, sessionId);
 
+
     const routeToNewFilter = f => {
         const params = new URLSearchParams(window.location.search);
         if (f === null) {

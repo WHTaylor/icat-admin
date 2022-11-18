@@ -87,10 +87,11 @@ const App = () => {
         }
     }
 
-    // If no servers are currently active, try to login to the last active server
-    // TODO: Make this take into account the URL - if on tips/about don't load,
-    // if has a server set load that one rather than last logged in one.
+    // If on the home or icat page, and no servers are currently active, try to
+    // login to the last active server.
+    // TODO: if a server is set in URL, load that one rather than last logged in one.
     useLayoutEffect(() => {
+        if (location.pathname != "/" && location.pathname != "/icat") return;
         if (connections.length > 0) return;
         const [server, username, sessionId] = getLastLogin();
         if (server == null || sessionId === null) return;

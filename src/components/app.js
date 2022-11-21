@@ -2,7 +2,6 @@ import { h } from 'preact';
 import { useLayoutEffect, useState } from 'preact/hooks';
 import { Router, route } from 'preact-router';
 
-import {encodedSearchParams} from '../utils.js';
 import IcatClient from '../icat.js';
 import About from './about';
 import Tips from './tips';
@@ -10,45 +9,7 @@ import Header from './header';
 import EntityViewer from './entity-viewer';
 import ServerConnector from './server-connector';
 import {getLastLogin, saveLogin, invalidateLogin} from '../connectioncache.js';
-
-function urlSearchParamsToObj(params) {
-    if (params == null) return null;
-    const res = {}
-    for (const [k, v] of params.entries()) res[k] = v;
-    return res;
-}
-
-function parseUrlParams(params) {
-    if (params == null || params.server == undefined)  return [null, null];
-    const connection = {server: params.server, username: params.username};
-    const filter = params.table == null
-        ? null
-        : {
-            table: params.table,
-            where: params.where,
-            offset: params.offset,
-            limit: params.limit,
-            sortField: params.sortField,
-            sortAsc: params.sortAsc,
-        };
-
-    return [connection, filter];
-}
-
-function toURLParams(connection, filter) {
-    const usp = new URLSearchParams();
-    if (connection != null) {
-        Object.entries(connection)
-            .filter(([k, v]) => k != "sessionId" && v != null)
-            .forEach(([k, v]) => usp.append(k, v));
-    }
-    if (filter != null) {
-        Object.entries(filter)
-            .filter(([k, v]) => v != null)
-            .forEach(([k, v]) => usp.append(k, v));
-    }
-    return usp;
-}
+import {urlSearchParamsToObj, parseUrlParams, encodedSearchParams, buildUrl} from '../routing.js';
 
 function getActiveConnectionIdx(connections, activeConnection) {
     if (activeConnection == null) return null;
@@ -76,8 +37,7 @@ const App = () => {
         saveLogin(server, username, sessionId);
         setConnections(connections.concat(newConnection));
         setActiveConnection(newConnection);
-        const params = toURLParams(newConnection, activeFilter);
-        route(`/icat?${encodedSearchParams(params)}`);
+        route(buildUrl(newConnection, activeFilter));
     };
 
     const disconnect = i => {
@@ -103,8 +63,7 @@ const App = () => {
             } else {
                 newActiveConnection = connections[activeConnectionIdx + 1];
             }
-            const params = toURLParams(newActiveConnection, null);
-            route(`/icat?${encodedSearchParams(params)}`);
+            route(buildUrl(newActiveConnection, null));
         }
     }
 

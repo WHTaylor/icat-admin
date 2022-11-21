@@ -2,6 +2,8 @@ import style from './style.css';
 import { route } from 'preact-router';
 import { Link } from 'preact-router/match';
 
+import { buildUrl } from '../../routing.js';
+
 function stripProtocol(server) {
     return server.split("://").slice(-1);
 }
@@ -13,7 +15,7 @@ const Header = ({ connections, closeConnection, activeConnectionIdx }) => {
         if (ev.buttons !== 4 && ev.buttons !== 1) return
         ev.preventDefault();
         if (ev.buttons === 4) closeConnection(i)
-        else route(`/icat?server=${conn.server}&username=${conn.username}`);
+        else route(buildUrl(conn, null));
     };
 
     return (

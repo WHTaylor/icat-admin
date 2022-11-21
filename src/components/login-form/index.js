@@ -1,7 +1,7 @@
 import style from './style.css';
 
 import {useState} from "preact/hooks";
-import {getLastLogin, serverNames} from '../../servercache.js'
+import {getLastLogin, getServerNames} from '../../connectioncache.js'
 
 function processServerName(name) {
     if (name.trim().length === 0) return "";
@@ -54,7 +54,7 @@ const LoginForm = ({doLogin, errMsg, isLoggingIn}) => {
  */
 const ServerSelector = () => {
     const [lastServer, ] = getLastLogin();
-    const serverOptions = serverNames()
+    const serverOptions = getServerNames()
         .map(s => s === lastServer
             ? <option key={s} selected>{s}</option>
             : <option key={s}>{s}</option>);

@@ -9,7 +9,7 @@ import Tips from './tips';
 import Header from './header';
 import EntityViewer from './entity-viewer';
 import ServerConnector from './server-connector';
-import {getLastLogin, saveLogin, invalidateLogin} from '../servercache.js';
+import {getLastLogin, saveLogin, invalidateLogin} from '../connectioncache.js';
 
 function urlSearchParamsToObj(params) {
     if (params == null) return null;
@@ -134,8 +134,8 @@ const App = () => {
     return (
         <>
             <Header
-                servers={connections}
-                closeServer={removeConnection}
+                connections={connections}
+                closeConnection={removeConnection}
                 activeConnectionIdx={activeConnectionIdx} />
 
             <Router onChange={handleIcatRoute}>

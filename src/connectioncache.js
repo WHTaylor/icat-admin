@@ -1,4 +1,4 @@
-/* Functions for saving/loading local storage connection information.
+/* Functions for saving/loading connections in/from local storage.
  *
  * The data is stored in local storage as key-value pairs.
  *
@@ -26,7 +26,7 @@ if (typeof window === 'undefined') {
 
 export function saveLogin(server, username, sessionId) {
     const existing = getConnectionNumber(server, username);
-    const n = existing === null ? nextFreeServerNumber() : existing;
+    const n = existing === null ? nextFreeConnectionNumber() : existing;
     if (existing === null) {
         localStorage.setItem(`connection|${n}|server`, server);
         localStorage.setItem(`connection|${n}|username`, username);
@@ -35,15 +35,15 @@ export function saveLogin(server, username, sessionId) {
     localStorage.setItem("lastConnection", n);
 }
 
-function nextFreeServerNumber() {
-    const serverNumbers = [...new Set(
+function nextFreeConnectionNumber() {
+    const connectionNumbers = [...new Set(
         connectionEntries()
                 .map(([n, _, __]) => n)
                 .map(n => Number.parseInt(n)))]
         .sort();
-    if (Math.min(...serverNumbers) > 1) return 1;
-    for (const n of serverNumbers) {
-        if (!(serverNumbers.includes(n + 1))) return n + 1
+    if (Math.min(...connectionNumbers) > 1) return 1;
+    for (const n of connectionNumbers) {
+        if (!(connectionNumbers.includes(n + 1))) return n + 1
     }
 }
 
@@ -72,10 +72,10 @@ export function getLastLogin() {
 }
 
 function getConnection(connectionNumber) {
-    const serverKVs = connectionEntries()
+    const connectionKVs = connectionEntries()
         .filter(([n, _, __]) => n === connectionNumber);
-    if (serverKVs.length === 0) return null;
-    return serverKVs.reduce((o, [_, k, v]) => ({...o, [k]: v}), {});
+    if (connectionKVs.length === 0) return null;
+    return connectionKVs.reduce((o, [_, k, v]) => ({...o, [k]: v}), {});
 }
 
 function connectionEntries() {
@@ -84,7 +84,7 @@ function connectionEntries() {
         .map(k => [...k.split("|").slice(1), localStorage[k]]);
 }
 
-export function serverNames() {
+export function getServerNames() {
     return [...new Set(connectionEntries()
         .filter(([_, k, __]) => k == "server")
         .map(([_, __, v]) => v))];

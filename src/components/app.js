@@ -28,7 +28,6 @@ const App = () => {
 
     const [connections, setConnections] = useState([]);
     const [activeConnection, setActiveConnection] = useState(paramsConn);
-    const [activeFilter, setActiveFilter] = useState(paramsFilter);
 
     const activeConnectionIdx = getActiveConnectionIdx(connections, activeConnection);
 
@@ -37,7 +36,7 @@ const App = () => {
         saveLogin(server, username, sessionId);
         setConnections(connections.concat(newConnection));
         setActiveConnection(newConnection);
-        route(buildUrl(newConnection, activeFilter));
+        route(buildUrl(newConnection, paramsFilter));
     };
 
     const disconnect = i => {
@@ -83,10 +82,8 @@ const App = () => {
     const handleIcatRoute = e => {
         if (e.path != "/icat") setActiveConnection(null);
         else {
-            const params = e.matches;
-            const [activeConn, activeFilter] = parseUrlParams(params);
-            setActiveConnection(activeConn);
-            setActiveFilter(activeFilter);
+            const [newConn, ] = parseUrlParams(e.matches);
+            setActiveConnection(newConn);
         }
     }
 
@@ -109,8 +106,7 @@ const App = () => {
                     key={c.sessionId}
                     server={c.server}
                     sessionId={c.sessionId}
-                    visible={i === activeConnectionIdx}
-                    activeFilter={i === activeConnectionIdx ? activeFilter : null} />) }
+                    visible={i === activeConnectionIdx} />) }
         </>
     );
 }

@@ -1,7 +1,7 @@
 import {useEffect, useState, useRef} from "preact/hooks";
 import style from './style.css';
 
-import {parseISODate, commonFields} from '../../../utils.js';
+import {parseISODate, commonFields, withCorrectedDateFormats} from '../../../utils.js';
 import ReadMore from '../../generic/read-more';
 import SuccessIndicator from '../../success-indicator';
 
@@ -55,9 +55,9 @@ const EntityRow = ({
         setSaveState(createSaveState({ isSaving: true }));
         // If entity.id is undefined, this is a new entity to be created
         // Otherwise we just want to send modifications with the current id
-        const e = entity.id === undefined
+        const e = withCorrectedDateFormats(entity.id === undefined
             ? entity
-            : {...modifications, id: entity.id};
+            : {...modifications, id: entity.id});
         const successHandle = entity.id === undefined
             ? res => syncModifications(res[0])
             : syncModifications;

@@ -21,7 +21,12 @@ function getActiveFilterIdx(filters, activeFilter) {
     return idx < 0 ? null : idx;
 }
 
-const EntityViewer = ({server, sessionId, visible}) => {
+type Props = {
+    server: string;
+    sessionId: string;
+    visible: boolean;
+}
+const EntityViewer = ({server, sessionId, visible}: Props) => {
     const [tabFilters, setTabFilters] = useState([]);
 
     const [_, activeFilter] = parseUrlParams(urlSearchParamsToObj(new URLSearchParams(window.location.search)));

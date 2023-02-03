@@ -1,4 +1,5 @@
 import {useState, useEffect, useRef} from "preact/hooks";
+import {h} from "preact";
 
 import style from './style.css';
 import {entityNames} from '../../icat.js';

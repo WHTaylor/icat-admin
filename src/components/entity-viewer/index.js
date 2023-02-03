@@ -1,5 +1,6 @@
 import {useState, useEffect} from "preact/hooks";
 import { route } from 'preact-router';
+import {h} from "preact";
 
 import IcatClient from '../../icat.js';
 import { lowercaseFirst, tableFilter, assignKey } from '../../utils.js';

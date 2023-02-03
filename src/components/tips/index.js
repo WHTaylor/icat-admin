@@ -1,4 +1,5 @@
 import SuccessIndicator from '../success-indicator';
+import {h} from "preact";
 
 const Tips = () => (
     <div class="page">

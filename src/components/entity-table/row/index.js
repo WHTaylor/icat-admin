@@ -1,8 +1,9 @@
-import {useEffect, useState, useRef} from "preact/hooks";
-import style from './style.css';
+import {useEffect, useRef, useState} from "preact/hooks";
 import {h} from "preact";
 
-import {parseISODate, commonFields, withCorrectedDateFormats} from '../../../utils.js';
+import style from './style.css';
+
+import {commonFields, parseISODate, withCorrectedDateFormats} from '../../../utils.js';
 import ReadMore from '../../generic/read-more';
 import SuccessIndicator from '../../success-indicator';
 

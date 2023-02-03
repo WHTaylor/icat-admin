@@ -1,6 +1,7 @@
-import {entityNames} from './icat.js';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
+
+import {entityNames} from './icat.js';
 
 dayjs.extend(customParseFormat);
 

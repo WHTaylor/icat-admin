@@ -1,7 +1,8 @@
-import style from './style.css';
-
 import {h} from "preact";
 import {useState} from "preact/hooks";
+
+import style from './style.css';
+
 import {getLastLogin, getServerNames} from '../../connectioncache.js'
 
 function processServerName(name) {

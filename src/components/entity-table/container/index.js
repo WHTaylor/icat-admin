@@ -1,11 +1,13 @@
 import {useEffect, useState} from "preact/hooks";
 import {h} from "preact";
-import style from './style.css';
-import {simplifyIcatErrMessage} from '../../../icatErrorHandling.js';
 
+import style from './style.css';
+
+
+import {simplifyIcatErrMessage} from '../../../icatErrorHandling.js';
 import IcatClient from '../../../icat.js';
 import EntityTableView from '../view';
-import {randomSuffix, joinAttributeToTableName, difference} from '../../../utils.js';
+import {difference, joinAttributeToTableName, randomSuffix} from '../../../utils.js';
 
 const EntityTable = ({server, sessionId, filter, handleFilterChange, openRelated, isOpen, setSortingBy, refreshData}) => {
     const [data, setData] = useState(null);

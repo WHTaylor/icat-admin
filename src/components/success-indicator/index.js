@@ -1,5 +1,6 @@
 import {useEffect, useState, useRef} from "preact/hooks";
 import {h} from "preact";
+
 import style from './style.css';
 
 const INTERVAL_MS = 10

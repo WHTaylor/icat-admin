@@ -1,5 +1,6 @@
-import style from './style.css';
 import {h} from "preact";
+
+import style from './style.css';
 
 /* Displays the list of tabs for open entity tables, and the active table
  */

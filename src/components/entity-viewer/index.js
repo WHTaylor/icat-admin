@@ -2,7 +2,7 @@ import {useEffect, useState} from "preact/hooks";
 import {route} from 'preact-router';
 import {h} from "preact";
 
-import IcatClient from '../../icat.js';
+import IcatClient from '../../icat';
 import {assignKey, lowercaseFirst, tableFilter} from '../../utils.js';
 import EntityTable from '../entity-table/container';
 import TableList from '../table-list';

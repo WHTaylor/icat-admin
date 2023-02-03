@@ -2,7 +2,7 @@ import { h } from 'preact';
 import { useLayoutEffect, useState } from 'preact/hooks';
 import { Router, route } from 'preact-router';
 
-import IcatClient from '../icat.js';
+import IcatClient from '../icat';
 import About from './about';
 import Tips from './tips';
 import Header from './header';

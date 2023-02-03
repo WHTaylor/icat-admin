@@ -7,22 +7,26 @@
 
 import {queryWhereFromInput} from './utils.js';
 
+type IcatEntity = {[k: string]: string | IcatEntity}
+type IcatResponse = {[k: string]: IcatEntity}[]
+
 // Unpack the entries returned from the API, because they are formatted like
 // { 'Investigation': { 'id': 123...}}
 // Assumes all entites are the same type
-function unpack(data) {
+function unpack(data: IcatResponse): IcatEntity[] {
     if (data.length === 0) return [];
-    const dataType = Object.keys(data[0]);
+    const first = data[0];
+    const dataType = Object.keys(first)[0];
     return data.map(d => d[dataType]);
 }
 
-function queryUrlClause(args) {
+function queryUrlClause(args: {[k: string]: string}) {
     return Object.entries(args)
         .map(kv => kv.map(encodeURIComponent).join('='))
         .join('&');
 }
 
-async function formatError(errResponse) {
+async function formatError(errResponse: Response): Promise<string> {
     const header = `${errResponse.status} ${errResponse.statusText}`;
     return errResponse.json()
         .then(r => `${header}: ${r["message"]}`);
@@ -41,7 +45,10 @@ function buildQuery(filter) {
 }
 
 class IcatClient {
-    constructor(host: string, sessionId: string) {
+    private readonly hostUrl: URL;
+    private sessionId: string;
+
+    constructor(host: string, sessionId = null) {
         this.hostUrl = new URL(host);
         this.sessionId = sessionId;
     }
@@ -50,13 +57,13 @@ class IcatClient {
         return new URL("icat/session/" + sessionId, this.hostUrl);
     }
 
-    entityUrl(queryParams) {
+    entityUrl(queryParams: {[k: string]: string}) {
         return new URL(
             `icat/entityManager?${queryUrlClause(queryParams)}`,
             this.hostUrl);
     }
 
-    async login(plugin, username, password) {
+    async login(plugin, username, password): Promise<string> {
         const creds = {
             plugin,
             credentials: [
@@ -98,7 +105,7 @@ class IcatClient {
             .then(unpack);
     }
 
-    async getCount(filter, signal) {
+    async getCount(filter, signal): Promise<string> {
         const where = queryWhereFromInput(filter.where);
         const query = `select count(e) from ${filter.table} e ${where}`;
         const params = {
@@ -162,7 +169,7 @@ class IcatClient {
             .then(res => res.json());
     }
 
-    async deleteEntities(entityType, ids) {
+    async deleteEntities(entityType: string, ids: number[]): Promise<Response> {
         const entities = ids.map(id => ({[entityType]: {id}}));
         const params = {
             sessionId: this.sessionId,

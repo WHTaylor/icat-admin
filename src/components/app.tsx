@@ -8,7 +8,7 @@ import Tips from './tips';
 import Header from './header';
 import EntityViewer from './entity-viewer';
 import ServerConnector from './server-connector';
-import {getLastLogin, saveLogin, invalidateLogin} from '../connectioncache.js';
+import {getLastLogin, saveLogin, invalidateLogin, Connection} from '../connectioncache';
 import {urlSearchParamsToObj, parseUrlParams, encodedSearchParams, buildUrl} from '../routing.js';
 
 function getActiveConnectionIdx(connections, activeConnection) {
@@ -31,12 +31,11 @@ const App = () => {
 
     const activeConnectionIdx = getActiveConnectionIdx(connections, activeConnection);
 
-    const createConnection = (server, username, sessionId) => {
-        const newConnection = {server, username, sessionId};
-        saveLogin(server, username, sessionId);
-        setConnections(connections.concat(newConnection));
-        setActiveConnection(newConnection);
-        route(buildUrl(newConnection, paramsFilter));
+    const createConnection = (login: Connection) => {
+        saveLogin(login.server, login.username, login.sessionId);
+        setConnections(connections.concat(login));
+        setActiveConnection(login);
+        route(buildUrl(login, paramsFilter));
     };
 
     const disconnect = i => {
@@ -72,11 +71,11 @@ const App = () => {
     useLayoutEffect(() => {
         if (location.pathname != "/" && location.pathname != "/icat") return;
         if (connections.length > 0) return;
-        const [server, username, sessionId] = getLastLogin();
-        if (server == null || sessionId === null) return;
-        const client = new IcatClient(server);
-        client.isValidSession(sessionId)
-            .then(res => {if (res) createConnection(server, username, sessionId)});
+        const login = getLastLogin();
+        if (login === null) return;
+        const client = new IcatClient(login.server);
+        client.isValidSession(login.sessionId)
+            .then(res => {if (res) createConnection(login)});
     });
 
     const handleIcatRoute = e => {
@@ -87,6 +86,7 @@ const App = () => {
         }
     }
 
+    // @ts-ignore
     return (
         <>
             <Header

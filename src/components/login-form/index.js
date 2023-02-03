@@ -3,7 +3,7 @@ import {useState} from "preact/hooks";
 
 import style from './style.css';
 
-import {getLastLogin, getServerNames} from '../../connectioncache.js'
+import {getLastLogin, getServerNames} from '../../connectioncache'
 
 function processServerName(name) {
     if (name.trim().length === 0) return "";
@@ -55,9 +55,10 @@ const LoginForm = ({doLogin, errMsg, isLoggingIn}) => {
  * servers, or the user clicks the button, will be a text input.
  */
 const ServerSelector = () => {
-    const [lastServer,] = getLastLogin();
+    const lastLogin = getLastLogin();
+    const server = lastLogin?.server;
     const serverOptions = getServerNames()
-        .map(s => s === lastServer
+        .map(s => s === server
             ? <option key={s} selected>{s}</option>
             : <option key={s}>{s}</option>);
     const [addingServer, setAddingServer] = useState(serverOptions.length === 0);

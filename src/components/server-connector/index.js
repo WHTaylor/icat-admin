@@ -25,7 +25,8 @@ const ServerConnector = ({createConnection}) => {
             .then(s => {
                 if (typeof s === "string") {
                     const u = plugin === "anon" ? "anon" : `${plugin}/${username}`;
-                    createConnection(server, u, s);
+                    const login = {server, username: u, sessionId: s}
+                    createConnection(login);
                 } else {
                     return Promise.reject("Failed to connect " + s.toString());
                 }

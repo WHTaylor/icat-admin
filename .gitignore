@@ -3,3 +3,4 @@ build
 /*.log
 size-plugin.json
 cypress/videos
+.idea

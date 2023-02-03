@@ -8,13 +8,12 @@ import ContextMenu from '../../context-menu';
 import {defaultHeaderSort, joinAttributeToTableName} from '../../../utils.js';
 
 const EntityTableView = ({
-    data, entityType, sortingBy, deletions, creations,
-    openRelated, setSortingBy, saveEntity, modifyDataRow,
-    markToDelete, cancelDeletion, doDelete,
-    editCreation, cancelCreate, insertCreation
-}) =>
-{
-    const [contextMenuProps, setContextMenuProps] =  useState(null);
+                             data, entityType, sortingBy, deletions, creations,
+                             openRelated, setSortingBy, saveEntity, modifyDataRow,
+                             markToDelete, cancelDeletion, doDelete,
+                             editCreation, cancelCreate, insertCreation
+                         }) => {
+    const [contextMenuProps, setContextMenuProps] = useState(null);
     // Locally saved changes to entities
     const [entityModifications, setEntityModifications] = useState({});
     // fieldBeingEdited is:
@@ -86,12 +85,12 @@ const EntityTableView = ({
         const v = data.find(e => e[k] !== undefined && e[k] !== null)[k];
         return (<select onChange={ev => setDisplayField(ev.target.value)}>
             {Object.keys(v)
-                    .filter(vk => typeof v[vk] !== "object")
-                    .map(vk =>
-                <option
-                    key={vk}
-                    value={vk}
-                    selected={relatedDisplayFields[k] === vk}>{vk}</option>)}
+                .filter(vk => typeof v[vk] !== "object")
+                .map(vk =>
+                    <option
+                        key={vk}
+                        value={vk}
+                        selected={relatedDisplayFields[k] === vk}>{vk}</option>)}
         </select>);
     };
 
@@ -101,7 +100,7 @@ const EntityTableView = ({
             const fieldIsEntity = joinAttributeToTableName(entityType, k) !== null;
             const newValue = fieldIsEntity
                 // TODO: Validate whether the selected entity exists
-                ? { id: Number.parseInt(v) }
+                ? {id: Number.parseInt(v)}
                 : v;
             isNewRow
                 ? editCreation(i, k, newValue)
@@ -111,7 +110,7 @@ const EntityTableView = ({
         const syncModifications = isNewRow
             ? async id => await insertCreation(i, id)
             : async () => await modifyDataRow(i, entityModifications[e.id])
-                    .then(() => removeModifications(e.id));
+                .then(() => removeModifications(e.id));
         const revertChanges = isNewRow
             ? () => cancelCreate(i)
             : () => removeModifications(e.id);
@@ -148,17 +147,17 @@ const EntityTableView = ({
             markToDelete={() => markToDelete(e.id)}
             cancelDeletion={() => cancelDeletion(e.id)}
             doDelete={() => doDelete(e.id)}
-            markedForDeletion={deletions.has(e.id)} />;
+            markedForDeletion={deletions.has(e.id)}/>;
     };
 
     return (
         <>
-        <table>
-            <tr>
-                <th>Actions</th>
-                {keys.map(k =>
-                    <th key={k + "-header"}>
-                        <div class={style.tableHeaderContainer}>
+            <table>
+                <tr>
+                    <th>Actions</th>
+                    {keys.map(k =>
+                        <th key={k + "-header"}>
+                            <div class={style.tableHeaderContainer}>
                             <span class={style.tableHeading}>
                                 {k}
                                 <span>
@@ -166,7 +165,7 @@ const EntityTableView = ({
                                         className={
                                             `${style.sortButton}
                                             ${sortingBy.field === k && sortingBy.asc
-                                            ? style.activeSort : '' }`}
+                                                ? style.activeSort : ''}`}
                                         onClick={() => setSortingBy(k, true)}
                                         title={`Sort by ${k}, ascending`}>
                                         ▲
@@ -175,21 +174,21 @@ const EntityTableView = ({
                                         className={
                                             `${style.sortButton}
                                             ${sortingBy.field === k && !sortingBy.asc
-                                            ? style.activeSort : '' }`}
+                                                ? style.activeSort : ''}`}
                                         onClick={() => setSortingBy(k, false)}
                                         title={`Sort by ${k}, descending`}>
                                         ▼
                                     </button>
                                 </span>
                             </span>
-                        {shouldShowRelatedFieldDisplayOptions(k) &&
-                                relatedFieldDisplaySelect(k)}
-                        </div>
-                    </th>)}
-            </tr>
-            {creations.concat(data).map((e, i) => buildEntityRow(e, i))}
-        </table>
-        {contextMenuProps !== null && <ContextMenu {...contextMenuProps} />}
+                                {shouldShowRelatedFieldDisplayOptions(k) &&
+                                    relatedFieldDisplaySelect(k)}
+                            </div>
+                        </th>)}
+                </tr>
+                {creations.concat(data).map((e, i) => buildEntityRow(e, i))}
+            </table>
+            {contextMenuProps !== null && <ContextMenu {...contextMenuProps} />}
         </>
     );
 }

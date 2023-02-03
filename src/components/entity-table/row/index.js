@@ -21,13 +21,13 @@ function formatCellContent(cellContent) {
 }
 
 const EntityRow = ({
-    entity, modifications, headers,
-    editingField, relatedEntityDisplayFields, markedForDeletion,
-    openContextMenu,
-    startEditing, stopEditing, makeEdit,
-    saveEntity, revertChanges, syncModifications,
-    markToDelete, cancelDeletion, doDelete}) =>
-{
+                       entity, modifications, headers,
+                       editingField, relatedEntityDisplayFields, markedForDeletion,
+                       openContextMenu,
+                       startEditing, stopEditing, makeEdit,
+                       saveEntity, revertChanges, syncModifications,
+                       markToDelete, cancelDeletion, doDelete
+                   }) => {
     const inputEl = useRef(null);
     const [saveState, setSaveState] = useState(null);
     const createSaveState = fields => ({
@@ -54,7 +54,7 @@ const EntityRow = ({
     });
 
     const saveChanges = () => {
-        setSaveState(createSaveState({ isSaving: true }));
+        setSaveState(createSaveState({isSaving: true}));
         // If entity.id is undefined, this is a new entity to be created
         // Otherwise we just want to send modifications with the current id
         const e = withCorrectedDateFormats(entity.id === undefined
@@ -66,15 +66,16 @@ const EntityRow = ({
         saveEntity(e)
             .then(successHandle)
             .then(() => setSaveState(createSaveState({
-                failed: false, isSaving: false})))
+                failed: false, isSaving: false
+            })))
             .catch(err => setSaveState(createSaveState({
-                    failed: true, message: err, isSaving: false
-                })));
+                failed: true, message: err, isSaving: false
+            })));
     };
 
     const getCurrentValue = field => {
         const isModified = modifications !== undefined
-                         && modifications[field] !== undefined;
+            && modifications[field] !== undefined;
         const source = isModified
             ? modifications
             : entity;
@@ -84,10 +85,10 @@ const EntityRow = ({
     const getFieldValue = field => {
         const value = getCurrentValue(field);
         const isModified = modifications !== undefined
-                         && modifications[field] !== undefined;
+            && modifications[field] !== undefined;
 
         // Always show id for modified related entities
-        if (isModified && typeof(value) === "object") {
+        if (isModified && typeof (value) === "object") {
             return value.id
         }
 
@@ -106,7 +107,7 @@ const EntityRow = ({
     const getInitialEditValue = field => {
         const value = getCurrentValue(field);
 
-        return typeof(value) === "object"
+        return typeof (value) === "object"
             ? value.id
             : getFieldValue(field);
     };
@@ -137,50 +138,50 @@ const EntityRow = ({
                 k === editingField
                     ? <td>
                         <input type="text"
-                            ref={inputEl}
-                            value={getInitialEditValue(k)}
-                            class={style.editInput}
+                               ref={inputEl}
+                               value={getInitialEditValue(k)}
+                               class={style.editInput}
                             // Stop propagation to avoid stop editing event bound to
                             // document.onClick
-                            onClick={ev => ev.stopPropagation()}
-                            onChange={ev => makeEdit(editingField, ev.target.value)} />
-                      </td>
+                               onClick={ev => ev.stopPropagation()}
+                               onChange={ev => makeEdit(editingField, ev.target.value)}/>
+                    </td>
                     : <td
                         onClick={ev => handleFieldClick(ev, k)}
                         class={markedForDeletion
                             ? style.markedForDeletion
                             : entity.id === undefined && style.newRow}>
-                        <ReadMore text={getFieldValue(k)} />
-                      </td>
+                        <ReadMore text={getFieldValue(k)}/>
+                    </td>
             )}
         </tr>
     );
 }
 
 const RowActions = ({
-    isNewRow, saveState, isModified, markedForDeletion,
-    revertChanges, saveChanges, markToDelete, cancelDeletion, doDelete}) =>
-{
+                        isNewRow, saveState, isModified, markedForDeletion,
+                        revertChanges, saveChanges, markToDelete, cancelDeletion, doDelete
+                    }) => {
     if (saveState != null) {
-        return <SuccessIndicator saveState={saveState} />;
+        return <SuccessIndicator saveState={saveState}/>;
     }
 
     let actions = [];
     if (isNewRow) {
-        actions.push({ title: "Cancel creation", ev: revertChanges, icon: "🚫"});
-        actions.push({ title: "Create row", ev: saveChanges, icon: "💾"});
+        actions.push({title: "Cancel creation", ev: revertChanges, icon: "🚫"});
+        actions.push({title: "Create row", ev: saveChanges, icon: "💾"});
     } else if (markedForDeletion) {
-        actions.push({ title: "Cancel deletion", ev: cancelDeletion, icon: "↩️"});
-        actions.push({ title: "Confirm deletion", ev: doDelete, icon: "✔️"});
+        actions.push({title: "Cancel deletion", ev: cancelDeletion, icon: "↩️"});
+        actions.push({title: "Confirm deletion", ev: doDelete, icon: "✔️"});
     } else {
-        actions.push({ title: "Mark for deletion", ev: markToDelete, icon: "🗑"});
+        actions.push({title: "Mark for deletion", ev: markToDelete, icon: "🗑"});
     }
 
     if (isModified) {
         actions.push(
-            { title: "Revert changes", ev: revertChanges, icon: "↩️"});
+            {title: "Revert changes", ev: revertChanges, icon: "↩️"});
         actions.push(
-            { title: "Save changes", ev: saveChanges, icon: "💾"});
+            {title: "Save changes", ev: saveChanges, icon: "💾"});
     }
     return (<>
         {actions.map(a =>

@@ -14,10 +14,13 @@ const ReadMore = ({text}) => {
 
     return (
         <>
-        {shownText}{!open && "..."}
-        <button onClick={ev => {ev.stopPropagation(); setOpen(!open)}} class={style.readMoreBtn}>
-            {open ? "less" : "show more"}
-        </button>
+            {shownText}{!open && "..."}
+            <button onClick={ev => {
+                ev.stopPropagation();
+                setOpen(!open)
+            }} class={style.readMoreBtn}>
+                {open ? "less" : "show more"}
+            </button>
         </>
     );
 }

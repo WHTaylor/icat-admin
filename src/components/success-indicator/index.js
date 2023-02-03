@@ -5,7 +5,7 @@ import style from './style.css';
 
 const INTERVAL_MS = 10
 
-const SuccessIndicator = ({saveState, clearTimeoutMs = 2000 }) => {
+const SuccessIndicator = ({saveState, clearTimeoutMs = 2000}) => {
     const [mousePos, setMousePos] = useState(null);
     const timer = useRef(0);
 
@@ -32,15 +32,15 @@ const SuccessIndicator = ({saveState, clearTimeoutMs = 2000 }) => {
             onMouseMove={ev => {
                 setMousePos({x: ev.pageX + 10, y: ev.pageY - 10});
             }}
-            onMouseLeave={() => setMousePos(null)} >
+            onMouseLeave={() => setMousePos(null)}>
             {icon}
         </span>
-        {mousePos !== null && saveState.failed &&
-            <div
-                class={style.messageContainer}
-                style={{top: mousePos.y, left: mousePos.x}}>
-                {saveState.message}
-            </div>}
+            {mousePos !== null && saveState.failed &&
+                <div
+                    class={style.messageContainer}
+                    style={{top: mousePos.y, left: mousePos.x}}>
+                    {saveState.message}
+                </div>}
         </>
     );
 }

@@ -14,14 +14,22 @@
  */
 
 if (typeof window === 'undefined') {
-  global.localStorage = {
-    _data       : {},
-    setItem     : (id, val) => { return this._data[id] = String(val); },
-    // Using id => this._data[id] instead of function syntax breaks the prod build
-    getItem     : function(id) { this._data[id] }, //eslint-disable-line
-    removeItem  : id => { return delete this._data[id]; },
-    clear       : () => { this._data = {}; }
-  };
+    global.localStorage = {
+        _data: {},
+        setItem: (id, val) => {
+            return this._data[id] = String(val);
+        },
+        // Using id => this._data[id] instead of function syntax breaks the prod build
+        getItem: function (id) {
+            this._data[id]
+        }, //eslint-disable-line
+        removeItem: id => {
+            return delete this._data[id];
+        },
+        clear: () => {
+            this._data = {};
+        }
+    };
 }
 
 export function saveLogin(server, username, sessionId) {
@@ -38,8 +46,8 @@ export function saveLogin(server, username, sessionId) {
 function nextFreeConnectionNumber() {
     const connectionNumbers = [...new Set(
         connectionEntries()
-                .map(([n, _, __]) => n)
-                .map(n => Number.parseInt(n)))]
+            .map(([n, _, __]) => n)
+            .map(n => Number.parseInt(n)))]
         .sort();
     if (Math.min(...connectionNumbers) > 1) return 1;
     for (const n of connectionNumbers) {

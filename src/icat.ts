@@ -121,7 +121,7 @@ class IcatClient {
             .then(json => json[0]);
     }
 
-    async getById(entityType, id) {
+    async getById(entityType: string, id: number) {
         const query = `${entityType} e include 1`;
         const params = {
             sessionId: this.sessionId,

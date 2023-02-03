@@ -30,7 +30,7 @@ export function icatAttributeToTableName(tableName, a) {
     return capitalizedSingular;
 }
 
-export function joinAttributeToTableName(originTable, attribute) {
+export function joinAttributeToTableName(originTable: string, attribute: string): string | null {
     if (attribute === "type") {
         // instrument.type is just a free text description field
         if (originTable == "Instrument") return null

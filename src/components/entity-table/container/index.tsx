@@ -3,12 +3,21 @@ import {h, Fragment} from "preact";
 
 import style from './style.css';
 
-
 import {simplifyIcatErrMessage} from '../../../icatErrorHandling.js';
 import IcatClient from '../../../icat';
 import EntityTableView from '../view';
-import {difference, joinAttributeToTableName, randomSuffix} from '../../../utils';
+import {difference, joinAttributeToTableName, randomSuffix, TableFilter} from '../../../utils';
 
+type Props = {
+    server: string;
+    sessionId: string;
+    filter: TableFilter;
+    handleFilterChange: (filter: TableFilter) => void;
+    openRelated: any;
+    isOpen: boolean;
+    setSortingBy: (field: string, asc: boolean) => void;
+    refreshData: () => void;
+}
 const EntityTable = ({
                          server,
                          sessionId,
@@ -18,7 +27,7 @@ const EntityTable = ({
                          isOpen,
                          setSortingBy,
                          refreshData
-                     }) => {
+                     }: Props) => {
     const [data, setData] = useState(null);
     const [errMsg, setErrMsg] = useState(null);
     const [count, setCount] = useState(null);

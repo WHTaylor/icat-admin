@@ -26,29 +26,29 @@ const TabWindow = props => {
     }
 
     const getTabXs = () =>
-        Array.from(document.querySelectorAll( `.${style.tabSwitcher} button`))
+        Array.from(document.querySelectorAll(`.${style.tabSwitcher} button`))
             .map(el => el.getBoundingClientRect())
             .map(r => r.x);
 
     return (
         <div class="mainContentAndRightColumn">
             {props.children.length > 0 &&
-            <div
-                class={style.tabSwitcher}
-                ondragover={ev => ev.preventDefault()}
-                ondrop={endDrag} >
-                {props.children.map(([name, key, ], i) =>
-                    <button
-                        key={key}
-                        onClick={() => props.handleChangeTabIdx(i)}
-                        onMouseDown={ev => handleMouseDown(ev, i)}
-                        class={`entityButton
+                <div
+                    class={style.tabSwitcher}
+                    ondragover={ev => ev.preventDefault()}
+                    ondrop={endDrag}>
+                    {props.children.map(([name, key,], i) =>
+                        <button
+                            key={key}
+                            onClick={() => props.handleChangeTabIdx(i)}
+                            onMouseDown={ev => handleMouseDown(ev, i)}
+                            class={`entityButton
                             ${i === props.activeTabIdx ? style.selectedTab : ""}`}
-                        draggable="true"
-                        ondragstart={ev => startDrag(ev, i)} >
-                        {name}
-                    </button>)}
-            </div> }
+                            draggable="true"
+                            ondragstart={ev => startDrag(ev, i)}>
+                            {name}
+                        </button>)}
+                </div>}
             {props.children.map(([, key, child], i) =>
                 <div
                     key={key}

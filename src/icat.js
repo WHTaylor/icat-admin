@@ -32,12 +32,13 @@ function buildQuery(filter) {
     const where = queryWhereFromInput(filter.where);
     const limit =
         filter.limit == null
-        ? ""
-        : ` limit ${filter.offset}, ${filter.limit}`;
+            ? ""
+            : ` limit ${filter.offset}, ${filter.limit}`;
     const order = filter.sortField == null
         ? ""
         : `order by e.${filter.sortField} ${filter.sortAsc ? "asc" : "desc"}`;
-    return `select e from ${filter.table} e ${where} ${order} ${limit} include 1`;
+    return `select e
+            from ${filter.table} e ${where} ${order} ${limit} include 1`;
 }
 
 class IcatClient {
@@ -61,7 +62,8 @@ class IcatClient {
             plugin,
             credentials: [
                 {username},
-                {password}]};
+                {password}]
+        };
         const form = new FormData();
         form.append('json', JSON.stringify(creds));
         const url = new URL("icat/session", this.hostUrl);
@@ -79,7 +81,7 @@ class IcatClient {
     }
 
     async refresh() {
-        fetch(this.sessionUrl(this.sessionId), { method: "PUT" });
+        fetch(this.sessionUrl(this.sessionId), {method: "PUT"});
     }
 
     async getEntries(filter, signal) {
@@ -99,7 +101,8 @@ class IcatClient {
 
     async getCount(filter, signal) {
         const where = queryWhereFromInput(filter.where);
-        const query = `select count(e) from ${filter.table} e ${where}`;
+        const query = `select count(e)
+                       from ${filter.table} e ${where}`;
         const params = {
             sessionId: this.sessionId,
             query,
@@ -136,7 +139,7 @@ class IcatClient {
 
     async logout() {
         fetch(this.sessionUrl(this.sessionId),
-            { method: "DELETE" });
+            {method: "DELETE"});
         this.sessionId = undefined;
     }
 

@@ -27,7 +27,7 @@ const TableList = ({openTab}) => {
                 setTyped("");
             } else if (ev.keyCode >= 65 && ev.keyCode <= 90) {
                 setTyped(typed + ev.key);
-            } else if(ev.key === "Backspace") {
+            } else if (ev.key === "Backspace") {
                 setTyped(typed.slice(0, typed.length - 1));
             } else if (ev.key == "Enter" && typed !== "") {
                 const toOpen = getTable(typed);
@@ -43,18 +43,18 @@ const TableList = ({openTab}) => {
 
     return (
         <>
-        <h2>ICAT tables</h2>
-        <ul class={style.tableList}>
-            {entityNames.map(en =>
-                <li key={en}>
-                    <button
-                        class="entityButton"
-                        onClick={() => openTab(tableFilter(en, 0, 50))}>
-                        {en}
-                    </button>
-                </li>)}
-        </ul>
-        <TypingPreview current={typed} match={getTable(typed)} />
+            <h2>ICAT tables</h2>
+            <ul class={style.tableList}>
+                {entityNames.map(en =>
+                    <li key={en}>
+                        <button
+                            class="entityButton"
+                            onClick={() => openTab(tableFilter(en, 0, 50))}>
+                            {en}
+                        </button>
+                    </li>)}
+            </ul>
+            <TypingPreview current={typed} match={getTable(typed)}/>
         </>
     );
 }

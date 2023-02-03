@@ -29,16 +29,16 @@ const LoginForm = ({doLogin, errMsg, isLoggingIn}) => {
             class="mainContent"
             onSubmit={submit}>
 
-            <ServerSelector />
+            <ServerSelector/>
 
             <label for="pluginInput" class={style.block}>Auth plugin:</label>
-            <input type="text" name="plugin" id="pluginInput" defaultValue="anon" class={style.block} />
+            <input type="text" name="plugin" id="pluginInput" defaultValue="anon" class={style.block}/>
 
             <label for="usernameInput" class={style.block}>Username:</label>
-            <input type="text" name="username" id="usernameInput" class={style.block} />
+            <input type="text" name="username" id="usernameInput" class={style.block}/>
 
             <label for="passwordInput" class={style.block}>Password:</label>
-            <input type="password" name="password" id="passwordInput" class={style.block} />
+            <input type="password" name="password" id="passwordInput" class={style.block}/>
 
             <button class={style.block}>Login</button>
 
@@ -55,7 +55,7 @@ const LoginForm = ({doLogin, errMsg, isLoggingIn}) => {
  * servers, or the user clicks the button, will be a text input.
  */
 const ServerSelector = () => {
-    const [lastServer, ] = getLastLogin();
+    const [lastServer,] = getLastLogin();
     const serverOptions = getServerNames()
         .map(s => s === lastServer
             ? <option key={s} selected>{s}</option>
@@ -63,7 +63,7 @@ const ServerSelector = () => {
     const [addingServer, setAddingServer] = useState(serverOptions.length === 0);
 
     const input = addingServer
-        ? <input id="serverInput" type="text" class={style.inline} />
+        ? <input id="serverInput" type="text" class={style.inline}/>
         : <select id="serverInput" class={style.inline}>{serverOptions}</select>;
 
     const button = <button

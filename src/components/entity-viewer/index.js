@@ -13,11 +13,11 @@ function getActiveFilterIdx(filters, activeFilter) {
     if (activeFilter === null) return null;
     const idx = filters.findIndex(f =>
         f.table == activeFilter.table
-            && f.where == activeFilter.where
-            && f.offset?.toString() == activeFilter.offset
-            && f.limit?.toString() == activeFilter.limit
-            && f.sortField == activeFilter.sortField
-            && f.sortAsc?.toString() == activeFilter.sortAsc);
+        && f.where == activeFilter.where
+        && f.offset?.toString() == activeFilter.offset
+        && f.limit?.toString() == activeFilter.limit
+        && f.sortField == activeFilter.sortField
+        && f.sortAsc?.toString() == activeFilter.sortAsc);
     return idx < 0 ? null : idx;
 }
 
@@ -89,7 +89,7 @@ const EntityViewer = ({server, sessionId, visible}) => {
             ? "type.id"
             : oneToMany
                 ? `${lowercaseFirst(origin)}.id`
-                :"id";
+                : "id";
         openTab(tableFilter(related, 0, 50, `${searchFor} = ${relationId}`));
     }
 
@@ -113,7 +113,7 @@ const EntityViewer = ({server, sessionId, visible}) => {
     const setSortingBy = (i, k, sortAsc) => {
         const f = tabFilters[i];
         const newFilter = f.sortField !== k || f.sortAsc !== sortAsc
-            ? {...f, sortField: k, sortAsc }
+            ? {...f, sortField: k, sortAsc}
             : f.sortAsc === sortAsc
                 ? {...f, sortField: null}
                 : {...f, sortAsc};
@@ -122,7 +122,7 @@ const EntityViewer = ({server, sessionId, visible}) => {
 
     const refreshTab = i => {
         const f = tabFilters[i];
-        const newFilter= {...f, key: Math.random()};
+        const newFilter = {...f, key: Math.random()};
         handleFilterChange(i, newFilter);
     }
 
@@ -141,7 +141,7 @@ const EntityViewer = ({server, sessionId, visible}) => {
                 the active server.
             */}
             {visible && <div class="leftColumn">
-                <TableList openTab={openTab} />
+                <TableList openTab={openTab}/>
             </div>}
             <TabWindow
                 activeTabIdx={activeTabIdx}
@@ -162,7 +162,7 @@ const EntityViewer = ({server, sessionId, visible}) => {
                             setSortingBy={(k, sortAsc) => setSortingBy(i, k, sortAsc)}
                             isOpen={i === activeTabIdx}
                             refreshData={() => refreshTab(i)}
-                            key={f.key} />
+                            key={f.key}/>
                     ])}
             </TabWindow>
         </div>

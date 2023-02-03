@@ -8,7 +8,7 @@ export function urlSearchParamsToObj(params) {
 }
 
 export function parseUrlParams(params) {
-    if (params == null || params.server == undefined)  return [null, null];
+    if (params == null || params.server == undefined) return [null, null];
     const connection = {server: params.server, username: params.username};
     const filter = params.table == null
         ? null
@@ -42,8 +42,8 @@ function toURLParams(connection, filter) {
 // URLSearchParams.toString doesn't seem to URL encode in an expected way
 export function encodedSearchParams(params) {
     return Array.from(
-            params.entries(),
-            ([k, v]) => encodeURI(k) + "=" + encodeURI(v))
+        params.entries(),
+        ([k, v]) => encodeURI(k) + "=" + encodeURI(v))
         .join("&");
 }
 

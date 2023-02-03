@@ -1,4 +1,4 @@
-import { useState } from "preact/hooks";
+import {useState} from "preact/hooks";
 import {h} from "preact";
 
 import IcatClient from '../../icat.js';
@@ -30,10 +30,13 @@ const ServerConnector = ({createConnection}) => {
                     return Promise.reject("Failed to connect " + s.toString());
                 }
             })
-            .catch(err => { setErrMsg(err.toString()); setIsLoggingIn(false)});
+            .catch(err => {
+                setErrMsg(err.toString());
+                setIsLoggingIn(false)
+            });
     };
     return <div class="page">
-        <LoginForm errMsg={errMsg} doLogin={doLogin} isLoggingIn={isLoggingIn} />
+        <LoginForm errMsg={errMsg} doLogin={doLogin} isLoggingIn={isLoggingIn}/>
     </div>;
 }
 

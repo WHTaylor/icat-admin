@@ -12,7 +12,8 @@ const ContextMenu = ({entityType, entity, openRelated, x, y}) => {
                 icatAttributeToTableName(entityType, k),
                 entity.id,
                 true,
-                entityType.endsWith("Type"))}));
+                entityType.endsWith("Type"))
+        }));
 
     // Related entities which are one-many (ie. datafile.dataset)
     const relatedSingleCallbacks = Object.keys(entity)
@@ -22,17 +23,19 @@ const ContextMenu = ({entityType, entity, openRelated, x, y}) => {
             openRelated: () => openRelated(
                 joinAttributeToTableName(entityType, k),
                 entity[k].id,
-                false, false)}));
+                false, false)
+        }));
 
     const items = relatedArrayCallbacks.concat(relatedSingleCallbacks);
     const content = items.length > 0
-        ?  <><h3>Show related</h3>
-           <ul class={style.contextMenuList}>
-           {items.map(i =>
-               <li key={i} class={style.contextMenuRow} onClick={i.openRelated}>
-                  {i.entityType}
-               </li>)}
-            </ul></>
+        ? <><h3>Show related</h3>
+            <ul class={style.contextMenuList}>
+                {items.map(i =>
+                    <li key={i} class={style.contextMenuRow} onClick={i.openRelated}>
+                        {i.entityType}
+                    </li>)}
+            </ul>
+        </>
         : <h3>No related entities</h3>;
     return (
         <div class={style.contextMenu} style={{top: y, left: x}}>

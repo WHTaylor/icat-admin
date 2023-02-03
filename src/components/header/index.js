@@ -11,7 +11,7 @@ function stripProtocol(server) {
 }
 
 /* The header nav bar for the site, with links to active servers and static pages */
-const Header = ({ connections, closeConnection, activeConnectionIdx }) => {
+const Header = ({connections, closeConnection, activeConnectionIdx}) => {
     const onClickConnectionLink = (ev, i, conn) => {
         // Middle click to close, left click to activate
         if (ev.buttons !== 4 && ev.buttons !== 1) return
@@ -30,7 +30,7 @@ const Header = ({ connections, closeConnection, activeConnectionIdx }) => {
                         key={conn + i}
                         conn={conn}
                         handleClick={ev => onClickConnectionLink(ev, i, conn)}
-                        isActive={i === activeConnectionIdx} />)}
+                        isActive={i === activeConnectionIdx}/>)}
                 <Link activeClassName={style.active} href="/">
                     +
                 </Link>
@@ -47,8 +47,8 @@ const Header = ({ connections, closeConnection, activeConnectionIdx }) => {
 
 const ConnectionLink = ({conn, isActive, handleClick}) => {
     return <a onMouseDown={handleClick} class={isActive && style.active}>
-            {`${conn.username}@${stripProtocol(conn.server)}`}
-        </a>;
+        {`${conn.username}@${stripProtocol(conn.server)}`}
+    </a>;
 }
 
 export default Header;

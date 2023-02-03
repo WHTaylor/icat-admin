@@ -23,21 +23,21 @@ export type Connection = {
 if (typeof window === 'undefined') {
     global.localStorage = {
         _data: {},
-        setItem: (id, val) => {
-            return this._data[id] = String(val);
+        setItem: function(id, val) {
+            this._data[id] = val;
         },
         // Using id => this._data[id] instead of function syntax breaks the prod build
         getItem: function (id) {
             return this._data[id]
         }, //eslint-disable-line
-        removeItem: id => {
+        removeItem: function (id) {
             return delete this._data[id];
         },
-        clear: () => {
+        clear: function() {
             this._data = {};
         },
-        length: this._data.length,
-        key: n => this._data[n]
+        length: 0,
+        key: function (n: number) { return this._data.keys[n] }
     };
 }
 
@@ -49,7 +49,7 @@ export function saveLogin(server, username, sessionId) {
         localStorage.setItem(`connection|${n}|username`, username);
     }
     localStorage.setItem(`connection|${n}|sessionId`, sessionId);
-    localStorage.setItem("lastConnection", n);
+    localStorage.setItem("lastConnection", n.toString());
 }
 
 function nextFreeConnectionNumber() {

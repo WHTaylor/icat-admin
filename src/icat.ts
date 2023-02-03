@@ -20,7 +20,7 @@ function unpack(data: IcatResponse): IcatEntity[] {
     return data.map(d => d[dataType]);
 }
 
-function queryUrlClause(args: {[k: string]: string}) {
+function queryUrlClause(args: {[k: string]: string | number}) {
     return Object.entries(args)
         .map(kv => kv.map(encodeURIComponent).join('='))
         .join('&');
@@ -57,7 +57,7 @@ class IcatClient {
         return new URL("icat/session/" + sessionId, this.hostUrl);
     }
 
-    entityUrl(queryParams: {[k: string]: string}) {
+    entityUrl(queryParams: {[k: string]: string | number}) {
         return new URL(
             `icat/entityManager?${queryUrlClause(queryParams)}`,
             this.hostUrl);
@@ -76,7 +76,7 @@ class IcatClient {
         return fetch(
             url, {
                 method: "POST",
-                body: new URLSearchParams(form),
+                body: new URLSearchParams(form as any),
             })
             .then(res => res.ok
                 ? res
@@ -160,7 +160,7 @@ class IcatClient {
         return fetch(
             new URL("icat/entityManager", this.hostUrl), {
                 method: "POST",
-                body: new URLSearchParams(form),
+                body: new URLSearchParams(form as any),
             })
             .then(res => res.ok
                 ? res

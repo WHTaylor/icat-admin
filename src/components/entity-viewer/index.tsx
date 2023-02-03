@@ -126,7 +126,7 @@ const EntityViewer = ({server, sessionId, visible}: Props) => {
         handleFilterChange(i, newFilter);
     };
 
-    const refreshTab = i => {
+    const refreshTab = (i: number) => {
         const f = tabFilters[i];
         const newFilter = {...f, key: Math.random()};
         handleFilterChange(i, newFilter);

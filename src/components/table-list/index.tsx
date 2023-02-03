@@ -4,19 +4,23 @@ import {h} from "preact";
 import style from './style.css';
 
 import {entityNames} from '../../icat';
-import {tableFilter} from '../../utils.js';
+import {TableFilter, tableFilter} from '../../utils';
 
-function getTable(t) {
+type ValIdx = [string, number];
+function getTable(t: string): string | null {
     if (!t) return null;
     const present = entityNames
-        .map(e => [e, e.toLowerCase().indexOf(t.toLowerCase())])
-        .filter(p => p[1] >= 0)
-        .sort((p1, p2) => p1[1] - p2[1])
-        .map(p => p[0])
+        .map(e => [e, e.toLowerCase().indexOf(t!.toLowerCase())])
+        .filter((p: ValIdx) => p[1] >= 0)
+        .sort((p1: ValIdx, p2: ValIdx) => p1[1] - p2[1])
+        .map((p: ValIdx) => p[0])
     return present.length > 0 ? present[0] : null;
 }
 
-const TableList = ({openTab}) => {
+type Props = {
+    openTab: (filter: TableFilter) => void
+};
+const TableList = ({openTab}: Props) => {
     const [typed, setTyped] = useState("");
 
     useEffect(() => {

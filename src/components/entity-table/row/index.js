@@ -3,7 +3,7 @@ import {h} from "preact";
 
 import style from './style.css';
 
-import {commonFields, parseISODate, withCorrectedDateFormats} from '../../../utils.js';
+import {commonFields, parseISODate, withCorrectedDateFormats} from '../../../utils';
 import ReadMore from '../../generic/read-more';
 import SuccessIndicator from '../../success-indicator';
 

@@ -144,7 +144,7 @@ const EntityRow = ({
                             // Stop propagation to avoid stop editing event bound to
                             // document.onClick
                                onClick={ev => ev.stopPropagation()}
-                               onChange={ev => makeEdit(editingField, ev.target.value)}/>
+                               onChange={ev => makeEdit(editingField, (ev.target as HTMLInputElement).value)}/>
                     </td>
                     : <td
                         onClick={ev => handleFieldClick(ev, k)}

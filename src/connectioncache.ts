@@ -13,6 +13,13 @@
  * active connection. We try to reuse that connection on the home page by default.
  */
 
+type ConnectionStorageEntry = [string, string, string];
+export type Connection = {
+    server: string;
+    sessionId: string;
+    username: string;
+}
+
 if (typeof window === 'undefined') {
     global.localStorage = {
         _data: {},
@@ -21,14 +28,16 @@ if (typeof window === 'undefined') {
         },
         // Using id => this._data[id] instead of function syntax breaks the prod build
         getItem: function (id) {
-            this._data[id]
+            return this._data[id]
         }, //eslint-disable-line
         removeItem: id => {
             return delete this._data[id];
         },
         clear: () => {
             this._data = {};
-        }
+        },
+        length: this._data.length,
+        key: n => this._data[n]
     };
 }
 
@@ -71,28 +80,34 @@ function getConnectionNumber(server, username) {
     return nonUnique === undefined ? null : nonUnique;
 }
 
-export function getLastLogin() {
+export function getLastLogin(): Connection | null {
     const n = localStorage.getItem("lastConnection");
-    const info = getConnection(n);
-    return info === null
-        ? [null, null, null]
-        : [info.server, info.username, info.sessionId || null];
+    return getConnection(n);
 }
 
-function getConnection(connectionNumber) {
+function getConnection(connectionNumber: string): Connection {
     const connectionKVs = connectionEntries()
         .filter(([n, _, __]) => n === connectionNumber);
     if (connectionKVs.length === 0) return null;
-    return connectionKVs.reduce((o, [_, k, v]) => ({...o, [k]: v}), {});
+    const asObj = connectionKVs.reduce((o, [_, k, v]) => ({...o, [k]: v}), {});
+    const {server, sessionId, username} = <any>asObj;
+    return {
+        server, sessionId, username
+    }
 }
 
-function connectionEntries() {
+function connectionEntries(): ConnectionStorageEntry[] {
     return Object.keys(localStorage)
         .filter(k => k.startsWith("connection"))
-        .map(k => [...k.split("|").slice(1), localStorage[k]]);
+        .map(k => [...extractConnectionKey(k), localStorage[k]]);
 }
 
-export function getServerNames() {
+function extractConnectionKey(connectionKey: string): [string, string] {
+    const [n, k] = [...connectionKey.split("|").slice(1)];
+    return [n, k];
+}
+
+export function getServerNames(): string[] {
     return [...new Set(connectionEntries()
         .filter(([_, k, __]) => k == "server")
         .map(([_, __, v]) => v))];

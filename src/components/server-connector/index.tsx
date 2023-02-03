@@ -6,7 +6,7 @@ import LoginForm from '../login-form';
 
 /* Handles state for logging in to an ICAT server.
  */
-const ServerConnector = ({createConnection}) => {
+const ServerConnector = ({createConnection: (login: string) => void}) => {
     const [errMsg, setErrMsg] = useState(null);
     const [isLoggingIn, setIsLoggingIn] = useState(false);
 

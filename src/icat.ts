@@ -37,12 +37,11 @@ function buildQuery(filter) {
     const order = filter.sortField == null
         ? ""
         : `order by e.${filter.sortField} ${filter.sortAsc ? "asc" : "desc"}`;
-    return `select e
-            from ${filter.table} e ${where} ${order} ${limit} include 1`;
+    return `select e from ${filter.table} e ${where} ${order} ${limit} include 1`;
 }
 
 class IcatClient {
-    constructor(host, sessionId) {
+    constructor(host: string, sessionId: string) {
         this.hostUrl = new URL(host);
         this.sessionId = sessionId;
     }
@@ -101,8 +100,7 @@ class IcatClient {
 
     async getCount(filter, signal) {
         const where = queryWhereFromInput(filter.where);
-        const query = `select count(e)
-                       from ${filter.table} e ${where}`;
+        const query = `select count(e) from ${filter.table} e ${where}`;
         const params = {
             sessionId: this.sessionId,
             query,

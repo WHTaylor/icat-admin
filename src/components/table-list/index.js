@@ -3,7 +3,7 @@ import {h} from "preact";
 
 import style from './style.css';
 
-import {entityNames} from '../../icat.js';
+import {entityNames} from '../../icat';
 import {tableFilter} from '../../utils.js';
 
 function getTable(t) {

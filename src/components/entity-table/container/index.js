@@ -5,7 +5,7 @@ import style from './style.css';
 
 
 import {simplifyIcatErrMessage} from '../../../icatErrorHandling.js';
-import IcatClient from '../../../icat.js';
+import IcatClient from '../../../icat';
 import EntityTableView from '../view';
 import {difference, joinAttributeToTableName, randomSuffix} from '../../../utils.js';
 
@@ -120,8 +120,8 @@ const EntityTable = ({
                 const newData = data.filter(e => !ids.includes(e.id));
                 setData(newData);
             })
-            .then(setCount(count - rowsToDelete.size))
-            .then(setRowsToDelete(difference(rowsToDelete, ids)));
+            .then(_ => setCount(count - rowsToDelete.size))
+            .then(_ => setRowsToDelete(difference(rowsToDelete, ids)));
 
 
     const editCreation = (i, k, v) => {

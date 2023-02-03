@@ -1,6 +1,6 @@
-import { h, Fragment } from 'preact';
+import {h, Fragment, FunctionComponent} from 'preact';
 import { useLayoutEffect, useState } from 'preact/hooks';
-import { Router, route } from 'preact-router';
+import {Router, route, Route} from 'preact-router';
 
 import IcatClient from '../icat';
 import About from './about';
@@ -95,10 +95,10 @@ const App = () => {
                 activeConnectionIdx={activeConnectionIdx} />
 
             <Router onChange={handleIcatRoute}>
-                <Tips path="/tips" />
-                <About path="/about" />
-                <Nothing path="/icat" />
-                <ServerConnector createConnection={createConnection} path="/" />
+                <Route path="/tips" component={Tips}/>
+                <Route path="/about" component={About}/>
+                <Route path="/icat" component={Nothing}/>
+                <Route path="/" component={ServerConnector} createConnection={createConnection} />
             </Router>
 
             {connections.map((c, i) =>
@@ -111,6 +111,6 @@ const App = () => {
     );
 }
 
-const Nothing = () => {};
+const Nothing: FunctionComponent = () => null;
 
 export default App;

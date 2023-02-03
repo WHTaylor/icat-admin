@@ -5,6 +5,16 @@ import {entityNames} from './icat';
 
 dayjs.extend(customParseFormat);
 
+export type TableFilter = {
+    key: number;
+    table: string;
+    offset: number;
+    limit: number;
+    where: string | null;
+    sortField: string | null;
+    sortAsc: boolean | null;
+}
+
 // On ICAT objects, attribute names for related entities are lowercase and pluralised.
 // Remove the 's' and uppercase the first letter to get the table name.
 //
@@ -43,7 +53,13 @@ function capitalize(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
 
 export function lowercaseFirst(s) { return s.charAt(0).toLowerCase() + s.slice(1); }
 
-export function tableFilter(table, offset, limit, where, sortField=null, sortAsc=true) {
+export function tableFilter(
+    table: string,
+    offset: number,
+    limit: number,
+    where: string = null,
+    sortField: string = null,
+    sortAsc = true): TableFilter {
     if (table === undefined) console.error("tableFilter called without args");
     return {
         key: Math.random(),

@@ -5,7 +5,7 @@
  * module.
  */
 
-import {queryWhereFromInput} from './utils.js';
+import {queryWhereFromInput} from './utils';
 
 type IcatEntity = {[k: string]: string | IcatEntity}
 type IcatResponse = {[k: string]: IcatEntity}[]

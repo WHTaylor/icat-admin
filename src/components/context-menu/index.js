@@ -1,6 +1,6 @@
 import style from './style.css';
 import {h} from "preact";
-import {icatAttributeToTableName, joinAttributeToTableName} from '../../utils.js'
+import {icatAttributeToTableName, joinAttributeToTableName} from '../../utils'
 
 const ContextMenu = ({entityType, entity, openRelated, x, y}) => {
     // Related entities which are many-one (ie. investigation.datasets)

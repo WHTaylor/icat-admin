@@ -7,7 +7,7 @@ import style from './style.css';
 import {simplifyIcatErrMessage} from '../../../icatErrorHandling.js';
 import IcatClient from '../../../icat';
 import EntityTableView from '../view';
-import {difference, joinAttributeToTableName, randomSuffix} from '../../../utils.js';
+import {difference, joinAttributeToTableName, randomSuffix} from '../../../utils';
 
 const EntityTable = ({
                          server,

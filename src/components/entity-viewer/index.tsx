@@ -1,15 +1,15 @@
-import {useEffect, useState} from "preact/hooks";
+import {StateUpdater, useEffect, useState} from "preact/hooks";
 import {route} from 'preact-router';
 import {h} from "preact";
 
 import IcatClient from '../../icat';
-import {assignKey, lowercaseFirst, tableFilter} from '../../utils.js';
+import {assignKey, lowercaseFirst, TableFilter, tableFilter} from '../../utils';
 import EntityTable from '../entity-table/container';
 import TableList from '../table-list';
 import TabWindow from '../tab-window';
 import {mergeFilterIntoParams, parseUrlParams, urlSearchParamsToObj} from '../../routing.js';
 
-function getActiveFilterIdx(filters, activeFilter) {
+function getActiveFilterIdx(filters: TableFilter[], activeFilter) {
     if (activeFilter === null) return null;
     const idx = filters.findIndex(f =>
         f.table == activeFilter.table
@@ -27,7 +27,8 @@ type Props = {
     visible: boolean;
 }
 const EntityViewer = ({server, sessionId, visible}: Props) => {
-    const [tabFilters, setTabFilters] = useState([]);
+    const [tabFilters, setTabFilters]: [TableFilter[], StateUpdater<TableFilter[]>]
+        = useState([]);
 
     const [_, activeFilter] = parseUrlParams(urlSearchParamsToObj(new URLSearchParams(window.location.search)));
     const activeTabIdx = getActiveFilterIdx(tabFilters, activeFilter);
@@ -40,7 +41,7 @@ const EntityViewer = ({server, sessionId, visible}: Props) => {
 
     const icatClient = new IcatClient(server, sessionId);
 
-    const routeToNewFilter = f => {
+    const routeToNewFilter = (f: TableFilter) => {
         const params = new URLSearchParams(window.location.search);
         route(window.location.pathname + "?" + mergeFilterIntoParams(params, f));
     };
@@ -53,7 +54,7 @@ const EntityViewer = ({server, sessionId, visible}: Props) => {
         routeToNewFilter(newFilter);
     }
 
-    const openTab = f => {
+    const openTab = (f: TableFilter) => {
         setTabFilters(tabFilters.concat([f]));
         routeToNewFilter(f);
         // Timeout is used as a small hack to make sure scroll happens after component

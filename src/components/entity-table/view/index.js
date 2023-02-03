@@ -5,7 +5,7 @@ import style from './style.css';
 
 import EntityRow from '../row';
 import ContextMenu from '../../context-menu';
-import {defaultHeaderSort, joinAttributeToTableName} from '../../../utils.js';
+import {defaultHeaderSort, joinAttributeToTableName} from '../../../utils';
 
 const EntityTableView = ({
                              data, entityType, sortingBy, deletions, creations,

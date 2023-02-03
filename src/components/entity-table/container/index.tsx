@@ -164,7 +164,7 @@ const EntityTable = ({
                 class={style.filterInput}
                 value={filter.where}
                 placeholder="Filter by (ie. id = 1234)"
-                onChange={ev => changeWhere(ev.target.value)}/>
+                onChange={ev => changeWhere((ev.target as HTMLInputElement).value)}/>
             <button title="Refresh data" onClick={refreshData}>↻</button>
             <PaginationControl
                 isActive={isOpen}
@@ -243,12 +243,12 @@ const PaginationControl = ({isActive, pageNumber, handleSetPage, handleLimitChan
             <input type="number"
                    value={pageNumber}
                    class={style.pageInput}
-                   onChange={ev => handleSetPage(ev.target.value)}/>
+                   onChange={ev => handleSetPage((ev.target as HTMLInputElement).value)}/>
             <button onClick={incPage} id={nextId}>Next</button>
             <span>
                 <label for="pageSizeInput">Per page:</label>
                 <select name="pageSizeInput" onChange={
-                    ev => handleLimitChange(Number.parseInt(ev.target.value))}>
+                    ev => handleLimitChange(Number.parseInt((ev.target as HTMLSelectElement).value))}>
                     <option value="20">20</option>
                     <option value="50" selected>50</option>
                     <option value="100">100</option>

@@ -15,13 +15,16 @@ function processServerName(name) {
 }
 
 const LoginForm = ({doLogin, errMsg, isLoggingIn}) => {
+    const getInput = (id: string) =>
+        document.getElementById(id) as HTMLInputElement;
     const submit = ev => {
         ev.preventDefault();
         doLogin(
-            processServerName(document.getElementById("serverInput").value),
-            document.getElementById("pluginInput").value,
-            document.getElementById("usernameInput").value,
-            document.getElementById("passwordInput").value);
+            // Server input could be an input or a select, but it always has a value
+            processServerName(getInput("serverInput").value),
+            getInput("pluginInput").value,
+            getInput("usernameInput").value,
+            getInput("passwordInput").value);
     };
 
     return (

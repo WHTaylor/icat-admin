@@ -83,7 +83,7 @@ const EntityTableView = ({
         const setDisplayField = v =>
             setRelatedDisplayFields({...relatedDisplayFields, [k]: v});
         const v = data.find(e => e[k] !== undefined && e[k] !== null)[k];
-        return (<select onChange={ev => setDisplayField(ev.target.value)}>
+        return (<select onChange={ev => setDisplayField((ev.target as HTMLSelectElement).value)}>
             {Object.keys(v)
                 .filter(vk => typeof v[vk] !== "object")
                 .map(vk =>
@@ -116,7 +116,6 @@ const EntityTableView = ({
             : () => removeModifications(e.id);
         return <EntityRow
             key={isNewRow ? "new-" + i : e.id}
-            entityType={entityType}
             headers={keys}
             entity={e}
             modifications={isNewRow ? undefined : entityModifications[e.id]}

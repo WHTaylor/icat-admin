@@ -35,8 +35,8 @@ const TabWindow = props => {
             {props.children.length > 0 &&
                 <div
                     class={style.tabSwitcher}
-                    ondragover={ev => ev.preventDefault()}
-                    ondrop={endDrag}>
+                    onDragOver={ev => ev.preventDefault()}
+                    onDrop={endDrag}>
                     {props.children.map(([name, key,], i) =>
                         <button
                             key={key}
@@ -44,8 +44,8 @@ const TabWindow = props => {
                             onMouseDown={ev => handleMouseDown(ev, i)}
                             class={`entityButton
                             ${i === props.activeTabIdx ? style.selectedTab : ""}`}
-                            draggable="true"
-                            ondragstart={ev => startDrag(ev, i)}>
+                            draggable={true}
+                            onDragStart={ev => startDrag(ev, i)}>
                             {name}
                         </button>)}
                 </div>}

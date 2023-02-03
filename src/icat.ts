@@ -63,7 +63,7 @@ class IcatClient {
             this.hostUrl);
     }
 
-    async login(plugin, username, password): Promise<string> {
+    async login(plugin, username, password): Promise<string | PromiseRejectionEvent> {
         const creds = {
             plugin,
             credentials: [

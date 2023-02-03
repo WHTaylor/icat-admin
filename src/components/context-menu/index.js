@@ -1,5 +1,5 @@
 import style from './style.css';
-import {h} from "preact";
+import {h, Fragment} from "preact";
 import {icatAttributeToTableName, joinAttributeToTableName} from '../../utils'
 
 const ContextMenu = ({entityType, entity, openRelated, x, y}) => {

@@ -48,7 +48,7 @@ class IcatClient {
     private readonly hostUrl: URL;
     private sessionId: string;
 
-    constructor(host: string, sessionId = null) {
+    constructor(host: string, sessionId: string = null) {
         this.hostUrl = new URL(host);
         this.sessionId = sessionId;
     }

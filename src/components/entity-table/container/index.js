@@ -1,4 +1,5 @@
 import {useEffect, useState} from "preact/hooks";
+import {h} from "preact";
 import style from './style.css';
 import {simplifyIcatErrMessage} from '../../../icatErrorHandling.js';
 

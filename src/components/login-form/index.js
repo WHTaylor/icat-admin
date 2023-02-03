@@ -1,5 +1,6 @@
 import style from './style.css';
 
+import {h} from "preact";
 import {useState} from "preact/hooks";
 import {getLastLogin, getServerNames} from '../../connectioncache.js'
 

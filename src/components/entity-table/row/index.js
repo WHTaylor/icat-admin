@@ -1,5 +1,6 @@
 import {useEffect, useState, useRef} from "preact/hooks";
 import style from './style.css';
+import {h} from "preact";
 
 import {parseISODate, commonFields, withCorrectedDateFormats} from '../../../utils.js';
 import ReadMore from '../../generic/read-more';

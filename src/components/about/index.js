@@ -1,3 +1,5 @@
+import {h} from "preact";
+
 const About = () => (
     <div class="page">
         <h2 class="leftColumn">About ICAT Admin</h2>

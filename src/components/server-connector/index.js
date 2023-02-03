@@ -1,4 +1,5 @@
 import { useState } from "preact/hooks";
+import {h} from "preact";
 
 import IcatClient from '../../icat.js';
 import LoginForm from '../login-form';

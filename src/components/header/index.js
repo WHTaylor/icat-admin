@@ -1,9 +1,10 @@
-import style from './style.css';
 import {h} from "preact";
-import { route } from 'preact-router';
-import { Link } from 'preact-router/match';
+import {route} from 'preact-router';
+import {Link} from 'preact-router/match';
 
-import { buildUrl } from '../../routing.js';
+import style from './style.css';
+
+import {buildUrl} from '../../routing.js';
 
 function stripProtocol(server) {
     return server.split("://").slice(-1);

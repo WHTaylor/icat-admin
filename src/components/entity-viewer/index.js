@@ -1,13 +1,13 @@
-import {useState, useEffect} from "preact/hooks";
-import { route } from 'preact-router';
+import {useEffect, useState} from "preact/hooks";
+import {route} from 'preact-router';
 import {h} from "preact";
 
 import IcatClient from '../../icat.js';
-import { lowercaseFirst, tableFilter, assignKey } from '../../utils.js';
+import {assignKey, lowercaseFirst, tableFilter} from '../../utils.js';
 import EntityTable from '../entity-table/container';
 import TableList from '../table-list';
 import TabWindow from '../tab-window';
-import { urlSearchParamsToObj, parseUrlParams, mergeFilterIntoParams } from '../../routing.js';
+import {mergeFilterIntoParams, parseUrlParams, urlSearchParamsToObj} from '../../routing.js';
 
 function getActiveFilterIdx(filters, activeFilter) {
     if (activeFilter === null) return null;

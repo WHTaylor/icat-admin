@@ -1,5 +1,6 @@
 import {useEffect, useState} from "preact/hooks";
 import {h} from "preact";
+
 import style from './style.css';
 
 import EntityRow from '../row';

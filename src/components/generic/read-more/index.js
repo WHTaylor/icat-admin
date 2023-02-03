@@ -1,7 +1,7 @@
-import style from './style.css';
-
 import {h} from "preact";
 import {useState} from "preact/hooks";
+
+import style from './style.css';
 
 const MAX_UNSUMMARISED_TEXT = 70;
 const ReadMore = ({text}) => {

@@ -4,7 +4,7 @@ import {h, Fragment} from "preact";
 import style from './style.css';
 
 import {simplifyIcatErrMessage} from '../../../icatErrorHandling.js';
-import IcatClient from '../../../icat';
+import IcatClient, {IcatEntity} from '../../../icat';
 import EntityTableView from '../view';
 import {difference, joinAttributeToTableName, randomSuffix, TableFilter} from '../../../utils';
 
@@ -28,13 +28,13 @@ const EntityTable = ({
                          setSortingBy,
                          refreshData
                      }: Props) => {
-    const [data, setData] = useState(null);
+    const [data, setData] = useState<IcatEntity[] | null>(null);
     const [errMsg, setErrMsg] = useState(null);
-    const [count, setCount] = useState(null);
+    const [count, setCount] = useState<number | null>(null);
     // Row indexes that are marked to be deleted
-    const [rowsToDelete, setRowsToDelete] = useState(new Set());
+    const [rowsToDelete, setRowsToDelete] = useState<Set<number>>(new Set());
     // Objects without ids to be written to ICAT
-    const [rowsToCreate, setRowsToCreate] = useState([]);
+    const [rowsToCreate, setRowsToCreate] = useState<any[]>([]);
     const icatClient = new IcatClient(server, sessionId);
 
     useEffect(() => {
@@ -95,14 +95,14 @@ const EntityTable = ({
     const pageNumber = Math.floor(filter.offset / filter.limit) + 1;
 
     const changeData = async (i, changes) => {
-        const changed = [...data];
+        const changed = [...(data || [])];
 
         // For related entity changes, we need to lookup the new entity in ICAT
         const resolve = async (field, value) => {
             if (typeof (value) !== "object") return [field, value];
 
             const entityType = joinAttributeToTableName(filter.table, field);
-            return [field, await icatClient.getById(entityType, value.id)];
+            return [field, await icatClient.getById(entityType!, value.id)];
         }
 
         const toResolve = Promise.all(Object.entries(changes)
@@ -126,10 +126,10 @@ const EntityTable = ({
     const deleteEntities = async ids =>
         icatClient.deleteEntities(filter.table, ids)
             .then(() => {
-                const newData = data.filter(e => !ids.includes(e.id));
+                const newData = (data || []).filter(e => !ids.includes(e.id));
                 setData(newData);
             })
-            .then(_ => setCount(count - rowsToDelete.size))
+            .then(_ => setCount((count || 0) - rowsToDelete.size))
             .then(_ => setRowsToDelete(difference(rowsToDelete, ids)));
 
 
@@ -149,7 +149,7 @@ const EntityTable = ({
 
     const insertCreation = async (i, id) => {
         const created = await icatClient.getById(filter.table, id);
-        const withCreated = [...data];
+        const withCreated = [...(data || [])];
         withCreated.unshift(created);
         setData(withCreated);
         cancelCreate(i);
@@ -162,7 +162,7 @@ const EntityTable = ({
             <input
                 type="text"
                 class={style.filterInput}
-                value={filter.where}
+                value={filter.where || ""}
                 placeholder="Filter by (ie. id = 1234)"
                 onChange={ev => changeWhere((ev.target as HTMLInputElement).value)}/>
             <button title="Refresh data" onClick={refreshData}>↻</button>
@@ -228,8 +228,8 @@ const PaginationControl = ({isActive, pageNumber, handleSetPage, handleLimitChan
             if (!focusOkForPageChange()) return;
             if (ev.key !== "ArrowLeft" && ev.key !== "ArrowRight") return;
             ev.preventDefault();
-            if (ev.key === "ArrowLeft") document.getElementById(prevId).click();
-            else document.getElementById(nextId).click();
+            if (ev.key === "ArrowLeft") document.getElementById(prevId)!.click();
+            else document.getElementById(nextId)!.click();
         };
         document.addEventListener("keydown", changePage);
         return () => {
@@ -259,7 +259,7 @@ const PaginationControl = ({isActive, pageNumber, handleSetPage, handleLimitChan
 }
 
 const DeleteActions = ({deletions, clearDeletions, doDeletions}) => {
-    if (deletions.size === 0) return;
+    if (deletions.size === 0) return <></>;
     return (
         <span>
             <button onClick={doDeletions}>Delete {deletions.size} rows</button>

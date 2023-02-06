@@ -7,7 +7,7 @@
 
 import {queryWhereFromInput} from './utils';
 
-type IcatEntity = {[k: string]: string | IcatEntity}
+export type IcatEntity = {[k: string]: string | IcatEntity}
 type IcatResponse = {[k: string]: IcatEntity}[]
 
 // Unpack the entries returned from the API, because they are formatted like
@@ -46,9 +46,9 @@ function buildQuery(filter) {
 
 class IcatClient {
     private readonly hostUrl: URL;
-    private sessionId: string;
+    private sessionId: string | null;
 
-    constructor(host: string, sessionId: string = null) {
+    constructor(host: string, sessionId: string | null = null) {
         this.hostUrl = new URL(host);
         this.sessionId = sessionId;
     }
@@ -58,8 +58,12 @@ class IcatClient {
     }
 
     entityUrl(queryParams: {[k: string]: string | number}): URL {
+        if (this.sessionId === null) {
+            throw Error("Can't create entity URL before session ID is set");
+        }
+        const params = {...queryParams, sessionId: this.sessionId!};
         return new URL(
-            `icat/entityManager?${queryUrlClause(queryParams)}`,
+            `icat/entityManager?${queryUrlClause(params)}`,
             this.hostUrl);
     }
 
@@ -90,10 +94,9 @@ class IcatClient {
         fetch(this.sessionUrl(this.sessionId).toString(), {method: "PUT"});
     }
 
-    async getEntries(filter, signal) {
+    async getEntries(filter, signal): Promise<IcatEntity[]> {
         const query = buildQuery(filter);
         const params = {
-            sessionId: this.sessionId,
             query,
         }
         return fetch(this.entityUrl(params).toString(), {signal})
@@ -105,11 +108,10 @@ class IcatClient {
             .then(unpack);
     }
 
-    async getCount(filter, signal): Promise<string> {
+    async getCount(filter, signal): Promise<number> {
         const where = queryWhereFromInput(filter.where);
         const query = `select count(e) from ${filter.table} e ${where}`;
         const params = {
-            sessionId: this.sessionId,
             query,
         }
         return fetch(this.entityUrl(params).toString(), {signal})
@@ -118,13 +120,12 @@ class IcatClient {
                 : formatError(res)
                     .then(msg => Promise.reject(msg)))
             .then(res => res.json())
-            .then(json => json[0]);
+            .then(json => json[0] as number);
     }
 
     async getById(entityType: string, id: number) {
         const query = `${entityType} e include 1`;
         const params = {
-            sessionId: this.sessionId,
             query,
             id
         };
@@ -145,13 +146,13 @@ class IcatClient {
     async logout() {
         fetch(this.sessionUrl(this.sessionId).toString(),
             {method: "DELETE"});
-        this.sessionId = undefined;
+        this.sessionId = null;
     }
 
     async writeEntity(entityType, entity) {
         const form = new FormData();
         form.append('entities', JSON.stringify({[entityType]: entity}));
-        form.append('sessionId', this.sessionId);
+        form.append('sessionId', this.sessionId || "");
         return fetch(
             new URL("icat/entityManager", this.hostUrl).toString(),
             {
@@ -168,7 +169,6 @@ class IcatClient {
     async deleteEntities(entityType: string, ids: number[]): Promise<Response> {
         const entities = ids.map(id => ({[entityType]: {id}}));
         const params = {
-            sessionId: this.sessionId,
             entities: JSON.stringify(entities)
         };
         return fetch(this.entityUrl(params).toString(), {method: "DELETE"})

@@ -26,7 +26,7 @@ const App = () => {
         : new URLSearchParams(window.location.search);
     const [paramsConn, paramsFilter] = parseUrlParams(urlSearchParamsToObj(usps));
 
-    const [connections, setConnections] = useState([]);
+    const [connections, setConnections] = useState<Connection[]>([]);
     const [activeConnection, setActiveConnection] = useState(paramsConn);
 
     const activeConnectionIdx = getActiveConnectionIdx(connections, activeConnection);

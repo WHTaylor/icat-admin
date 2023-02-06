@@ -64,10 +64,13 @@ const TableList = ({openTab}: Props) => {
 }
 
 const TypingPreview = ({current, match}) => {
-    const el = useRef(null);
+    const el = useRef<HTMLDivElement>(null);
     useEffect(() => {
+        if (el.current === null) return;
+
         el.current.classList.add(style.active);
-        const n = setTimeout(() => el.current.classList.remove(style.active), 900);
+        const n = setTimeout(() =>
+            el.current!.classList.remove(style.active), 900);
         return () => clearTimeout(n);
     });
 

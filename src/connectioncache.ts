@@ -52,7 +52,7 @@ export function saveLogin(server, username, sessionId) {
     localStorage.setItem("lastConnection", n.toString());
 }
 
-function nextFreeConnectionNumber() {
+function nextFreeConnectionNumber(): number {
     const connectionNumbers = [...new Set(
         connectionEntries()
             .map(([n, _, __]) => n)
@@ -62,6 +62,7 @@ function nextFreeConnectionNumber() {
     for (const n of connectionNumbers) {
         if (!(connectionNumbers.includes(n + 1))) return n + 1
     }
+    return 1;
 }
 
 export function invalidateLogin(serverName, username) {
@@ -82,10 +83,10 @@ function getConnectionNumber(server, username) {
 
 export function getLastLogin(): Connection | null {
     const n = localStorage.getItem("lastConnection");
-    return getConnection(n);
+    return n === null ? null : getConnection(n);
 }
 
-function getConnection(connectionNumber: string): Connection {
+function getConnection(connectionNumber: string): Connection | null {
     const connectionKVs = connectionEntries()
         .filter(([n, _, __]) => n === connectionNumber);
     if (connectionKVs.length === 0) return null;

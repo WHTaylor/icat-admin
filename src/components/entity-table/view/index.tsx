@@ -7,20 +7,28 @@ import EntityRow from '../row';
 import ContextMenu from '../../context-menu';
 import {defaultHeaderSort, joinAttributeToTableName} from '../../../utils';
 
+type CtxMenuProps = {
+    x: number;
+    y: number;
+    entity: {};
+    openRelated: any;
+    entityType: string;
+}
 const EntityTableView = ({
                              data, entityType, sortingBy, deletions, creations,
                              openRelated, setSortingBy, saveEntity, modifyDataRow,
                              markToDelete, cancelDeletion, doDelete,
                              editCreation, cancelCreate, insertCreation
                          }) => {
-    const [contextMenuProps, setContextMenuProps] = useState(null);
+    const [contextMenuProps, setContextMenuProps]
+        = useState<CtxMenuProps | null>(null);
     // Locally saved changes to entities
     const [entityModifications, setEntityModifications] = useState({});
     // fieldBeingEdited is:
     // [null, null] - nothing being edited
     // if editingNewRow, [index in creations, field]
     // else [entity id, field]
-    const [editingNewRow, setEditingNewRow] = useState(null);
+    const [editingNewRow, setEditingNewRow] = useState(false);
     const [fieldBeingEdited, setFieldBeingEdited] = useState([null, null]);
     const stopEditing = () => setFieldBeingEdited([null, null]);
     // Field to show for each related entity in table

@@ -28,7 +28,7 @@ const EntityRow = ({
                        saveEntity, revertChanges, syncModifications,
                        markToDelete, cancelDeletion, doDelete
                    }) => {
-    const inputEl = useRef(null);
+    const inputEl = useRef<HTMLInputElement>(null);
     const [saveState, setSaveState] = useState(null);
     const createSaveState = fields => ({
         ...fields, clear: () => setSaveState(null)
@@ -158,6 +158,11 @@ const EntityRow = ({
     );
 }
 
+type ActionButtonData = {
+    title: string;
+    ev: (Event) => void;
+    icon: string;
+}
 const RowActions = ({
                         isNewRow, saveState, isModified, markedForDeletion,
                         revertChanges, saveChanges, markToDelete, cancelDeletion, doDelete
@@ -166,7 +171,7 @@ const RowActions = ({
         return <SuccessIndicator saveState={saveState}/>;
     }
 
-    let actions = [];
+    let actions: ActionButtonData[] = [];
     if (isNewRow) {
         actions.push({title: "Cancel creation", ev: revertChanges, icon: "🚫"});
         actions.push({title: "Create row", ev: saveChanges, icon: "💾"});
@@ -189,6 +194,7 @@ const RowActions = ({
                 class={style.actionButton}
                 key={a.title}
                 title={a.title}
+                // @ts-ignore-line
                 onClick={a.ev}>
                 {a.icon}
             </button>)}

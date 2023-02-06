@@ -5,8 +5,9 @@ import style from './style.css';
 
 const INTERVAL_MS = 10
 
+type MousePos = { x: number, y: number };
 const SuccessIndicator = ({saveState, clearTimeoutMs = 2000}) => {
-    const [mousePos, setMousePos] = useState(null);
+    const [mousePos, setMousePos] = useState<MousePos | null>(null);
     const timer = useRef(0);
 
     const icon = saveState.isSaving
@@ -38,7 +39,10 @@ const SuccessIndicator = ({saveState, clearTimeoutMs = 2000}) => {
             {mousePos !== null && saveState.failed &&
                 <div
                     class={style.messageContainer}
-                    style={{top: mousePos.y, left: mousePos.x}}>
+                    style={{
+                        top: (mousePos as MousePos).y,
+                        left: (mousePos as MousePos).x
+                    }}>
                     {saveState.message}
                 </div>}
         </>

@@ -57,8 +57,8 @@ export function tableFilter(
     table: string,
     offset: number,
     limit: number,
-    where: string = null,
-    sortField: string = null,
+    where: string | null = null,
+    sortField: string | null = null,
     sortAsc = true): TableFilter {
     if (table === undefined) console.error("tableFilter called without args");
     return {
@@ -127,7 +127,7 @@ export function queryWhereFromInput(whereInput) {
     return ` where ${withEntityIdentifier}`;
 }
 
-export function difference(set, other) {
+export function difference<T>(set: Set<T>, other: Set<T>): Set<T> {
     let diff = new Set(set);
     for (let e of other) {
         diff.delete(e);

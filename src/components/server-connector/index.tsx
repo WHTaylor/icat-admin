@@ -11,7 +11,7 @@ type Props = {
     createConnection: (login: Connection) => void
 }
 const ServerConnector = ({createConnection}: Props) => {
-    const [errMsg, setErrMsg] = useState(null);
+    const [errMsg, setErrMsg] = useState<string | null>(null);
     const [isLoggingIn, setIsLoggingIn] = useState(false);
 
     const doLogin = async (server, plugin, username, password) => {

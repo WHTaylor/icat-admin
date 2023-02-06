@@ -9,7 +9,7 @@ import TableList from '../table-list';
 import TabWindow from '../tab-window';
 import {mergeFilterIntoParams, parseUrlParams, urlSearchParamsToObj} from '../../routing.js';
 
-function getActiveFilterIdx(filters: TableFilter[], activeFilter) {
+function getActiveFilterIdx(filters: TableFilter[], activeFilter) : number | null {
     if (activeFilter === null) return null;
     const idx = filters.findIndex(f =>
         f.table == activeFilter.table
@@ -153,8 +153,8 @@ const EntityViewer = ({server, sessionId, visible}: Props) => {
                 activeTabIdx={activeTabIdx}
                 closeTab={closeTab}
                 handleChangeTabIdx={i => routeToNewFilter(tabFilters[i])}
-                swapTabs={swapTabs}>
-                {tabFilters.map((f, i) =>
+                swapTabs={swapTabs}
+                something={tabFilters.map((f, i) =>
                     [
                         f.table,
                         f.key,
@@ -169,8 +169,7 @@ const EntityViewer = ({server, sessionId, visible}: Props) => {
                             isOpen={i === activeTabIdx}
                             refreshData={() => refreshTab(i)}
                             key={f.key}/>
-                    ])}
-            </TabWindow>
+                    ])} />
         </div>
     );
 }

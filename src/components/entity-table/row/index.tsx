@@ -6,6 +6,7 @@ import style from './style.css';
 import {commonFields, parseISODate, withCorrectedDateFormats} from '../../../utils';
 import ReadMore from '../../generic/read-more';
 import SuccessIndicator from '../../success-indicator';
+import {IcatEntity, IcatEntityValue} from "../../../icat";
 
 function formatCellContent(cellContent) {
     if (cellContent === undefined || cellContent === null) return "";
@@ -20,6 +21,13 @@ function formatCellContent(cellContent) {
         : cellContent.toString()
 }
 
+type Props = {
+    entity: IcatEntity;
+    modifications: { [k: string]: string | number };
+    headers: string[];
+    editingField: string | null;
+    [k: string]: any;
+}
 const EntityRow = ({
                        entity, modifications, headers,
                        editingField, relatedEntityDisplayFields, markedForDeletion,
@@ -27,7 +35,7 @@ const EntityRow = ({
                        startEditing, stopEditing, makeEdit,
                        saveEntity, revertChanges, syncModifications,
                        markToDelete, cancelDeletion, doDelete
-                   }) => {
+                   }: Props) => {
     const inputEl = useRef<HTMLInputElement>(null);
     const [saveState, setSaveState] = useState(null);
     const createSaveState = fields => ({
@@ -73,7 +81,7 @@ const EntityRow = ({
             })));
     };
 
-    const getCurrentValue = field => {
+    const getCurrentValue = (field: string): IcatEntityValue => {
         const isModified = modifications !== undefined
             && modifications[field] !== undefined;
         const source = isModified
@@ -89,7 +97,7 @@ const EntityRow = ({
 
         // Always show id for modified related entities
         if (isModified && typeof (value) === "object") {
-            return value.id
+            return (value as IcatEntity).id;
         }
 
         return relatedEntityDisplayFields[field] === undefined
@@ -108,7 +116,7 @@ const EntityRow = ({
         const value = getCurrentValue(field);
 
         return typeof (value) === "object"
-            ? value.id
+            ? (value as IcatEntity).id
             : getFieldValue(field);
     };
 

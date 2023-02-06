@@ -1,10 +1,18 @@
 import {h} from "preact";
 
 import style from './style.css';
+import JSX = h.JSX;
 
-/* Displays the list of tabs for open entity tables, and the active table
- */
-const TabWindow = props => {
+type Props = {
+    activeTabIdx: number | null;
+    closeTab: (i: number) => void;
+    handleChangeTabIdx: (i: number) => void;
+    swapTabs: (a: number, b: number) => void;
+    something: [string, number, JSX.Element][];
+}
+
+/** Displays the list of tabs for open entity tables, and the active table */
+const TabWindow = (props: Props) => {
     const handleMouseDown = (ev, i) => {
         // Only want middle mouse clicks
         if (ev.buttons != 4) return;
@@ -32,12 +40,12 @@ const TabWindow = props => {
 
     return (
         <div class="mainContentAndRightColumn">
-            {props.children.length > 0 &&
+            {props.something.length > 0 &&
                 <div
                     class={style.tabSwitcher}
                     onDragOver={ev => ev.preventDefault()}
                     onDrop={endDrag}>
-                    {props.children.map(([name, key,], i) =>
+                    {props.something.map(([name, key,], i) =>
                         <button
                             key={key}
                             onClick={() => props.handleChangeTabIdx(i)}
@@ -49,7 +57,7 @@ const TabWindow = props => {
                             {name}
                         </button>)}
                 </div>}
-            {props.children.map(([, key, child], i) =>
+            {props.something.map(([, key, child], i) =>
                 <div
                     key={key}
                     class={i === props.activeTabIdx ? "" : "hidden"}>{child}</div>)}

@@ -7,7 +7,14 @@
 
 import {queryWhereFromInput} from './utils';
 
-export type IcatEntity = {[k: string]: string | IcatEntity}
+export type IcatEntityValue = string | number | IcatEntity | IcatEntity[];
+export type IcatEntity = {
+    id: string;
+    [k: string]: IcatEntityValue;
+}
+export type NewIcatEntity = {
+    [k: string]: IcatEntityValue;
+}
 type IcatResponse = {[k: string]: IcatEntity}[]
 
 // Unpack the entries returned from the API, because they are formatted like

@@ -8,6 +8,7 @@ import ContextMenu from '../../context-menu';
 import {defaultHeaderSort, joinAttributeToTableName} from '../../../utils';
 import {IcatEntity, IcatEntityValue} from "../../../icat";
 import JSX = h.JSX;
+import {Optional} from "../../../genericUtils";
 
 type CtxMenuProps = {
     x: number;
@@ -18,7 +19,7 @@ type CtxMenuProps = {
 }
 
 type Props = {
-    data: IcatEntity[] | null;
+    data: Optional<IcatEntity[]>;
     [k: string]: any;
 }
 const EntityTableView = ({
@@ -59,14 +60,15 @@ const EntityTableView = ({
     });
 
     // Note: early returns need to be after all hooks
-    if (data === null) return <p>Loading...</p>;
-    if (data.length === 0) return <p>No entries</p>;
+    if (data.isEmpty()) return <p>Loading...</p>;
+    const entries = data.get();
+    if (entries.length === 0) return <p>No entries</p>;
 
     const editEntity = (id: string, field: string, newValue: IcatEntityValue) => {
         const cur = entityModifications[id] === undefined
             ? {}
             : entityModifications[id];
-        const originalValue = data.find(e => e.id === id)![field];
+        const originalValue = entries.find(e => e.id === id)![field];
         const edited = {...cur, [field]: newValue};
         // If we've modified the value back to the original, remove the modification
         if (newValue === originalValue
@@ -84,13 +86,13 @@ const EntityTableView = ({
     const removeModifications = id =>
         setEntityModifications({...entityModifications, [id]: undefined});
 
-    const dataAttributes = data
+    const dataAttributes = entries
         .flatMap(d => Object.keys(d)
             .filter(k => !Array.isArray(d[k])));
     const keys = defaultHeaderSort([...new Set(dataAttributes)]);
 
     const relatedFieldDisplaySelect = (k: string): JSX.Element => {
-        const firstEntityWithValue = data.find(e => e[k] !== undefined);
+        const firstEntityWithValue = entries.find(e => e[k] !== undefined);
         if (firstEntityWithValue === undefined) return <></>;
 
         const fieldValue = firstEntityWithValue[k];
@@ -201,7 +203,7 @@ const EntityTableView = ({
                             </div>
                         </th>)}
                 </tr>
-                {creations.concat(data).map((e, i) => buildEntityRow(e, i))}
+                {creations.concat(entries).map((e, i) => buildEntityRow(e, i))}
             </table>
             {contextMenuProps !== null && <ContextMenu {...contextMenuProps} />}
         </>

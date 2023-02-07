@@ -3,10 +3,12 @@ import {h, Fragment} from "preact";
 
 import style from './style.css';
 
+import {useOptionalState} from '../../../hooks'
 import {simplifyIcatErrMessage} from '../../../icatErrorHandling.js';
 import IcatClient, {IcatEntity} from '../../../icat';
 import EntityTableView from '../view';
 import {difference, joinAttributeToTableName, randomSuffix, TableFilter} from '../../../utils';
+import {Optional} from "../../../genericUtils";
 
 type Props = {
     server: string;
@@ -28,9 +30,9 @@ const EntityTable = ({
                          setSortingBy,
                          refreshData
                      }: Props) => {
-    const [data, setData] = useState<IcatEntity[] | null>(null);
+    const [data, setData] = useOptionalState<IcatEntity[]>();
     const [errMsg, setErrMsg] = useState(null);
-    const [count, setCount] = useState<number | null>(null);
+    const [count, setCount] = useOptionalState<number>();
     // Row indexes that are marked to be deleted
     const [rowsToDelete, setRowsToDelete] = useState<Set<number>>(new Set());
     // Objects without ids to be written to ICAT
@@ -45,7 +47,7 @@ const EntityTable = ({
             const signal = controller.signal;
             const getEntries = async () => {
                 icatClient.getEntries(filter, signal)
-                    .then(d => setData(d))
+                    .then(d => setData(new Optional(d)))
                     .catch(err => {
                         // DOMException gets throws if promise is aborted, which it is
                         // during cleanup `controller.abort()` when table/filter changes
@@ -68,7 +70,7 @@ const EntityTable = ({
             const signal = controller.signal;
             const getCount = async () => {
                 icatClient.getCount(filter, signal)
-                    .then(c => setCount(c))
+                    .then(c => setCount(new Optional(c)))
                     // Silently ignore errors, this is only a nice to have
                     .catch(() => {
                     });
@@ -95,7 +97,7 @@ const EntityTable = ({
     const pageNumber = Math.floor(filter.offset / filter.limit) + 1;
 
     const changeData = async (i, changes) => {
-        const changed = [...(data || [])];
+        const changed = [...data.or([])];
 
         // For related entity changes, we need to lookup the new entity in ICAT
         const resolve = async (field, value) => {
@@ -111,7 +113,7 @@ const EntityTable = ({
         await toResolve.then(changes => {
             const changeObj = Object.fromEntries(changes);
             changed[i] = {...changed[i], ...changeObj};
-            setData(changed);
+            setData(new Optional(changed));
         });
     };
 
@@ -126,10 +128,10 @@ const EntityTable = ({
     const deleteEntities = async ids =>
         icatClient.deleteEntities(filter.table, ids)
             .then(() => {
-                const newData = (data || []).filter(e => !ids.includes(e.id));
-                setData(newData);
+                setData(data.map(
+                    entries => entries.filter(e => !ids.includes(e.id))));
             })
-            .then(_ => setCount((count || 0) - rowsToDelete.size))
+            .then(_ => setCount(count.map(c => c - rowsToDelete.size)))
             .then(_ => setRowsToDelete(difference(rowsToDelete, ids)));
 
 
@@ -149,9 +151,9 @@ const EntityTable = ({
 
     const insertCreation = async (i, id) => {
         const created = await icatClient.getById(filter.table, id);
-        const withCreated = [...(data || [])];
+        const withCreated = [...data.or([])];
         withCreated.unshift(created);
-        setData(withCreated);
+        setData(new Optional(withCreated));
         cancelCreate(i);
     };
 
@@ -172,8 +174,8 @@ const EntityTable = ({
                 handleSetPage={handleSetPage}
                 handleLimitChange={changeLimit}
                 handlePageChange={changePage}/>
-            {count !== null &&
-                <p class={style.tableTitleCount}>{count} matches</p>}
+            {!count.isEmpty() &&
+                <p class={style.tableTitleCount}>{count.get()} matches</p>}
         </span>
             <span class={style.tableActionsBar}>
             <CreateActions

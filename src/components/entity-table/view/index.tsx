@@ -6,6 +6,8 @@ import style from './style.css';
 import EntityRow from '../row';
 import ContextMenu from '../../context-menu';
 import {defaultHeaderSort, joinAttributeToTableName} from '../../../utils';
+import {IcatEntity, IcatEntityValue} from "../../../icat";
+import JSX = h.JSX;
 
 type CtxMenuProps = {
     x: number;
@@ -14,12 +16,17 @@ type CtxMenuProps = {
     openRelated: any;
     entityType: string;
 }
+
+type Props = {
+    data: IcatEntity[] | null;
+    [k: string]: any;
+}
 const EntityTableView = ({
                              data, entityType, sortingBy, deletions, creations,
                              openRelated, setSortingBy, saveEntity, modifyDataRow,
                              markToDelete, cancelDeletion, doDelete,
                              editCreation, cancelCreate, insertCreation
-                         }) => {
+                         }: Props) => {
     const [contextMenuProps, setContextMenuProps]
         = useState<CtxMenuProps | null>(null);
     // Locally saved changes to entities
@@ -32,7 +39,8 @@ const EntityTableView = ({
     const [fieldBeingEdited, setFieldBeingEdited] = useState([null, null]);
     const stopEditing = () => setFieldBeingEdited([null, null]);
     // Field to show for each related entity in table
-    const [relatedDisplayFields, setRelatedDisplayFields] = useState({});
+    const [relatedDisplayFields, setRelatedDisplayFields] =
+        useState<{ [k: string]: string }>({});
 
     const clearContextMenu = () => setContextMenuProps(null);
 
@@ -54,15 +62,15 @@ const EntityTableView = ({
     if (data === null) return <p>Loading...</p>;
     if (data.length === 0) return <p>No entries</p>;
 
-    const editEntity = (id, field, newValue) => {
+    const editEntity = (id: string, field: string, newValue: IcatEntityValue) => {
         const cur = entityModifications[id] === undefined
             ? {}
             : entityModifications[id];
-        const originalValue = data.filter(e => e.id === id)[0][field];
+        const originalValue = data.find(e => e.id === id)![field];
         const edited = {...cur, [field]: newValue};
         // If we've modified the value back to the original, remove the modification
         if (newValue === originalValue
-            || typeof originalValue === "object" && originalValue.id === newValue.id) {
+            || typeof originalValue === "object" && (originalValue as IcatEntity).id === (newValue as IcatEntity).id) {
             delete edited[field];
         }
         const newModified = {...entityModifications, [id]: edited};
@@ -77,23 +85,24 @@ const EntityTableView = ({
         setEntityModifications({...entityModifications, [id]: undefined});
 
     const dataAttributes = data
-        .map(d => Object.keys(d)
+        .flatMap(d => Object.keys(d)
             .filter(k => !Array.isArray(d[k])));
-    const keys = defaultHeaderSort(
-        [...new Set(dataAttributes.reduce((dk1, dk2) => dk1.concat(dk2)))]);
+    const keys = defaultHeaderSort([...new Set(dataAttributes)]);
 
-    const shouldShowRelatedFieldDisplayOptions = k => {
-        const v = data[0][k];
-        return typeof v === "object" && !Array.isArray(v)
-    };
+    const relatedFieldDisplaySelect = (k: string): JSX.Element => {
+        const firstEntityWithValue = data.find(e => e[k] !== undefined);
+        if (firstEntityWithValue === undefined) return <></>;
 
-    const relatedFieldDisplaySelect = k => {
+        const fieldValue = firstEntityWithValue[k];
+        const fieldValueIsRelatedEntity =
+            typeof fieldValue === "object" && !Array.isArray(fieldValue);
+        if (!fieldValueIsRelatedEntity) return <></>;
+
         const setDisplayField = v =>
             setRelatedDisplayFields({...relatedDisplayFields, [k]: v});
-        const v = data.find(e => e[k] !== undefined && e[k] !== null)[k];
         return (<select onChange={ev => setDisplayField((ev.target as HTMLSelectElement).value)}>
-            {Object.keys(v)
-                .filter(vk => typeof v[vk] !== "object")
+            {Object.keys(fieldValue)
+                .filter(vk => typeof fieldValue[vk] !== "object")
                 .map(vk =>
                     <option
                         key={vk}
@@ -102,7 +111,7 @@ const EntityTableView = ({
         </select>);
     };
 
-    const buildEntityRow = (e, i) => {
+    const buildEntityRow = (e: IcatEntity, i: number): JSX.Element => {
         const isNewRow = e.id === undefined;
         const makeEdit = (k, v) => {
             const fieldIsEntity = joinAttributeToTableName(entityType, k) !== null;
@@ -188,8 +197,7 @@ const EntityTableView = ({
                                     </button>
                                 </span>
                             </span>
-                                {shouldShowRelatedFieldDisplayOptions(k) &&
-                                    relatedFieldDisplaySelect(k)}
+                                {relatedFieldDisplaySelect(k)}
                             </div>
                         </th>)}
                 </tr>

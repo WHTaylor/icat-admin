@@ -8,7 +8,7 @@ import ReadMore from '../../generic/read-more';
 import SuccessIndicator from '../../success-indicator';
 import {IcatEntity, IcatEntityValue} from "../../../icat";
 
-function formatCellContent(cellContent) {
+function formatCellContent(cellContent: IcatEntityValue | undefined | null) : string {
     if (cellContent === undefined || cellContent === null) return "";
     if (typeof cellContent === "string") {
         const asDate = parseISODate(cellContent);
@@ -17,7 +17,7 @@ function formatCellContent(cellContent) {
             : cellContent;
     }
     return typeof cellContent === "object"
-        ? cellContent.id.toString()
+        ? (cellContent as IcatEntity).id.toString()
         : cellContent.toString()
 }
 
@@ -90,7 +90,7 @@ const EntityRow = ({
         return source[field];
     };
 
-    const getFieldValue = field => {
+    const getFieldValue = (field: string): string => {
         const value = getCurrentValue(field);
         const isModified = modifications !== undefined
             && modifications[field] !== undefined;

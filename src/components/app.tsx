@@ -9,7 +9,7 @@ import Header from './header';
 import EntityViewer from './entity-viewer';
 import ServerConnector from './server-connector';
 import {getLastLogin, saveLogin, invalidateLogin, Connection} from '../connectioncache';
-import {urlSearchParamsToObj, parseUrlParams, encodedSearchParams, buildUrl} from '../routing.js';
+import {urlSearchParamsToObj, parseUrlParams, encodedSearchParams, buildUrl} from '../routing';
 
 function getActiveConnectionIdx(connections, activeConnection) {
     if (activeConnection == null) return null;

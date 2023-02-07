@@ -4,14 +4,20 @@ import {Link} from 'preact-router/match';
 
 import style from './style.css';
 
-import {buildUrl} from '../../routing.js';
+import {buildUrl} from '../../routing';
+import {Connection} from "../../connectioncache";
 
 function stripProtocol(server) {
     return server.split("://").slice(-1);
 }
 
+type Props = {
+    connections: Connection[];
+    closeConnection: Function;
+    activeConnectionIdx: number;
+}
 /* The header nav bar for the site, with links to active servers and static pages */
-const Header = ({connections, closeConnection, activeConnectionIdx}) => {
+const Header = ({connections, closeConnection, activeConnectionIdx}: Props) => {
     const onClickConnectionLink = (ev, i, conn) => {
         // Middle click to close, left click to activate
         if (ev.buttons !== 4 && ev.buttons !== 1) return
@@ -26,8 +32,8 @@ const Header = ({connections, closeConnection, activeConnectionIdx}) => {
             <nav>
                 {connections.map((conn, i) =>
                     <ConnectionLink
-                        // This will break if we allow connecitons to be reordered
-                        key={conn + i}
+                        // This will break if we allow connections to be reordered
+                        key={i}
                         conn={conn}
                         handleClick={ev => onClickConnectionLink(ev, i, conn)}
                         isActive={i === activeConnectionIdx}/>)}

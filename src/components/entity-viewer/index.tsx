@@ -7,7 +7,7 @@ import {assignKey, lowercaseFirst, TableFilter, tableFilter} from '../../utils';
 import EntityTable from '../entity-table/container';
 import TableList from '../table-list';
 import TabWindow from '../tab-window';
-import {mergeFilterIntoParams, parseUrlParams, urlSearchParamsToObj} from '../../routing.js';
+import {mergeFilterIntoParams, parseUrlParams, urlSearchParamsToObj} from '../../routing';
 
 function getActiveFilterIdx(filters: TableFilter[], activeFilter) : number | null {
     if (activeFilter === null) return null;

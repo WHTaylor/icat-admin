@@ -1,5 +1,8 @@
 /* Functions for handling query parameters used for routing */
 
+import {Connection} from "./connectioncache";
+import {TableFilter} from "./utils";
+
 export function urlSearchParamsToObj(params) {
     if (params == null) return null;
     const res = {}
@@ -24,7 +27,7 @@ export function parseUrlParams(params) {
     return [connection, filter];
 }
 
-function toURLParams(connection, filter) {
+function toURLParams(connection: Connection, filter: TableFilter) {
     const usp = new URLSearchParams();
     if (connection != null) {
         Object.entries(connection)
@@ -34,7 +37,7 @@ function toURLParams(connection, filter) {
     if (filter != null) {
         Object.entries(filter)
             .filter(([k, v]) => v != null)
-            .forEach(([k, v]) => usp.append(k, v));
+            .forEach(([k, v]) => usp.append(k, v!.toString()));
     }
     return usp;
 }

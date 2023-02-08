@@ -202,7 +202,6 @@ const RowActions = ({
                 class={style.actionButton}
                 key={a.title}
                 title={a.title}
-                // @ts-ignore-line
                 onClick={a.ev}>
                 {a.icon}
             </button>)}

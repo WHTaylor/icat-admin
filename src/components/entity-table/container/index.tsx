@@ -48,7 +48,7 @@ const EntityTable = ({
             const signal = controller.signal;
             const getEntries = async () => {
                 icatClient.getEntries(filter, signal)
-                    .then(d => setData(new Optional(d)))
+                    .then(d => setData(d))
                     .catch(err => {
                         // DOMException gets throws if promise is aborted, which it is
                         // during cleanup `controller.abort()` when table/filter changes
@@ -71,7 +71,7 @@ const EntityTable = ({
             const signal = controller.signal;
             const getCount = async () => {
                 icatClient.getCount(filter, signal)
-                    .then(c => setCount(new Optional(c)))
+                    .then(c => setCount(c))
                     // Silently ignore errors, this is only a nice to have
                     .catch(() => {
                     });
@@ -114,7 +114,7 @@ const EntityTable = ({
         await toResolve.then(changes => {
             const changeObj = Object.fromEntries(changes);
             changed[i] = {...changed[i], ...changeObj};
-            setData(new Optional(changed));
+            setData(changed);
         });
     };
 
@@ -154,7 +154,7 @@ const EntityTable = ({
         const created = await icatClient.getById(filter.table, id);
         const withCreated = [...data.or([])];
         withCreated.unshift(created);
-        setData(new Optional(withCreated));
+        setData(withCreated);
         cancelCreate(i);
     };
 

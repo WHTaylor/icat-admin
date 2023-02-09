@@ -18,13 +18,14 @@ type Props = {
 }
 /* The header nav bar for the site, with links to active servers and static pages */
 const Header = ({connections, closeConnection, activeConnectionIdx}: Props) => {
-    const onClickConnectionLink = (ev, i, conn) => {
-        // Middle click to close, left click to activate
-        if (ev.buttons !== 4 && ev.buttons !== 1) return
-        ev.preventDefault();
-        if (ev.buttons === 4) closeConnection(i)
-        else route(buildUrl(conn, null));
-    };
+    const onClickConnectionLink =
+        (ev: MouseEvent, i: number, conn: Connection): void => {
+            // Middle click to close, left click to activate
+            if (ev.buttons !== 4 && ev.buttons !== 1) return
+            ev.preventDefault();
+            if (ev.buttons === 4) closeConnection(i)
+            else route(buildUrl(conn, null));
+        };
 
     return (
         <header class={style.header}>
@@ -51,7 +52,12 @@ const Header = ({connections, closeConnection, activeConnectionIdx}: Props) => {
     )
 };
 
-const ConnectionLink = ({conn, isActive, handleClick}) => {
+const ConnectionLink = ({conn, isActive, handleClick}:
+                            {
+                                conn: Connection,
+                                isActive: boolean,
+                                handleClick: (ev: MouseEvent) => void
+                            }) => {
     return <a onMouseDown={handleClick} class={isActive && style.active}>
         {`${conn.username}@${stripProtocol(conn.server)}`}
     </a>;

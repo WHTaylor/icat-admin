@@ -10,6 +10,7 @@ type Props = {
     handleChangeTabIdx: (i: number) => void;
     swapTabs: (a: number, b: number) => void;
     entityTables: [TableFilter, JSX.Element][];
+    visible: boolean;
 }
 
 /** Displays the list of tabs for open entity tables, and the active table */
@@ -41,7 +42,7 @@ const TabWindow = (props: Props) => {
 
     return (
         <div class="mainContentAndRightColumn">
-            {props.entityTables.length > 0 &&
+            {props.visible && props.entityTables.length > 0 &&
                 <div
                     class={style.tabSwitcher}
                     onDragOver={ev => ev.preventDefault()}

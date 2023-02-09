@@ -9,6 +9,7 @@ import {defaultHeaderSort, joinAttributeToTableName} from '../../../utils';
 import {IcatEntity, IcatEntityValue} from "../../../icat";
 import JSX = h.JSX;
 import {Optional} from "../../../genericUtils";
+import {useOptionalState} from "../../../hooks";
 
 
 type Props = {
@@ -16,6 +17,14 @@ type Props = {
     openRelated: OpenRelatedHandler;
     [k: string]: any;
 }
+
+type FieldEdit = {
+    // idx will be the index in creations if a new row is being edited,
+    // or the entity id if an existing row is being edited
+    idx: number | string;
+    field: string
+};
+
 const EntityTableView = ({
                              data, entityType, sortingBy, deletions, creations,
                              openRelated, setSortingBy, saveEntity, modifyDataRow,
@@ -26,13 +35,10 @@ const EntityTableView = ({
         = useState<CtxMenuProps | null>(null);
     // Locally saved changes to entities
     const [entityModifications, setEntityModifications] = useState({});
-    // fieldBeingEdited is:
-    // [null, null] - nothing being edited
-    // if editingNewRow, [index in creations, field]
-    // else [entity id, field]
     const [editingNewRow, setEditingNewRow] = useState(false);
-    const [fieldBeingEdited, setFieldBeingEdited] = useState([null, null]);
-    const stopEditing = () => setFieldBeingEdited([null, null]);
+    const [fieldBeingEdited, setFieldBeingEdited] =
+        useOptionalState<FieldEdit>(null);
+    const stopEditing = () => setFieldBeingEdited(null);
     // Field to show for each related entity in table
     const [relatedDisplayFields, setRelatedDisplayFields] =
         useState<{ [k: string]: string }>({});
@@ -127,28 +133,26 @@ const EntityTableView = ({
         const revertChanges = isNewRow
             ? () => cancelCreate(i)
             : () => removeModifications(e.id);
+        const isRowBeingEdited =
+            !fieldBeingEdited.isEmpty()
+            && (editingNewRow
+                ? isNewRow && fieldBeingEdited.get().idx === i
+                : !isNewRow && fieldBeingEdited.get().idx === e.id);
+
         return <EntityRow
             key={isNewRow ? "new-" + i : e.id}
             headers={keys}
             entity={e}
             modifications={isNewRow ? undefined : entityModifications[e.id]}
             editingField={
-                editingNewRow
-                    ? isNewRow
-                        ? fieldBeingEdited[0] === i
-                            ? fieldBeingEdited[1]
-                            : null
-                        : null
-                    : !isNewRow
-                        ? fieldBeingEdited[0] === e.id
-                            ? fieldBeingEdited[1]
-                            : null
-                        : null} // This is insane
+                isRowBeingEdited
+                    ? fieldBeingEdited.get().field
+                    : null}
             relatedEntityDisplayFields={relatedDisplayFields}
             openContextMenu={(x, y) => openContextMenu(x, y, e)}
             startEditing={field => {
                 clearContextMenu();
-                setFieldBeingEdited([isNewRow ? i : e.id, field]);
+                setFieldBeingEdited({idx: isNewRow ? i : e.id, field});
                 setEditingNewRow(isNewRow);
             }}
             stopEditing={stopEditing}

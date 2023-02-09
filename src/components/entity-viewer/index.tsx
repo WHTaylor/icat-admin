@@ -35,7 +35,7 @@ const EntityViewer = ({server, sessionId, visible}: Props) => {
 
     // If we've been given a filter that doesn't have a tab yet, create it
     // This happens when opening a filter directly from a URL
-    if (activeFilter != null && activeTabIdx === null) {
+    if (visible && activeFilter != null && activeTabIdx === null) {
         setTabFilters(tabFilters.concat([assignKey(activeFilter)]));
     }
 

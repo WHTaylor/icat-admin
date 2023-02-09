@@ -3,10 +3,11 @@ import {h, Fragment} from "preact";
 
 import style from './style.css';
 
-import {commonFields, parseISODate, withCorrectedDateFormats} from '../../../utils';
+import {commonFields} from '../../../utils';
 import ReadMore from '../../generic/read-more';
 import SuccessIndicator from '../../success-indicator';
 import {IcatEntity, IcatEntityValue} from "../../../icat";
+import {parseISODate, withCorrectedDateFormats} from "../../../dateUtils";
 
 function formatCellContent(cellContent: IcatEntityValue | undefined | null) : string {
     if (cellContent === undefined || cellContent === null) return "";

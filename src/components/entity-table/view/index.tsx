@@ -5,7 +5,7 @@ import style from './style.css';
 
 import EntityRow from '../row';
 import ContextMenu, {CtxMenuProps, OpenRelatedHandler} from '../../context-menu';
-import {defaultHeaderSort, joinAttributeToTableName} from '../../../utils';
+import {defaultHeaderSort, xToOneAttributeToEntityName} from '../../../utils';
 import {IcatEntity, IcatEntityValue} from "../../../icat";
 import JSX = h.JSX;
 import {Optional} from "../../../genericUtils";
@@ -116,7 +116,7 @@ const EntityTableView = ({
     const buildEntityRow = (e: IcatEntity, i: number): JSX.Element => {
         const isNewRow = e.id === undefined;
         const makeEdit = (k, v) => {
-            const fieldIsEntity = joinAttributeToTableName(entityType, k) !== null;
+            const fieldIsEntity = xToOneAttributeToEntityName(entityType, k) !== null;
             const newValue = fieldIsEntity
                 // TODO: Validate whether the selected entity exists
                 ? {id: Number.parseInt(v)}

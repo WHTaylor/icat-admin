@@ -7,7 +7,7 @@ import {useOptionalState} from '../../../hooks'
 import {simplifyIcatErrMessage} from '../../../icatErrorHandling.js';
 import IcatClient, {IcatEntity} from '../../../icat';
 import EntityTableView from '../view';
-import {difference, joinAttributeToTableName, randomSuffix, TableFilter} from '../../../utils';
+import {difference, xToOneAttributeToEntityName, randomSuffix, TableFilter} from '../../../utils';
 import {Optional} from "../../../genericUtils";
 import {OpenRelatedHandler} from "../../context-menu";
 
@@ -104,7 +104,7 @@ const EntityTable = ({
         const resolve = async (field, value) => {
             if (typeof (value) !== "object") return [field, value];
 
-            const entityType = joinAttributeToTableName(filter.table, field);
+            const entityType = xToOneAttributeToEntityName(filter.table, field);
             return [field, await icatClient.getById(entityType!, value.id)];
         }
 

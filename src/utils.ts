@@ -24,7 +24,7 @@ export type TableFilter = {
  * @param originEntity the entity the attribute is on
  * @param attribute the attribute on the entity
  */
-export function icatAttributeToTableName(
+export function xToManyAttributeToEntityName(
     originEntity: string, attribute: string): string {
     // The new (ICAT 5+) entity DataPublications has several attributes for
     // related entities which don't match the entity name.
@@ -54,7 +54,7 @@ export function icatAttributeToTableName(
  * @param originTable the entity the attribute is on
  * @param attribute the attribute on the entity
  */
-export function joinAttributeToTableName(
+export function xToOneAttributeToEntityName(
     originTable: string, attribute: string): string | null {
     if (attribute === "type") {
         // instrument.type is just a free text description field
@@ -90,9 +90,13 @@ export function idReferenceFromRelatedEntity(
         : "id";
 }
 
-function capitalize(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+function capitalize(s: string): string {
+    return s.charAt(0).toUpperCase() + s.slice(1);
+}
 
-export function lowercaseFirst(s) { return s.charAt(0).toLowerCase() + s.slice(1); }
+export function lowercaseFirst(s: string): string {
+    return s.charAt(0).toLowerCase() + s.slice(1);
+}
 
 export function tableFilter(
     table: string,
@@ -117,9 +121,18 @@ export function assignKey(filter) {
     return {key: Math.random(), ...filter};
 }
 
-// By default, sort id to the beginning and the other common fields to the end
+
 const sortToEnd = ["createId", "createTime", "modId", "modTime"];
-export function defaultHeaderSort(headers) {
+/**
+ * Sort an array of headers into a sensible order
+ *
+ * This sorts 'id' to the front, the other shared entity fields to the end,
+ * puts 'startDate' and 'endDate' next to each other if they both exist,
+ * and otherwise makes everything alphabetical
+ *
+ * @param headers the entity attributes to sort
+ */
+export function defaultHeaderSort(headers: string[]): string[] {
     const end = headers.filter(h => sortToEnd.includes(h)).sort();
     const start = ["id"];
     const middle = headers.filter(h => h !== "id" && !sortToEnd.includes(h)).sort();

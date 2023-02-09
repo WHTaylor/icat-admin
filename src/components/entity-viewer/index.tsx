@@ -5,7 +5,7 @@ import {h} from "preact";
 import IcatClient from '../../icat';
 import {
     assignKey,
-    icatAttributeToTableName, joinAttributeToTableName,
+    xToManyAttributeToEntityName, xToOneAttributeToEntityName,
     idReferenceFromRelatedEntity,
     TableFilter,
     tableFilter
@@ -89,8 +89,8 @@ const EntityViewer = ({server, sessionId, visible}: Props) => {
                          originId: string,
                          oneToMany: boolean) => {
         const relatedEntity = oneToMany
-            ? icatAttributeToTableName(originEntity, attribute)
-            : joinAttributeToTableName(originEntity, attribute);
+            ? xToManyAttributeToEntityName(originEntity, attribute)
+            : xToOneAttributeToEntityName(originEntity, attribute);
 
         if (relatedEntity === null) return;
 

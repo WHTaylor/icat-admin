@@ -15,7 +15,7 @@ export type IcatEntity = {
 export type NewIcatEntity = {
     [k: string]: IcatEntityValue;
 }
-type IcatResponse = {[k: string]: IcatEntity}[]
+type IcatResponse = { [k: string]: IcatEntity }[]
 
 // Unpack the entries returned from the API, because they are formatted like
 // { 'Investigation': { 'id': 123...}}
@@ -27,7 +27,7 @@ function unpack(data: IcatResponse): IcatEntity[] {
     return data.map(d => d[dataType]);
 }
 
-function queryUrlClause(args: {[k: string]: string | number}) {
+function queryUrlClause(args: { [k: string]: string | number }) {
     return Object.entries(args)
         .map(kv => kv.map(encodeURIComponent).join('='))
         .join('&');
@@ -64,7 +64,7 @@ class IcatClient {
         return new URL("icat/session/" + sessionId, this.hostUrl);
     }
 
-    entityUrl(queryParams: {[k: string]: string | number}): URL {
+    entityUrl(queryParams: { [k: string]: string | number }): URL {
         if (this.sessionId === null) {
             throw Error("Can't create entity URL before session ID is set");
         }

@@ -81,7 +81,7 @@ export function xToOneAttributeToEntityName(
 export function idReferenceFromRelatedEntity(
     origin: string,
     related: string,
-    isOneToMany: boolean) : string {
+    isOneToMany: boolean): string {
     if (origin.endsWith("Type")) return "type.id";
 
     return isOneToMany
@@ -120,8 +120,8 @@ export function assignKey(filter) {
     return {key: Math.random(), ...filter};
 }
 
-
 const sortToEnd = ["createId", "createTime", "modId", "modTime"];
+
 /**
  * Sort an array of headers into a sensible order
  *
@@ -145,6 +145,7 @@ export function defaultHeaderSort(headers: string[]): string[] {
     }
     return start.concat(middle).concat(end);
 }
+
 export const commonFields = ["id", ...sortToEnd];
 
 export function randomSuffix() {
@@ -187,4 +188,3 @@ export function difference<T>(set: Set<T>, other: Set<T>): Set<T> {
     }
     return diff;
 }
-

@@ -32,7 +32,7 @@ const EntityTableView = ({
                              editCreation, cancelCreate, insertCreation
                          }: Props) => {
     const [contextMenuProps, setContextMenuProps]
-        = useState<CtxMenuProps | null>(null);
+        = useOptionalState<CtxMenuProps>(null);
     // Locally saved changes to entities
     const [entityModifications, setEntityModifications] = useState({});
     const [editingNewRow, setEditingNewRow] = useState(false);
@@ -203,7 +203,7 @@ const EntityTableView = ({
                 </tr>
                 {creations.concat(entries).map((e, i) => buildEntityRow(e, i))}
             </table>
-            {contextMenuProps !== null && <ContextMenu {...contextMenuProps} />}
+            {!contextMenuProps.isEmpty() && <ContextMenu {...contextMenuProps.get()} />}
         </>
     );
 }

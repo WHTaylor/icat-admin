@@ -4,6 +4,7 @@ import {h} from "preact";
 import IcatClient from '../../icat';
 import LoginForm from '../login-form';
 import {Connection} from "../../connectioncache";
+import {useOptionalState} from "../../hooks";
 
 /* Handles state for logging in to an ICAT server.
  */
@@ -11,7 +12,7 @@ type Props = {
     createConnection: (login: Connection) => void
 }
 const ServerConnector = ({createConnection}: Props) => {
-    const [errMsg, setErrMsg] = useState<string | null>(null);
+    const [errMsg, setErrMsg] = useOptionalState<string>(null);
     const [isLoggingIn, setIsLoggingIn] = useState(false);
 
     const doLogin = async (server, plugin, username, password) => {

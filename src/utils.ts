@@ -67,12 +67,13 @@ export function joinAttributeToTableName(
         return "Datafile";
     } else if (attribute.endsWith("DataCollection")) {
         return "DataCollection";
+    } else if (originTable === "DataPublication" && attribute === "content") {
+        return "DataCollection";
+    } else if (attribute === "publication") {
+        // 'publication's are actually DataPublications, not Publications
+        return "DataPublication";
     } else if (entityNames.includes(capitalize(attribute))) {
         return capitalize(attribute);
-    } else if (originTable === "DataPublication") {
-        if (attribute === "content") return "DataCollection";
-    } else if (originTable === "RelatedItem") {
-        if (attribute === "publication") return "DataPublication";
     }
 
     return null;

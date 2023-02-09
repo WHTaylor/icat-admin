@@ -154,10 +154,9 @@ const EntityViewer = ({server, sessionId, visible}: Props) => {
                 closeTab={closeTab}
                 handleChangeTabIdx={i => routeToNewFilter(tabFilters[i])}
                 swapTabs={swapTabs}
-                something={tabFilters.map((f, i) =>
+                entityTables={tabFilters.map((f, i) =>
                     [
-                        f.table,
-                        f.key,
+                        f,
                         <EntityTable
                             server={server}
                             sessionId={sessionId}

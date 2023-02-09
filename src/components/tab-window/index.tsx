@@ -2,13 +2,14 @@ import {h} from "preact";
 
 import style from './style.css';
 import JSX = h.JSX;
+import {TableFilter} from "../../utils";
 
 type Props = {
     activeTabIdx: number | null;
     closeTab: (i: number) => void;
     handleChangeTabIdx: (i: number) => void;
     swapTabs: (a: number, b: number) => void;
-    something: [string, number, JSX.Element][];
+    entityTables: [TableFilter, JSX.Element][];
 }
 
 /** Displays the list of tabs for open entity tables, and the active table */
@@ -40,26 +41,25 @@ const TabWindow = (props: Props) => {
 
     return (
         <div class="mainContentAndRightColumn">
-            {props.something.length > 0 &&
+            {props.entityTables.length > 0 &&
                 <div
                     class={style.tabSwitcher}
                     onDragOver={ev => ev.preventDefault()}
                     onDrop={endDrag}>
-                    {props.something.map(([name, key,], i) =>
+                    {props.entityTables.map(([filter,], i) =>
                         <button
-                            key={key}
+                            key={filter.key}
                             onClick={() => props.handleChangeTabIdx(i)}
                             onMouseDown={ev => handleMouseDown(ev, i)}
-                            class={`entityButton
-                            ${i === props.activeTabIdx ? style.selectedTab : ""}`}
+                            class={`entityButton ${i === props.activeTabIdx ? style.selectedTab : ""}`}
                             draggable={true}
                             onDragStart={ev => startDrag(ev, i)}>
-                            {name}
+                            {filter.table}
                         </button>)}
                 </div>}
-            {props.something.map(([, key, child], i) =>
+            {props.entityTables.map(([filter, child], i) =>
                 <div
-                    key={key}
+                    key={filter.key}
                     class={i === props.activeTabIdx ? "" : "hidden"}>{child}</div>)}
         </div>
     );

@@ -4,22 +4,16 @@ import {h, Fragment} from "preact";
 import style from './style.css';
 
 import EntityRow from '../row';
-import ContextMenu from '../../context-menu';
+import ContextMenu, {CtxMenuProps, OpenRelatedHandler} from '../../context-menu';
 import {defaultHeaderSort, joinAttributeToTableName} from '../../../utils';
 import {IcatEntity, IcatEntityValue} from "../../../icat";
 import JSX = h.JSX;
 import {Optional} from "../../../genericUtils";
 
-type CtxMenuProps = {
-    x: number;
-    y: number;
-    entity: {};
-    openRelated: any;
-    entityType: string;
-}
 
 type Props = {
     data: Optional<IcatEntity[]>;
+    openRelated: OpenRelatedHandler;
     [k: string]: any;
 }
 const EntityTableView = ({
@@ -46,7 +40,7 @@ const EntityTableView = ({
     const clearContextMenu = () => setContextMenuProps(null);
 
     const openContextMenu = (x, y, entity) => {
-        setContextMenuProps({x, y, entity, openRelated, entityType});
+        setContextMenuProps({x, y, entity, openRelated});
         stopEditing();
     };
 
@@ -151,7 +145,7 @@ const EntityTableView = ({
                             : null
                         : null} // This is insane
             relatedEntityDisplayFields={relatedDisplayFields}
-            openContextMenu={openContextMenu}
+            openContextMenu={(x, y) => openContextMenu(x, y, e)}
             startEditing={field => {
                 clearContextMenu();
                 setFieldBeingEdited([isNewRow ? i : e.id, field]);

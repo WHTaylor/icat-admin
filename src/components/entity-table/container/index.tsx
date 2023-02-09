@@ -9,13 +9,14 @@ import IcatClient, {IcatEntity} from '../../../icat';
 import EntityTableView from '../view';
 import {difference, joinAttributeToTableName, randomSuffix, TableFilter} from '../../../utils';
 import {Optional} from "../../../genericUtils";
+import {OpenRelatedHandler} from "../../context-menu";
 
 type Props = {
     server: string;
     sessionId: string;
     filter: TableFilter;
     handleFilterChange: (filter: TableFilter) => void;
-    openRelated: any;
+    openRelated: OpenRelatedHandler;
     isOpen: boolean;
     setSortingBy: (field: string, asc: boolean) => void;
     refreshData: () => void;

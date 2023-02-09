@@ -44,7 +44,7 @@ const EntityRow = ({
 
     const doOpenContextMenu = ev => {
         ev.preventDefault();
-        openContextMenu(ev.pageX, ev.pageY, entity);
+        openContextMenu(ev.pageX, ev.pageY);
     };
 
     useEffect(() => {

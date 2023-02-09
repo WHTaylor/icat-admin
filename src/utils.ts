@@ -2,6 +2,7 @@ import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 
 import {entityNames} from './icat';
+import {TestWatcher} from "jest";
 
 dayjs.extend(customParseFormat);
 
@@ -15,22 +16,46 @@ export type TableFilter = {
     sortAsc: boolean | null;
 }
 
-// On ICAT objects, attribute names for related entities are lowercase and pluralised.
-// Remove the 's' and uppercase the first letter to get the table name.
-//
-// Fields called 'parameters' link to a table specific to the table
-// ie. datafile.parameters are instances of DatafileParameter
-export function icatAttributeToTableName(tableName, a) {
-    const singular = a.slice(0, -1);
+/**
+ * Return the name of the entity which a one-many attribute points at.
+ *
+ * Most of the time, this is the singularised and uppercased attribute name
+ *
+ * @param originEntity the entity the attribute is on
+ * @param attribute the attribute on the entity
+ */
+export function icatAttributeToTableName(
+    originEntity: string, attribute: string): string {
+    // The new (ICAT 5+) entity DataPublications has several attributes for
+    // related entities which don't match the entity name.
+    if (originEntity == "DataPublication") {
+        if (attribute === "fundingReferences") return "DataPublicationFunding";
+        if (attribute === "dates") return "DataPublicationDate";
+        if (attribute === "users") return "DataPublicationUser";
+    }
+
+    // Most attribute names for related entities are the table name lowercased
+    // and pluralised. Reverse this to get the table name
+    const singular = attribute.slice(0, -1);
     const capitalizedSingular = capitalize(singular);
+
+    // Fields called 'parameters' link to a table specific to the table
+    // ie. datafile.parameters are instances of DatafileParameter
     if (singular === "parameter") {
-        return tableName + capitalizedSingular;
+        return originEntity + capitalizedSingular;
     }
 
     return capitalizedSingular;
 }
 
-export function joinAttributeToTableName(originTable: string, attribute: string): string | null {
+/**
+ * Return the name of the entity which an x-one attribute points at.
+ *
+ * @param originTable the entity the attribute is on
+ * @param attribute the attribute on the entity
+ */
+export function joinAttributeToTableName(
+    originTable: string, attribute: string): string | null {
     if (attribute === "type") {
         // instrument.type is just a free text description field
         if (originTable == "Instrument") return null
@@ -44,9 +69,24 @@ export function joinAttributeToTableName(originTable: string, attribute: string)
         return "DataCollection";
     } else if (entityNames.includes(capitalize(attribute))) {
         return capitalize(attribute);
+    } else if (originTable === "DataPublication") {
+        if (attribute === "content") return "DataCollection";
+    } else if (originTable === "RelatedItem") {
+        if (attribute === "publication") return "DataPublication";
     }
 
     return null;
+}
+
+export function idReferenceFromRelatedEntity(
+    origin: string,
+    related: string,
+    isOneToMany: boolean) : string {
+    if (origin.endsWith("Type")) return "type.id";
+
+    return isOneToMany
+        ? `${lowercaseFirst(origin)}.id`
+        : "id";
 }
 
 function capitalize(s) { return s.charAt(0).toUpperCase() + s.slice(1); }

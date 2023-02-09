@@ -3,13 +3,19 @@ import {route} from 'preact-router';
 import {h} from "preact";
 
 import IcatClient from '../../icat';
-import {assignKey, lowercaseFirst, TableFilter, tableFilter} from '../../utils';
+import {
+    assignKey,
+    icatAttributeToTableName, joinAttributeToTableName,
+    idReferenceFromRelatedEntity,
+    TableFilter,
+    tableFilter
+} from '../../utils';
 import EntityTable from '../entity-table/container';
 import TableList from '../table-list';
 import TabWindow from '../tab-window';
 import {mergeFilterIntoParams, parseUrlParams, urlSearchParamsToObj} from '../../routing';
 
-function getActiveFilterIdx(filters: TableFilter[], activeFilter) : number | null {
+function getActiveFilterIdx(filters: TableFilter[], activeFilter): number | null {
     if (activeFilter === null) return null;
     const idx = filters.findIndex(f =>
         f.table == activeFilter.table
@@ -78,26 +84,22 @@ const EntityViewer = ({server, sessionId, visible}: Props) => {
         }
     };
 
-    /* related    - the table to open
-     * origin     - the table we're coming from
-     * relationId - the id used in the where filter of the new table
-     *              If the origin-related entity is one-many, this is the id of the
-     *              entity in the origin table, otherwise it's the id of the related
-     *              entity
-     * oneToMany  - true if related-origin is one-many, otherwise false
-     */
-    const openRelated = (related, origin, relationId, oneToMany, fromType) => {
-        // This happens if no matching table is found in joinAttributeToTableName
-        if (related === null) return;
+    const openRelated = (originEntity: string,
+                         attribute: string,
+                         originId: string,
+                         oneToMany: boolean) => {
+        const relatedEntity = oneToMany
+            ? icatAttributeToTableName(originEntity, attribute)
+            : joinAttributeToTableName(originEntity, attribute);
 
-        // TODO: Document what fromType is (because I've forgotten)
-        const searchFor = fromType
-            ? "type.id"
-            : oneToMany
-                ? `${lowercaseFirst(origin)}.id`
-                : "id";
-        openTab(tableFilter(related, 0, 50, `${searchFor} = ${relationId}`));
-    }
+        if (relatedEntity === null) return;
+
+        const originIdAttribute = idReferenceFromRelatedEntity(
+            originEntity, relatedEntity, oneToMany);
+
+        openTab(tableFilter(
+            relatedEntity, 0, 50, `${originIdAttribute} = ${originId}`));
+    };
 
     const closeTab = closeIdx => {
         const numTabs = tabFilters.length;
@@ -163,13 +165,13 @@ const EntityViewer = ({server, sessionId, visible}: Props) => {
                             sessionId={sessionId}
                             filter={f}
                             handleFilterChange={f => handleFilterChange(i, f)}
-                            openRelated={(e, id, isOneToMany, fromType) =>
-                                openRelated(e, f.table, id, isOneToMany, fromType)}
+                            openRelated={(attribute, id, isOneToMany) =>
+                                openRelated(f.table, attribute, id, isOneToMany)}
                             setSortingBy={(k, sortAsc) => setSortingBy(i, k, sortAsc)}
                             isOpen={i === activeTabIdx}
                             refreshData={() => refreshTab(i)}
                             key={f.key}/>
-                    ])} />
+                    ])}/>
         </div>
     );
 }

@@ -54,7 +54,9 @@ export function buildUrl(connection, filter) {
     return `/icat?${encodedSearchParams(toURLParams(connection, filter))}`;
 }
 
-export function mergeFilterIntoParams(params, filter) {
+export function mergeFilterIntoParams(
+    params: URLSearchParams | null, filter: TableFilter | null) {
+
     if (params == null) return "";
 
     if (filter === null) {

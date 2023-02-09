@@ -1,29 +1,31 @@
 import style from './style.css';
 import {h, Fragment} from "preact";
-import {icatAttributeToTableName, joinAttributeToTableName} from '../../utils'
+import {IcatEntity} from "../../icat";
 
-const ContextMenu = ({entityType, entity, openRelated, x, y}) => {
+export type OpenRelatedHandler =
+    (attribute: string, originId: string, isOneToMany: boolean) => void;
+
+export type CtxMenuProps = {
+    x: number;
+    y: number;
+    entity: IcatEntity;
+    openRelated: OpenRelatedHandler;
+}
+const ContextMenu = ({entity, openRelated, x, y}: CtxMenuProps) => {
     // Related entities which are many-one (ie. investigation.datasets)
     const relatedArrayCallbacks = Object.keys(entity)
         .filter(k => Array.isArray(entity[k]))
         .map(k => ({
-            entityType: k,
-            openRelated: () => openRelated(
-                icatAttributeToTableName(entityType, k),
-                entity.id,
-                true,
-                entityType.endsWith("Type"))
+            relatedEntityType: k,
+            openRelated: () => openRelated(k, entity.id, true)
         }));
 
     // Related entities which are one-many (ie. datafile.dataset)
     const relatedSingleCallbacks = Object.keys(entity)
         .filter(k => !Array.isArray(entity[k]) && typeof entity[k] === "object")
         .map(k => ({
-            entityType: k,
-            openRelated: () => openRelated(
-                joinAttributeToTableName(entityType, k),
-                entity[k].id,
-                false, false)
+            relatedEntityType: k,
+            openRelated: () => openRelated(k, (entity[k] as IcatEntity).id, false)
         }));
 
     const items = relatedArrayCallbacks.concat(relatedSingleCallbacks);
@@ -31,8 +33,10 @@ const ContextMenu = ({entityType, entity, openRelated, x, y}) => {
         ? <><h3>Show related</h3>
             <ul class={style.contextMenuList}>
                 {items.map(i =>
-                    <li key={i} class={style.contextMenuRow} onClick={i.openRelated}>
-                        {i.entityType}
+                    <li key={i.relatedEntityType}
+                        class={style.contextMenuRow}
+                        onClick={i.openRelated}>
+                        {i.relatedEntityType}
                     </li>)}
             </ul>
         </>

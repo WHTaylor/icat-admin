@@ -23,7 +23,8 @@
         {
           "argsIgnorePattern": "_+"
         }
-      ]
+      ],
+      "jest/no-deprecated-functions": "off"
     }
   },
   "devDependencies": {

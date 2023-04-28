@@ -14,9 +14,13 @@ const Tips = () => (
             <li>Middle click an entity tab to close it.</li>
             <li>Drag and drop entity tabs to change their order.</li>
             <li>The most recently opened tab will be restored on next visit, if the session from it is still valid.</li>
-            <li>If an update fails, this marker will be displayed: <SuccessIndicator
-                saveState={{failed: true, clear: () => ({}), message: "Error reason will be displayed here"}}/>. Hover
-                over it to see the error message.
+            <li>If an update fails, this marker will be displayed:
+                <SuccessIndicator
+                    saveState={{
+                        failed: true, clear: () => ({}),
+                        message: "Error reason will be displayed here"
+                    }}
+                />. Hover over it to see the error message.
             </li>
         </ul>
     </div>);

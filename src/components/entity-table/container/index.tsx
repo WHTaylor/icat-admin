@@ -3,12 +3,10 @@ import {h, Fragment} from "preact";
 
 import style from './style.css';
 
-import {useOptionalState} from '../../../hooks'
 import {simplifyIcatErrMessage} from '../../../icatErrorHandling.js';
 import IcatClient, {IcatEntity} from '../../../icat';
 import EntityTableView from '../view';
 import {difference, xToOneAttributeToEntityName, randomSuffix, TableFilter} from '../../../utils';
-import {Optional} from "../../../genericUtils";
 import {OpenRelatedHandler} from "../../context-menu";
 
 type Props = {
@@ -31,9 +29,9 @@ const EntityTable = ({
                          setSortingBy,
                          refreshData
                      }: Props) => {
-    const [data, setData] = useOptionalState<IcatEntity[]>();
+    const [data, setData] = useState<IcatEntity[] | null>(null);
     const [errMsg, setErrMsg] = useState(null);
-    const [count, setCount] = useOptionalState<number>();
+    const [count, setCount] = useState<number | null>(null);
     // Row indexes that are marked to be deleted
     const [rowsToDelete, setRowsToDelete] = useState<Set<number>>(new Set());
     // Objects without ids to be written to ICAT
@@ -98,7 +96,7 @@ const EntityTable = ({
     const pageNumber = Math.floor(filter.offset / filter.limit) + 1;
 
     const changeData = async (i, changes) => {
-        const changed = [...data.or([])];
+        const changed = [...(data || [])];
 
         // For related entity changes, we need to lookup the new entity in ICAT
         const resolve = async (field, value) => {
@@ -129,10 +127,10 @@ const EntityTable = ({
     const deleteEntities = async ids =>
         icatClient.deleteEntities(filter.table, ids)
             .then(() => {
-                setData(data.map(
-                    entries => entries.filter(e => !ids.includes(e.id))));
+                const newData = (data || []).filter(e => !ids.includes(e.id));
+                setData(newData);
             })
-            .then(_ => setCount(count.map(c => c - rowsToDelete.size)))
+            .then(_ => setCount((count || 0) - rowsToDelete.size))
             .then(_ => setRowsToDelete(difference(rowsToDelete, ids)));
 
 
@@ -152,7 +150,7 @@ const EntityTable = ({
 
     const insertCreation = async (i, id) => {
         const created = await icatClient.getById(filter.table, id);
-        const withCreated = [...data.or([])];
+        const withCreated = [...(data || [])];
         withCreated.unshift(created);
         setData(withCreated);
         cancelCreate(i);
@@ -175,8 +173,8 @@ const EntityTable = ({
                 handleSetPage={handleSetPage}
                 handleLimitChange={changeLimit}
                 handlePageChange={changePage}/>
-            {!count.isEmpty() &&
-                <p class={style.tableTitleCount}>{count.get()} matches</p>}
+            {count !== null &&
+                <p class={style.tableTitleCount}>{count} matches</p>}
         </span>
             <span class={style.tableActionsBar}>
             <CreateActions

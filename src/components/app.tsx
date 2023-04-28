@@ -9,65 +9,43 @@ import Header from './header';
 import EntityViewer from './entity-viewer';
 import ServerConnector from './server-connector';
 import {getLastLogin, saveLogin, invalidateLogin, Connection} from '../connectioncache';
-import {urlSearchParamsToObj, parseUrlParams, encodedSearchParams, buildUrl} from '../routing';
-
-function getActiveConnectionIdx(connections, activeConnection) {
-    if (activeConnection == null) return null;
-    const {server, username} = activeConnection;
-    const idx = connections.findIndex(c =>
-        c.server === server && c.username === username);
-    return idx < 0 ? null : idx;
-}
 
 const App = () => {
-    // Skip during node prerender
-    const usps = typeof window === "undefined"
-        ? null
-        : new URLSearchParams(window.location.search);
-    const [paramsConn, paramsFilter] = parseUrlParams(urlSearchParamsToObj(usps));
-
     const [connections, setConnections] = useState<Connection[]>([]);
-    const [activeConnection, setActiveConnection] = useState(paramsConn);
-
-    const activeConnectionIdx = getActiveConnectionIdx(connections, activeConnection);
+    const [activeConnection, setActiveConnection] =
+        useState<number | null>(null);
 
     const createConnection = (login: Connection) => {
         saveLogin(login.server, login.username, login.sessionId);
+        setActiveConnection(connections.length);
         setConnections(connections.concat(login));
-        setActiveConnection(login);
-        route(buildUrl(login, paramsFilter));
-    };
-
-    const disconnect = i => {
-        const c = connections[i];
-        invalidateLogin(c.server, c.username);
-        new IcatClient(c.server, c.sessionId).logout();
-        setConnections(connections.slice(0, i).concat(connections.slice(i + 1)));
+        route("/icat");
     };
 
     const removeConnection = i => {
         const numConnections = connections.length;
+        const c = connections[i];
 
-        disconnect(i);
-        if (activeConnectionIdx === null) return;
+        invalidateLogin(c.server, c.username);
+        new IcatClient(c.server, c.sessionId).logout();
+        setConnections(connections.slice(0, i).concat(connections.slice(i + 1)));
 
-        if (i === activeConnectionIdx) {
-            var newActiveConnection;
-            if (numConnections == 1) {
-                route('/');
-                return;
-            } else if (i === numConnections - 1) {
-                newActiveConnection = connections[numConnections - 2];
-            } else {
-                newActiveConnection = connections[activeConnectionIdx + 1];
-            }
-            route(buildUrl(newActiveConnection, null));
+        // Don't change active tab if non-connection tab is selected
+        if (activeConnection === null) return;
+
+        // Go to login screen if last connection was closed
+        if (numConnections === 1) route("/");
+
+        // If we closed a connection to the left, or the last connection whilst
+        //it was active, decrement the active connection
+        if (i < activeConnection
+            || (activeConnection == numConnections - 1) && i === activeConnection) {
+            setActiveConnection(activeConnection - 1);
         }
     }
 
     // If on the home or icat page, and no servers are currently active, try to
     // login to the last active server.
-    // TODO: if a server is set in URL, load that one rather than last logged in one.
     useLayoutEffect(() => {
         if (location.pathname != "/" && location.pathname != "/icat") return;
         if (connections.length > 0) return;
@@ -78,22 +56,19 @@ const App = () => {
             .then(res => {if (res) createConnection(login)});
     });
 
-    const handleIcatRoute = e => {
-        if (e.path != "/icat") setActiveConnection(null);
-        else {
-            const [newConn, ] = parseUrlParams(e.matches);
-            setActiveConnection(newConn);
-        }
-    }
-
     return (
         <>
             <Header
                 connections={connections}
                 closeConnection={removeConnection}
-                activeConnectionIdx={activeConnectionIdx} />
+                setActiveConnection={i => { route("/icat"); setActiveConnection(i)}}
+                activeConnection={activeConnection} />
 
-            <Router onChange={handleIcatRoute}>
+            <Router onChange={
+                e => {
+                    if (e.path != "/icat") setActiveConnection(null);
+                }
+            }>
                 <Route path="/tips" component={Tips}/>
                 <Route path="/about" component={About}/>
                 <Route path="/icat" component={Nothing}/>
@@ -105,7 +80,7 @@ const App = () => {
                     key={c.sessionId}
                     server={c.server}
                     sessionId={c.sessionId}
-                    visible={i === activeConnectionIdx} />) }
+                    visible={i === activeConnection} />) }
         </>
     );
 }

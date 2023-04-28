@@ -1,10 +1,8 @@
 import {StateUpdater, useEffect, useState} from "preact/hooks";
-import {route} from 'preact-router';
 import {h} from "preact";
 
 import IcatClient from '../../icat';
 import {
-    assignKey,
     xToManyAttributeToEntityName, xToOneAttributeToEntityName,
     idReferenceFromRelatedEntity,
     TableFilter,
@@ -13,19 +11,6 @@ import {
 import EntityTable from '../entity-table/container';
 import TableList from '../table-list';
 import TabWindow from '../tab-window';
-import {mergeFilterIntoParams, parseUrlParams, urlSearchParamsToObj} from '../../routing';
-
-function getActiveFilterIdx(filters: TableFilter[], activeFilter): number | null {
-    if (activeFilter === null) return null;
-    const idx = filters.findIndex(f =>
-        f.table == activeFilter.table
-        && f.where == activeFilter.where
-        && f.offset?.toString() == activeFilter.offset
-        && f.limit?.toString() == activeFilter.limit
-        && f.sortField == activeFilter.sortField
-        && f.sortAsc?.toString() == activeFilter.sortAsc);
-    return idx < 0 ? null : idx;
-}
 
 type Props = {
     server: string;
@@ -35,34 +20,20 @@ type Props = {
 const EntityViewer = ({server, sessionId, visible}: Props) => {
     const [tabFilters, setTabFilters]: [TableFilter[], StateUpdater<TableFilter[]>]
         = useState([]);
-
-    const [_, activeFilter] = parseUrlParams(urlSearchParamsToObj(new URLSearchParams(window.location.search)));
-    const activeTabIdx = getActiveFilterIdx(tabFilters, activeFilter);
-
-    // If we've been given a filter that doesn't have a tab yet, create it
-    // This happens when opening a filter directly from a URL
-    if (visible && activeFilter != null && activeTabIdx === null) {
-        setTabFilters(tabFilters.concat([assignKey(activeFilter)]));
-    }
+    const [activeTabIdx, setActiveTabIdx] = useState<number | null>(null);
 
     const icatClient = new IcatClient(server, sessionId);
 
-    const routeToNewFilter = (f: TableFilter) => {
-        const params = new URLSearchParams(window.location.search);
-        route(window.location.pathname + "?" + mergeFilterIntoParams(params, f));
-    };
-
-    const handleFilterChange = (i, newFilter) => {
+    const handleFilterChange = (i, newFilter) =>
         setTabFilters(
             tabFilters.slice(0, i)
                 .concat([newFilter])
                 .concat(tabFilters.slice(i + 1)));
-        routeToNewFilter(newFilter);
-    }
 
     const openTab = (f: TableFilter) => {
+        const numTabs = tabFilters.length;
         setTabFilters(tabFilters.concat([f]));
-        routeToNewFilter(f);
+        setActiveTabIdx(numTabs)
         // Timeout is used as a small hack to make sure scroll happens after component
         // rerenders (or at least, that's what it appears to do).
         setTimeout(() => window.scrollTo({top: 0, left: 0, behavior: "smooth"}), 1);
@@ -103,18 +74,13 @@ const EntityViewer = ({server, sessionId, visible}: Props) => {
 
     const closeTab = closeIdx => {
         const numTabs = tabFilters.length;
-        const activeTabIdx = getActiveFilterIdx(tabFilters, activeFilter);
         setTabFilters(tabFilters.filter((e, i) => i !== closeIdx));
-        if (closeIdx === activeTabIdx) {
-            var newActiveFilter;
-            if (numTabs === 1) {
-                newActiveFilter = null;
-            } else if (closeIdx === numTabs - 1) {
-                newActiveFilter = tabFilters[numTabs - 2];
-            } else {
-                newActiveFilter = tabFilters[closeIdx + 1];
-            }
-            routeToNewFilter(newActiveFilter);
+
+        if (activeTabIdx === null) return;
+        if (closeIdx < activeTabIdx) {
+            setActiveTabIdx(activeTabIdx - 1);
+        } else if (numTabs === 1) {
+            setActiveTabIdx(null);
         }
     };
 
@@ -154,7 +120,7 @@ const EntityViewer = ({server, sessionId, visible}: Props) => {
             <TabWindow
                 activeTabIdx={activeTabIdx}
                 closeTab={closeTab}
-                handleChangeTabIdx={i => routeToNewFilter(tabFilters[i])}
+                handleChangeTabIdx={i => setActiveTabIdx(i)}
                 swapTabs={swapTabs}
                 visible={visible}
                 entityTables={tabFilters.map((f, i) =>

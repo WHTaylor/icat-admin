@@ -8,13 +8,10 @@ import ContextMenu, {CtxMenuProps, OpenRelatedHandler} from '../../context-menu'
 import {defaultHeaderSort, xToOneAttributeToEntityName} from '../../../utils';
 import {IcatEntity, IcatEntityValue} from "../../../icat";
 import JSX = h.JSX;
-import {Optional} from "../../../genericUtils";
-import {useOptionalState} from "../../../hooks";
-
 
 type Props = {
-    data: Optional<IcatEntity[]>;
     openRelated: OpenRelatedHandler;
+    data: IcatEntity[] | null;
     [k: string]: any;
 }
 
@@ -31,13 +28,13 @@ const EntityTableView = ({
                              markToDelete, cancelDeletion, doDelete,
                              editCreation, cancelCreate, insertCreation
                          }: Props) => {
-    const [contextMenuProps, setContextMenuProps]
-        = useOptionalState<CtxMenuProps>(null);
+    const [contextMenuProps, setContextMenuProps] =
+        useState<CtxMenuProps | null>(null);
     // Locally saved changes to entities
     const [entityModifications, setEntityModifications] = useState({});
     const [editingNewRow, setEditingNewRow] = useState(false);
     const [fieldBeingEdited, setFieldBeingEdited] =
-        useOptionalState<FieldEdit>(null);
+        useState<FieldEdit | null>(null);
     const stopEditing = () => setFieldBeingEdited(null);
     // Field to show for each related entity in table
     const [relatedDisplayFields, setRelatedDisplayFields] =
@@ -60,15 +57,14 @@ const EntityTableView = ({
     });
 
     // Note: early returns need to be after all hooks
-    if (data.isEmpty()) return <p>Loading...</p>;
-    const entries = data.get();
-    if (entries.length === 0) return <p>No entries</p>;
+    if (data === null) return <p>Loading...</p>;
+    if (data.length === 0) return <p>No entries</p>;
 
     const editEntity = (id: string, field: string, newValue: IcatEntityValue) => {
         const cur = entityModifications[id] === undefined
             ? {}
             : entityModifications[id];
-        const originalValue = entries.find(e => e.id === id)![field];
+        const originalValue = data.find(e => e.id === id)![field];
         const edited = {...cur, [field]: newValue};
         // If we've modified the value back to the original, remove the modification
         if (newValue === originalValue
@@ -86,13 +82,13 @@ const EntityTableView = ({
     const removeModifications = id =>
         setEntityModifications({...entityModifications, [id]: undefined});
 
-    const dataAttributes = entries
+    const dataAttributes = data
         .flatMap(d => Object.keys(d)
             .filter(k => !Array.isArray(d[k])));
     const keys = defaultHeaderSort([...new Set(dataAttributes)]);
 
     const relatedFieldDisplaySelect = (k: string): JSX.Element => {
-        const firstEntityWithValue = entries.find(e => e[k] !== undefined);
+        const firstEntityWithValue = data.find(e => e[k] !== undefined);
         if (firstEntityWithValue === undefined) return <></>;
 
         const fieldValue = firstEntityWithValue[k];
@@ -134,10 +130,10 @@ const EntityTableView = ({
             ? () => cancelCreate(i)
             : () => removeModifications(e.id);
         const isRowBeingEdited =
-            !fieldBeingEdited.isEmpty()
+            fieldBeingEdited != null
             && (editingNewRow
-                ? isNewRow && fieldBeingEdited.get().idx === i
-                : !isNewRow && fieldBeingEdited.get().idx === e.id);
+                ? isNewRow && fieldBeingEdited.idx === i
+                : !isNewRow && fieldBeingEdited.idx === e.id);
 
         return <EntityRow
             key={isNewRow ? "new-" + i : e.id}
@@ -146,7 +142,7 @@ const EntityTableView = ({
             modifications={isNewRow ? undefined : entityModifications[e.id]}
             editingField={
                 isRowBeingEdited
-                    ? fieldBeingEdited.get().field
+                    ? fieldBeingEdited.field
                     : null}
             relatedEntityDisplayFields={relatedDisplayFields}
             openContextMenu={(x, y) => openContextMenu(x, y, e)}
@@ -201,9 +197,9 @@ const EntityTableView = ({
                             </div>
                         </th>)}
                 </tr>
-                {creations.concat(entries).map((e, i) => buildEntityRow(e, i))}
+                {creations.concat(data).map((e, i) => buildEntityRow(e, i))}
             </table>
-            {!contextMenuProps.isEmpty() && <ContextMenu {...contextMenuProps.get()} />}
+            {contextMenuProps != null && <ContextMenu {...contextMenuProps} />}
         </>
     );
 }

@@ -4,7 +4,6 @@ import {useState} from "preact/hooks";
 import style from './style.css';
 
 import {getLastLogin, getServerNames} from '../../connectioncache'
-import {Optional} from "../../genericUtils";
 
 function processServerName(name: string): string {
     if (name.trim().length === 0) return "";
@@ -21,7 +20,7 @@ type Props = {
         plugin: string,
         username: string,
         password: string) => void;
-    errMsg: Optional<string>;
+    errMsg: string | null;
     isLoggingIn: boolean;
 }
 const LoginForm = ({doLogin, errMsg, isLoggingIn}: Props) => {
@@ -55,7 +54,7 @@ const LoginForm = ({doLogin, errMsg, isLoggingIn}: Props) => {
 
             <button class={style.block}>Login</button>
 
-            {!errMsg.isEmpty() && <p>Error logging in: {errMsg.get()}</p>}
+            {errMsg != null && <p>Error logging in: {errMsg}</p>}
             {isLoggingIn && <p>Logging in...</p>}
         </form>);
 }

@@ -134,8 +134,7 @@ const EntityTable = ({
         cancelCreate(i);
     };
 
-    return (
-        <>
+    return (<>
         <span class={style.tableTitleBar}>
             <h2>{filter.table}</h2>
             <input
@@ -153,7 +152,8 @@ const EntityTable = ({
                 handlePageChange={changePage}/>
             <EntityCounter filter={filter} icatClient={icatClient}/>
         </span>
-            <span class={style.tableActionsBar}>
+
+        <span class={style.tableActionsBar}>
             <CreateActions
                 creations={rowsToCreate}
                 addCreation={() => setRowsToCreate(rowsToCreate.concat({}))}
@@ -163,27 +163,28 @@ const EntityTable = ({
                 clearDeletions={() => setRowsToDelete(new Set())}
                 doDeletions={() => deleteEntities([...rowsToDelete])}/>
         </span>
-            {errMsg ? <p>{errMsg}</p>
-                : <EntityTableView
-                    data={data}
-                    entityType={filter.table}
-                    sortingBy={{field: filter.sortField, asc: filter.sortAsc}}
-                    deletions={rowsToDelete}
-                    creations={rowsToCreate}
-                    openRelated={openRelated}
-                    setSortingBy={setSortingBy}
-                    saveEntity={e =>
-                        icatClient.writeEntity(filter.table, e)}
-                    modifyDataRow={changeData}
-                    markToDelete={markToDelete}
-                    cancelDeletion={cancelDeletion}
-                    doDelete={id => deleteEntities([id])}
-                    editCreation={editCreation}
-                    cancelCreate={cancelCreate}
-                    insertCreation={insertCreation}
-                />}
-        </>
-    );
+
+        {errMsg
+            ? <p>{errMsg}</p>
+            : <EntityTableView
+                data={data}
+                entityType={filter.table}
+                sortingBy={{field: filter.sortField, asc: filter.sortAsc}}
+                deletions={rowsToDelete}
+                creations={rowsToCreate}
+                openRelated={openRelated}
+                setSortingBy={setSortingBy}
+                saveEntity={e =>
+                    icatClient.writeEntity(filter.table, e)}
+                modifyDataRow={changeData}
+                markToDelete={markToDelete}
+                cancelDeletion={cancelDeletion}
+                doDelete={id => deleteEntities([id])}
+                editCreation={editCreation}
+                cancelCreate={cancelCreate}
+                insertCreation={insertCreation}
+            />}
+    </>);
 }
 
 const PaginationControl = ({isActive, pageNumber, handleSetPage, handleLimitChange, handlePageChange}) => {

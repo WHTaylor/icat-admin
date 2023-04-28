@@ -31,7 +31,6 @@ const EntityTable = ({
                      }: Props) => {
     const [data, setData] = useState<IcatEntity[] | null>(null);
     const [errMsg, setErrMsg] = useState(null);
-    const [count, setCount] = useState<number | null>(null);
     // Row indexes that are marked to be deleted
     const [rowsToDelete, setRowsToDelete] = useState<Set<number>>(new Set());
     // Objects without ids to be written to ICAT
@@ -60,25 +59,6 @@ const EntityTable = ({
         }
 
         return retrieveData();
-    }, [filter, server, sessionId]); // eslint-disable-line react-hooks/exhaustive-deps
-
-    useEffect(() => {
-        const retrieveCount = () => {
-            setCount(null);
-            const controller = new AbortController();
-            const signal = controller.signal;
-            const getCount = async () => {
-                icatClient.getCount(filter, signal)
-                    .then(c => setCount(c))
-                    // Silently ignore errors, this is only a nice to have
-                    .catch(() => {
-                    });
-            };
-            getCount();
-            return () => controller.abort();
-        }
-
-        return retrieveCount();
     }, [filter, server, sessionId]); // eslint-disable-line react-hooks/exhaustive-deps
 
     const changeWhere = w => handleFilterChange({...filter, where: w});
@@ -130,9 +110,7 @@ const EntityTable = ({
                 const newData = (data || []).filter(e => !ids.includes(e.id));
                 setData(newData);
             })
-            .then(_ => setCount((count || 0) - rowsToDelete.size))
             .then(_ => setRowsToDelete(difference(rowsToDelete, ids)));
-
 
     const editCreation = (i, k, v) => {
         const cur = rowsToCreate[i];
@@ -173,8 +151,7 @@ const EntityTable = ({
                 handleSetPage={handleSetPage}
                 handleLimitChange={changeLimit}
                 handlePageChange={changePage}/>
-            {count !== null &&
-                <p class={style.tableTitleCount}>{count} matches</p>}
+            <EntityCounter filter={filter} icatClient={icatClient}/>
         </span>
             <span class={style.tableActionsBar}>
             <CreateActions
@@ -277,5 +254,33 @@ const CreateActions = ({creations, addCreation, clearCreations}) => {
             }
         </span>);
 };
+
+type CounterProps = {
+    filter: TableFilter,
+    icatClient: IcatClient
+}
+const EntityCounter = ({filter, icatClient}: CounterProps) => {
+    const [count, setCount] = useState<number | null>(null);
+    useEffect(() => {
+        const retrieveCount = () => {
+            setCount(null);
+            const controller = new AbortController();
+            const signal = controller.signal;
+            const getCount = async () => {
+                icatClient.getCount(filter, signal)
+                    .then(c => setCount(c))
+                    // Silently ignore errors, this is only a nice to have
+                    .catch(() => {
+                    });
+            };
+            getCount();
+            return () => controller.abort();
+        }
+
+        return retrieveCount();
+    }, [filter, icatClient]); // eslint-disable-line react-hooks/exhaustive-deps
+
+    return <>{count !== null && <p class={style.tableTitleCount}>{count} matches</p>}</>
+}
 
 export default EntityTable;

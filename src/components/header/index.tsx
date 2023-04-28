@@ -1,30 +1,30 @@
 import {h} from "preact";
-import {route} from 'preact-router';
 import {Link} from 'preact-router/match';
 
 import style from './style.css';
 
-import {buildUrl} from '../../routing';
 import {Connection} from "../../connectioncache";
 
 function stripProtocol(server) {
     return server.split("://").slice(-1);
 }
 
+
 type Props = {
     connections: Connection[];
+    activeConnection: number | null
+    setActiveConnection: (i: number) => void;
     closeConnection: Function;
-    activeConnectionIdx: number;
 }
 /* The header nav bar for the site, with links to active servers and static pages */
-const Header = ({connections, closeConnection, activeConnectionIdx}: Props) => {
+const Header = ({connections, activeConnection, setActiveConnection, closeConnection}: Props) => {
     const onClickConnectionLink =
         (ev: MouseEvent, i: number, conn: Connection): void => {
             // Middle click to close, left click to activate
             if (ev.buttons !== 4 && ev.buttons !== 1) return
             ev.preventDefault();
             if (ev.buttons === 4) closeConnection(i)
-            else route(buildUrl(conn, null));
+            else setActiveConnection(i);
         };
 
     return (
@@ -37,7 +37,7 @@ const Header = ({connections, closeConnection, activeConnectionIdx}: Props) => {
                         key={i}
                         conn={conn}
                         handleClick={ev => onClickConnectionLink(ev, i, conn)}
-                        isActive={i === activeConnectionIdx}/>)}
+                        isActive={i === activeConnection}/>)}
                 <Link activeClassName={style.active} href="/">
                     +
                 </Link>

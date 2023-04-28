@@ -151,7 +151,7 @@ class IcatClient {
     }
 
     async logout() {
-        fetch(this.sessionUrl(this.sessionId).toString(),
+        await fetch(this.sessionUrl(this.sessionId).toString(),
             {method: "DELETE"});
         this.sessionId = null;
     }

@@ -116,10 +116,6 @@ export function tableFilter(
     };
 }
 
-export function assignKey(filter) {
-    return {key: Math.random(), ...filter};
-}
-
 const sortToEnd = ["createId", "createTime", "modId", "modTime"];
 
 /**

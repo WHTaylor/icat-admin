@@ -1,7 +1,7 @@
 import {StateUpdater, useEffect, useState} from "preact/hooks";
 import {h} from "preact";
 
-import IcatClient from '../../icat';
+import IcatClient, {entityNames} from '../../icat';
 import {
     xToManyAttributeToEntityName, xToOneAttributeToEntityName,
     idReferenceFromRelatedEntity,
@@ -9,8 +9,9 @@ import {
     tableFilter
 } from '../../utils';
 import EntityTable from '../entity-table/container';
-import TableList from '../table-list';
 import TabWindow from '../tab-window';
+import style from './style.css';
+import OpenTabModal from "../open-tab-modal";
 
 type Props = {
     server: string;
@@ -21,6 +22,7 @@ const EntityViewer = ({server, sessionId, visible}: Props) => {
     const [tabFilters, setTabFilters]: [TableFilter[], StateUpdater<TableFilter[]>]
         = useState([]);
     const [activeTabIdx, setActiveTabIdx] = useState<number | null>(null);
+    const [isOpenTabModalOpen, setIsOpenTabModalOpen] = useState(false);
 
     const icatClient = new IcatClient(server, sessionId);
 
@@ -107,6 +109,19 @@ const EntityViewer = ({server, sessionId, visible}: Props) => {
         return () => clearInterval(id);
     }, [server, sessionId]); // eslint-disable-line react-hooks/exhaustive-deps
 
+    // If this is visible, bind Alt-Shift-O to toggle an OpenTabModal
+    useEffect(() => {
+        if (!visible) return;
+
+        const readKey = ev => {
+            if (ev.altKey && ev.shiftKey && ev.key == "O") {
+                setIsOpenTabModalOpen(!isOpenTabModalOpen)
+            }
+        }
+        document.addEventListener("keydown", readKey);
+        return () => document.removeEventListener("keydown", readKey);
+    }, [visible, isOpenTabModalOpen])
+
     return (
         <div class={visible ? "page" : "hidden"}>
             {
@@ -117,10 +132,24 @@ const EntityViewer = ({server, sessionId, visible}: Props) => {
                 */
                 visible &&
                 <div class="leftColumn">
-                    <TableList openTab={openTab}/>
+                    <h2>ICAT tables</h2>
+                    <ul className={style.tableList}>
+                        {entityNames.map(en =>
+                            <li key={en}>
+                                <button
+                                    className="entityButton"
+                                    onClick={() => openTab(tableFilter(en, 0, 50))}>
+                                    {en}
+                                </button>
+                            </li>)}
+                    </ul>
                 </div>
 
                 // TODO: Pull EntityTable data up so we don't have to do this
+            }
+            {
+                visible && isOpenTabModalOpen &&
+                <OpenTabModal openTab={openTab} close={() => setIsOpenTabModalOpen(false)}></OpenTabModal>
             }
             <TabWindow
                 activeTabIdx={activeTabIdx}

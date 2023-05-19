@@ -49,7 +49,7 @@ const EntityRow = ({
     };
 
     useEffect(() => {
-        if (inputEl.current === null) return
+        if (inputEl.current === null) return;
 
         const el = inputEl.current;
         el.focus();

@@ -1,0 +1,31 @@
+.openTabModal {
+    position: fixed;
+    top: 20%;
+    left: 50%;
+    transform: translate(-50%);
+    background: var(--color-blue-very-light);
+    padding: 0.25em;
+    border: 1px solid darkgrey;
+}
+
+.openTabModal h3 {
+    font-size: large;
+    font-weight: 800;
+    padding: 0.2em;
+    margin: 0 0 0.35em;
+}
+
+.openTabModal ul {
+    list-style: none;
+    margin: 0;
+    padding: 0.25em;
+}
+
+.openTabModal ul li {
+    padding: 0.05em;
+}
+
+.active {
+    color: white;
+    background: var(--color-grey-very-dark);
+}

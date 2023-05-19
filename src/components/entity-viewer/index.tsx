@@ -109,14 +109,19 @@ const EntityViewer = ({server, sessionId, visible}: Props) => {
 
     return (
         <div class={visible ? "page" : "hidden"}>
-            { /*
-                Only render the TableList if visible.
-                This is because TableList binds a keydown event we only want for
-                the active server.
-            */}
-            {visible && <div class="leftColumn">
-                <TableList openTab={openTab}/>
-            </div>}
+            {
+                /*
+                 We have to always render the TabWindow because rerendering
+                 the EntityTables causes them to refetch data. We can get away
+                 without rendering the list of entities, however.
+                */
+                visible &&
+                <div class="leftColumn">
+                    <TableList openTab={openTab}/>
+                </div>
+
+                // TODO: Pull EntityTable data up so we don't have to do this
+            }
             <TabWindow
                 activeTabIdx={activeTabIdx}
                 closeTab={closeTab}

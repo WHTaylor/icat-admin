@@ -41,7 +41,7 @@ const OpenTabModal = ({openTab, close}: Props) => {
         }
 
         const readKey = ev => {
-            if (ev.key !== "ArrowUp" && ev.key !== "ArrowDown") {
+            if (!selectionControlKeys.includes(ev.key)) {
                 return;
             }
 
@@ -52,8 +52,12 @@ const OpenTabModal = ({openTab, close}: Props) => {
             let newIdx;
             if (ev.key === "ArrowUp") {
                 newIdx = Math.max(prev - 1, 0);
-            } else {
+            } else if (ev.key == "ArrowDown") {
                 newIdx = Math.min(prev + 1, matches.length - 1);
+            } else if (ev.key === "PageUp") {
+                newIdx = Math.max(prev - 5, 0);
+            } else {
+                newIdx = Math.min(prev + 5, matches.length - 1);
             }
             setSelectedIdx(newIdx);
         }
@@ -124,5 +128,7 @@ function getMatches(input: string): string[] {
     const re = new RegExp(pattern);
     return entityNames.filter(e => re.test(e.toLowerCase()));
 }
+
+const selectionControlKeys = ["ArrowUp", "ArrowDown", "PageUp", "PageDown"]
 
 export default OpenTabModal;

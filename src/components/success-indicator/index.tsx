@@ -6,7 +6,20 @@ import style from './style.css';
 const INTERVAL_MS = 10
 
 type MousePos = { x: number, y: number };
-const SuccessIndicator = ({saveState, clearTimeoutMs = 2000}) => {
+
+type SaveState = {
+    failed: boolean;
+    isSaving?: boolean;
+    clear: () => void;
+    message: string;
+};
+
+type Props = {
+    saveState: SaveState;
+    clearTimeoutMs?: number;
+};
+
+const SuccessIndicator = ({saveState, clearTimeoutMs = 2000}: Props) => {
     const [mousePos, setMousePos] = useState<MousePos | null>(null);
     const timer = useRef(0);
 

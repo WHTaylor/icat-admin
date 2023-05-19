@@ -128,9 +128,12 @@ const EntityViewer = ({server, sessionId, visible}: Props) => {
         <div class={visible ? "page" : "hidden"}>
             {
                 /*
-                 We have to always render the TabWindow because rerendering
-                 the EntityTables causes them to refetch data. We can get away
-                 without rendering the list of entities, however.
+                 TODO: Pull EntityTable (and maybe OpenTabModal) state up so we
+                 don't have to do this
+
+                 We have to always render the OpenTabModal and TabWindow, even
+                 if this component is not visible, because they contain state we
+                 want to keep even when viewing other tabs
                 */
                 visible &&
                 <div class="leftColumn">
@@ -146,13 +149,15 @@ const EntityViewer = ({server, sessionId, visible}: Props) => {
                             </li>)}
                     </ul>
                 </div>
+            }
 
-                // TODO: Pull EntityTable data up so we don't have to do this
+            {isOpenTabModalOpen &&
+                <OpenTabModal
+                    openTab={openTab}
+                    close={() => setIsOpenTabModalOpen(false)}
+                />
             }
-            {
-                visible && isOpenTabModalOpen &&
-                <OpenTabModal openTab={openTab} close={() => setIsOpenTabModalOpen(false)}></OpenTabModal>
-            }
+
             <TabWindow
                 activeTabIdx={activeTabIdx}
                 closeTab={closeTab}

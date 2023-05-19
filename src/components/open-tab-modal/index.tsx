@@ -1,5 +1,4 @@
 import {entityNames} from '../../icat';
-import {TableFilter, tableFilter} from '../../utils';
 
 import {StateUpdater, useEffect, useRef, useState} from "preact/hooks";
 import style from './style.css';
@@ -8,7 +7,7 @@ import {h} from "preact";
 const MAX_MATCHES = 20;
 
 type Props = {
-    openTab: (f: TableFilter) => void;
+    openTab: (e: string) => void;
     close: () => void;
 }
 
@@ -77,7 +76,7 @@ const OpenTabModal = ({openTab, close}: Props) => {
     const handleInputKeyDown = ev => {
         if (ev.key !== "Enter") return;
         if (selectedIdx === null) return;
-        openTab(tableFilter(matches[selectedIdx], 0, 50));
+        openTab(matches[selectedIdx]);
         close();
     }
 

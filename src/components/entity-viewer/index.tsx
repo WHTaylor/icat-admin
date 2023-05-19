@@ -32,7 +32,7 @@ const EntityViewer = ({server, sessionId, visible}: Props) => {
                 .concat([newFilter])
                 .concat(tabFilters.slice(i + 1)));
 
-    const openTab = (f: TableFilter) => {
+    const openTabForFilter = (f: TableFilter) => {
         const numTabs = tabFilters.length;
         setTabFilters(tabFilters.concat([f]));
         setActiveTabIdx(numTabs)
@@ -40,6 +40,9 @@ const EntityViewer = ({server, sessionId, visible}: Props) => {
         // rerenders (or at least, that's what it appears to do).
         setTimeout(() => window.scrollTo({top: 0, left: 0, behavior: "smooth"}), 1);
     };
+
+    const openTab = (entityName: string, where: string | null = null) =>
+        openTabForFilter(tableFilter(entityName, 0, 50, where));
 
     const swapTabs = (a, b) => {
         if (a === b) return;
@@ -70,8 +73,7 @@ const EntityViewer = ({server, sessionId, visible}: Props) => {
         const originIdAttribute = idReferenceFromRelatedEntity(
             originEntity, relatedEntity, oneToMany);
 
-        openTab(tableFilter(
-            relatedEntity, 0, 50, `${originIdAttribute} = ${originId}`));
+        openTab(relatedEntity, `${originIdAttribute} = ${originId}`);
     };
 
     const closeTab = closeIdx => {
@@ -138,7 +140,7 @@ const EntityViewer = ({server, sessionId, visible}: Props) => {
                             <li key={en}>
                                 <button
                                     className="entityButton"
-                                    onClick={() => openTab(tableFilter(en, 0, 50))}>
+                                    onClick={() => openTab(en)}>
                                     {en}
                                 </button>
                             </li>)}

@@ -11,6 +11,11 @@ export type CtxMenuProps = {
     entity: IcatEntity;
     openRelated: OpenRelatedHandler;
 }
+
+/**
+ * ContextMenu is displayed when right clicking an {@link EntityRow}, and
+ * gives options for displaying any entities linked to the selected one
+ */
 const ContextMenu = ({entity, openRelated, x, y}: CtxMenuProps) => {
     // Related entities which are many-one (ie. investigation.datasets)
     const relatedArrayCallbacks = Object.keys(entity)
@@ -41,6 +46,7 @@ const ContextMenu = ({entity, openRelated, x, y}: CtxMenuProps) => {
             </ul>
         </>
         : <h3>No related entities</h3>;
+
     return (
         <div class={style.contextMenu} style={{top: y, left: x}}>
             {content}

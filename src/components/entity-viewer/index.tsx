@@ -18,6 +18,14 @@ type Props = {
     sessionId: string;
     visible: boolean;
 }
+
+/**
+ * EntityViewer is the root component for viewing entity tables. It represents
+ * the main part of the window after logging in to a server.
+ *
+ * Contains components for opening new tables and a tab selector used to switch
+ * between the opened tables.
+ */
 const EntityViewer = ({server, sessionId, visible}: Props) => {
     const [tabFilters, setTabFilters]: [TableFilter[], StateUpdater<TableFilter[]>]
         = useState([]);

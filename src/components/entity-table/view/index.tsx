@@ -22,6 +22,10 @@ type FieldEdit = {
     field: string
 };
 
+/**
+ * Displays ICAT entities (data, deletions, and creations) as a table, with
+ * each row being rendered as an {@link EntityRow}
+ */
 const EntityTableView = ({
                              data, entityType, sortingBy, deletions, creations,
                              openRelated, setSortingBy, saveEntity, modifyDataRow,
@@ -197,7 +201,10 @@ const EntityTableView = ({
                             </div>
                         </th>)}
                 </tr>
-                {creations.concat(data).map((e, i) => buildEntityRow(e, i))}
+                {
+                    // Display a row for each creation, then all existing data
+                    creations.concat(data).map((e, i) => buildEntityRow(e, i))
+                }
             </table>
             {contextMenuProps != null && <ContextMenu {...contextMenuProps} />}
         </>

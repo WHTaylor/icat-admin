@@ -5,11 +5,13 @@ import IcatClient from '../../icat';
 import LoginForm from '../login-form';
 import {Connection} from "../../connectioncache";
 
-/* Handles state for logging in to an ICAT server.
- */
 type Props = {
     createConnection: (login: Connection) => void
 }
+
+/**
+ * Handles state for logging in to an ICAT server entered in a {@link LoginForm}
+ */
 const ServerConnector = ({createConnection}: Props) => {
     const [errMsg, setErrMsg] = useState<string | null>(null);
     const [isLoggingIn, setIsLoggingIn] = useState(false);

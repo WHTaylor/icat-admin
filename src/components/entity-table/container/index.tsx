@@ -19,6 +19,13 @@ type Props = {
     setSortingBy: (field: string, asc: boolean) => void;
     refreshData: () => void;
 }
+
+/**
+ * EntityTable manages the state for a single opened table of entities.
+ *
+ * Contains controls for changing the data, and an {@link EntityTableView} to
+ * display it.
+ */
 const EntityTable = ({
                          server,
                          sessionId,

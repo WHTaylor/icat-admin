@@ -1,10 +1,10 @@
-/* Functionality for interacting with ICAT servers.
+/**
+ * Functionality for interacting with ICAT servers.
  *
  * All queries to ICAT should go through the IcatClient class defined here, and
  * any data concerning ICAT (ie. the names of entities) should be kept in this
  * module.
  */
-
 import {queryWhereFromInput} from './utils';
 
 export type IcatEntityValue = string | number | IcatEntity | IcatEntity[];

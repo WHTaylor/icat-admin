@@ -29,6 +29,11 @@ type Props = {
     editingField: string | null;
     [k: string]: any;
 }
+
+/**
+ * Renders a single entity as a table row, and provides controls for editing
+ * the entity
+ */
 const EntityRow = ({
                        entity, modifications, headers,
                        editingField, relatedEntityDisplayFields, markedForDeletion,

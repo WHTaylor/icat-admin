@@ -13,7 +13,9 @@ type Props = {
     visible: boolean;
 }
 
-/** Displays the list of tabs for open entity tables, and the active table */
+/**
+ * Displays the list of tabs for open {@link EntityTable}s
+ */
 const TabWindow = (props: Props) => {
     const handleMouseDown = (ev, i) => {
         // Only want middle mouse clicks

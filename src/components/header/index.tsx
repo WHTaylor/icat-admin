@@ -16,7 +16,10 @@ type Props = {
     setActiveConnection: (i: number) => void;
     closeConnection: Function;
 }
-/* The header nav bar for the site, with links to active servers and static pages */
+/**
+ * The header nav bar for the site, with links to active connections, and the
+ * static pages
+ */
 const Header = ({connections, activeConnection, setActiveConnection, closeConnection}: Props) => {
     const onClickConnectionLink =
         (ev: MouseEvent, i: number, conn: Connection): void => {

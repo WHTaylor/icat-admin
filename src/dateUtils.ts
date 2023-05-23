@@ -11,11 +11,12 @@ export function parseISODate(s) {
     return dayjs(s, dateFormats, true);
 }
 
-/* Convert date formats to the single format that ICAT allows.
+/**
+ * Convert date formats to the single format that ICAT allows.
  *
  * This allows users to change dates without specifying milliseconds, which are
  * truncated anyway
- * */
+ */
 export function withCorrectedDateFormats(entity) {
     return Object.fromEntries(
         Object.entries(entity)

@@ -79,14 +79,16 @@ const EntityRow = ({
         return () => el.removeEventListener("keydown", cancelOnEsc);
     });
 
+    const isNewRow = entity.id === undefined;
+
     const saveChanges = () => {
         setSaveState(createSaveState({isSaving: true}));
         // If entity.id is undefined, this is a new entity to be created
         // Otherwise we just want to send modifications with the current id
-        const e = withCorrectedDateFormats(entity.id === undefined
+        const e = withCorrectedDateFormats(isNewRow
             ? entity
             : {...modifications, id: entity.id});
-        const successHandle = entity.id === undefined
+        const successHandle = isNewRow
             ? res => syncModifications(res[0])
             : syncModifications;
         saveEntity(e)
@@ -145,11 +147,17 @@ const EntityRow = ({
         startEditing(k);
     };
 
+    const getStyleForField = (k: string): string | undefined => {
+        if (markedForDeletion) return style.markedForDeletion;
+        if (isNewRow) return style.newRow
+        if(modifications && k in modifications) return style.modified;
+    }
+
     return (
         <tr onContextMenu={doOpenContextMenu} class={style.entityRow}>
             <td>
                 <RowActions
-                    isNewRow={entity.id === undefined}
+                    isNewRow={isNewRow}
                     saveState={saveState}
                     isModified={modifications !== undefined}
                     markedForDeletion={markedForDeletion}
@@ -174,9 +182,7 @@ const EntityRow = ({
                     </td>
                     : <td
                         onClick={ev => handleFieldClick(ev, k)}
-                        class={markedForDeletion
-                            ? style.markedForDeletion
-                            : entity.id === undefined && style.newRow}>
+                        class={getStyleForField(k)}>
                         <ReadMore text={getFieldValue(k)}/>
                     </td>
             )}

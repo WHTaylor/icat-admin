@@ -41,3 +41,7 @@ Because this is in a table, height acts like min-height.
 .editInput {
     width: 95%;
 }
+
+.modified {
+    background: lightgreen;
+}

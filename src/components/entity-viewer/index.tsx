@@ -70,7 +70,7 @@ const EntityViewer = ({server, sessionId, visible}: Props) => {
 
     const openRelated = (originEntity: string,
                          attribute: string,
-                         originId: string,
+                         originId: number,
                          oneToMany: boolean) => {
         const relatedEntity = oneToMany
             ? xToManyAttributeToEntityName(originEntity, attribute)

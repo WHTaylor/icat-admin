@@ -6,7 +6,7 @@ import style from './style.css';
 const MAX_UNSUMMARISED_TEXT = 70;
 
 type Props = {
-    text: string | undefined | number | Date;
+    text?: string | number | Date;
 }
 
 /**

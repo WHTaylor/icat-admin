@@ -3,15 +3,17 @@ import {h, Fragment} from "preact";
 
 import style from './style.css';
 
-import EntityRow from '../row';
+import EntityRow, {EntityModification} from '../row';
 import ContextMenu, {CtxMenuProps, OpenRelatedHandler} from '../../context-menu';
 import {defaultHeaderSort, xToOneAttributeToEntityName} from '../../../utils';
-import {IcatEntity, IcatEntityValue} from "../../../icat";
+import {ExistingIcatEntity, IcatEntity, IcatEntityValue, NewIcatEntity} from "../../../icat";
 import JSX = h.JSX;
 
 type Props = {
     openRelated: OpenRelatedHandler;
-    data: IcatEntity[] | null;
+    data: ExistingIcatEntity[] | null;
+    creations: NewIcatEntity[];
+    editCreation: (i: number, k: string, v: IcatEntityValue) => void;
     [k: string]: any;
 }
 
@@ -35,7 +37,8 @@ const EntityTableView = ({
     const [contextMenuProps, setContextMenuProps] =
         useState<CtxMenuProps | null>(null);
     // Locally saved changes to entities
-    const [entityModifications, setEntityModifications] = useState({});
+    const [entityModifications, setEntityModifications] =
+        useState<{[id: number]: EntityModification }>({});
     const [editingNewRow, setEditingNewRow] = useState(false);
     const [fieldBeingEdited, setFieldBeingEdited] =
         useState<FieldEdit | null>(null);
@@ -64,7 +67,7 @@ const EntityTableView = ({
     if (data === null) return <p>Loading...</p>;
     if (data.length === 0) return <p>No entries</p>;
 
-    const editEntity = (id: string, field: string, newValue: IcatEntityValue) => {
+    const editEntity = (id: number, field: string, newValue: string | number | {id: number}) => {
         const cur = entityModifications[id] === undefined
             ? {}
             : entityModifications[id];
@@ -83,8 +86,7 @@ const EntityTableView = ({
         setEntityModifications(newModified);
     };
 
-    const removeModifications = id =>
-        setEntityModifications({...entityModifications, [id]: undefined});
+    const removeModifications = (id: number) => delete entityModifications[id];
 
     const dataAttributes = data
         .flatMap(d => Object.keys(d)
@@ -113,13 +115,14 @@ const EntityTableView = ({
         </select>);
     };
 
-    const buildEntityRow = (e: IcatEntity, i: number): JSX.Element => {
-        const isNewRow = e.id === undefined;
-        const makeEdit = (k, v) => {
+    const buildEntityRow = (e: NewIcatEntity | ExistingIcatEntity, i: number): JSX.Element => {
+        const isNewRow = e?.id === undefined;
+
+        const makeEdit = (k: string, v: string | number) => {
             const fieldIsEntity = xToOneAttributeToEntityName(entityType, k) !== null;
             const newValue = fieldIsEntity
                 // TODO: Validate whether the selected entity exists
-                ? {id: Number.parseInt(v)}
+                ? {id: Number.parseInt(v as string)}
                 : v;
             isNewRow
                 ? editCreation(i, k, newValue)
@@ -166,6 +169,10 @@ const EntityTableView = ({
             markedForDeletion={deletions.has(e.id)}/>;
     };
 
+    // Slightly awkward array combination to make tsc happy
+    const empty: (ExistingIcatEntity | NewIcatEntity)[] = [];
+    const toDisplay = empty.concat(creations).concat(data);
+
     return (
         <>
             <table>
@@ -203,7 +210,7 @@ const EntityTableView = ({
                 </tr>
                 {
                     // Display a row for each creation, then all existing data
-                    creations.concat(data).map((e, i) => buildEntityRow(e, i))
+                    toDisplay.map((e, i) => buildEntityRow(e, i))
                 }
             </table>
             {contextMenuProps != null && <ContextMenu {...contextMenuProps} />}

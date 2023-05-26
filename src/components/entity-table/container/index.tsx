@@ -4,10 +4,11 @@ import {h, Fragment} from "preact";
 import style from './style.css';
 
 import {simplifyIcatErrMessage} from '../../../icatErrorHandling.js';
-import IcatClient, {IcatEntity} from '../../../icat';
+import IcatClient, {ExistingIcatEntity, NewIcatEntity, IcatEntityValue} from '../../../icat';
 import EntityTableView from '../view';
 import {difference, xToOneAttributeToEntityName, randomSuffix, TableFilter} from '../../../utils';
 import {OpenRelatedHandler} from "../../context-menu";
+import {EntityModification} from "../row";
 
 type Props = {
     server: string;
@@ -36,12 +37,12 @@ const EntityTable = ({
                          setSortingBy,
                          refreshData
                      }: Props) => {
-    const [data, setData] = useState<IcatEntity[] | null>(null);
+    const [data, setData] = useState<ExistingIcatEntity[] | null>(null);
     const [errMsg, setErrMsg] = useState(null);
     // Row indexes that are marked to be deleted
     const [rowsToDelete, setRowsToDelete] = useState<Set<number>>(new Set());
     // Objects without ids to be written to ICAT
-    const [rowsToCreate, setRowsToCreate] = useState<any[]>([]);
+    const [rowsToCreate, setRowsToCreate] = useState<NewIcatEntity[]>([]);
     const icatClient = new IcatClient(server, sessionId);
 
     useEffect(() => {
@@ -82,7 +83,7 @@ const EntityTable = ({
     };
     const pageNumber = Math.floor(filter.offset / filter.limit) + 1;
 
-    const changeData = async (i, changes) => {
+    const changeData = async (i: number, changes: EntityModification) => {
         const changed = [...(data || [])];
 
         // For related entity changes, we need to lookup the new entity in ICAT
@@ -119,7 +120,7 @@ const EntityTable = ({
             })
             .then(_ => setRowsToDelete(difference(rowsToDelete, ids)));
 
-    const editCreation = (i, k, v) => {
+    const editCreation = (i: number, k: string, v: IcatEntityValue) => {
         const cur = rowsToCreate[i];
         const modified = {...cur, [k]: v};
         const newToCreate = [...rowsToCreate];

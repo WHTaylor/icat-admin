@@ -7,20 +7,32 @@
  */
 import {queryWhereFromInput} from './utils';
 
-export type IcatEntityValue = string | number | IcatEntity | IcatEntity[];
+export type IcatEntityValue = string | number | ExistingIcatEntity | ExistingIcatEntity[];
+
 export type IcatEntity = {
-    id: string;
     [k: string]: IcatEntityValue;
 }
-export type NewIcatEntity = {
-    [k: string]: IcatEntityValue;
+
+/**
+ * An entity which already exists, and so has an ID assigned to it
+ */
+export type ExistingIcatEntity = IcatEntity & {
+    id: number;
 }
-type IcatResponse = { [k: string]: IcatEntity }[]
+
+/**
+ * An entity which hasn't been created in ICAT yet, so doesn't have an ID
+ */
+export type NewIcatEntity = IcatEntity & {
+    id?: never
+};
+
+type IcatResponse = { [k: string]: ExistingIcatEntity }[]
 
 // Unpack the entries returned from the API, because they are formatted like
 // { 'Investigation': { 'id': 123...}}
 // Assumes all entites are the same type
-function unpack(data: IcatResponse): IcatEntity[] {
+function unpack(data: IcatResponse): ExistingIcatEntity[] {
     if (data.length === 0) return [];
     const first = data[0];
     const dataType = Object.keys(first)[0];
@@ -101,7 +113,7 @@ class IcatClient {
         fetch(this.sessionUrl(this.sessionId).toString(), {method: "PUT"});
     }
 
-    async getEntries(filter, signal): Promise<IcatEntity[]> {
+    async getEntries(filter, signal): Promise<ExistingIcatEntity[]> {
         const query = buildQuery(filter);
         const params = {
             query,

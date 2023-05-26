@@ -1,14 +1,14 @@
 import style from './style.css';
 import {h, Fragment} from "preact";
-import {IcatEntity} from "../../icat";
+import {ExistingIcatEntity} from "../../icat";
 
 export type OpenRelatedHandler =
-    (attribute: string, originId: string, isOneToMany: boolean) => void;
+    (attribute: string, originId: number, isOneToMany: boolean) => void;
 
 export type CtxMenuProps = {
     x: number;
     y: number;
-    entity: IcatEntity;
+    entity: ExistingIcatEntity;
     openRelated: OpenRelatedHandler;
 }
 
@@ -30,7 +30,7 @@ const ContextMenu = ({entity, openRelated, x, y}: CtxMenuProps) => {
         .filter(k => !Array.isArray(entity[k]) && typeof entity[k] === "object")
         .map(k => ({
             relatedEntityType: k,
-            openRelated: () => openRelated(k, (entity[k] as IcatEntity).id, false)
+            openRelated: () => openRelated(k, (entity[k] as ExistingIcatEntity).id, false)
         }));
 
     const items = relatedArrayCallbacks.concat(relatedSingleCallbacks);

@@ -34,7 +34,7 @@ const EntityViewer = ({server, sessionId, visible}: Props) => {
 
     const icatClient = new IcatClient(server, sessionId);
 
-    const handleFilterChange = (i, newFilter) =>
+    const handleFilterChange = (i: number, newFilter: TableFilter) =>
         setTabFilters(
             tabFilters.slice(0, i)
                 .concat([newFilter])
@@ -52,7 +52,7 @@ const EntityViewer = ({server, sessionId, visible}: Props) => {
     const openTab = (entityName: string, where: string | null = null) =>
         openTabForFilter(tableFilter(entityName, 0, 50, where));
 
-    const swapTabs = (a, b) => {
+    const swapTabs = (a: number, b: number) => {
         if (a === b) return;
         else if (a < b) {
             const left = tabFilters.slice(0, a)
@@ -84,7 +84,7 @@ const EntityViewer = ({server, sessionId, visible}: Props) => {
         openTab(relatedEntity, `${originIdAttribute} = ${originId}`);
     };
 
-    const closeTab = closeIdx => {
+    const closeTab = (closeIdx: number) => {
         const numTabs = tabFilters.length;
         setTabFilters(tabFilters.filter((e, i) => i !== closeIdx));
         if (numTabs === 1 || activeTabIdx === null) {
@@ -95,7 +95,7 @@ const EntityViewer = ({server, sessionId, visible}: Props) => {
         }
     };
 
-    const setSortingBy = (i, k, sortAsc) => {
+    const setSortingBy = (i: number, k: string, sortAsc: boolean) => {
         const f = tabFilters[i];
         const newFilter = f.sortField !== k || f.sortAsc !== sortAsc
             ? {...f, sortField: k, sortAsc}
@@ -122,7 +122,7 @@ const EntityViewer = ({server, sessionId, visible}: Props) => {
     useEffect(() => {
         if (!visible) return;
 
-        const readKey = ev => {
+        const readKey = (ev: KeyboardEvent) => {
             if (ev.altKey && ev.shiftKey && ev.key == "O") {
                 setIsOpenTabModalOpen(!isOpenTabModalOpen)
             }

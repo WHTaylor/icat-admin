@@ -69,14 +69,14 @@ const EntityTable = ({
         return retrieveData();
     }, [filter, server, sessionId]); // eslint-disable-line react-hooks/exhaustive-deps
 
-    const changeWhere = w => handleFilterChange({...filter, where: w});
-    const changeLimit = l => handleFilterChange({...filter, limit: l});
-    const changePage = change => {
+    const changeWhere = (w: string) => handleFilterChange({...filter, where: w});
+    const changeLimit = (l: number) => handleFilterChange({...filter, limit: l});
+    const changePage = (change: number) => {
         const newOffset = Math.max(0, filter.offset + (filter.limit * change));
         if (newOffset === filter.offset) return;
         handleFilterChange({...filter, offset: newOffset});
     };
-    const handleSetPage = n => {
+    const handleSetPage = (n: number) => {
         const newOffset = Math.max(0, filter.limit * (n - 1));
         if (newOffset === filter.offset) return;
         handleFilterChange({...filter, offset: newOffset});
@@ -87,11 +87,16 @@ const EntityTable = ({
         const changed = [...(data || [])];
 
         // For related entity changes, we need to lookup the new entity in ICAT
-        const resolve = async (field, value) => {
+        const resolve = async (
+            field: string,
+            value: string | number | { id: number })
+            : Promise<[string, string | number | ExistingIcatEntity]> => {
+
             if (typeof (value) !== "object") return [field, value];
 
             const entityType = xToOneAttributeToEntityName(filter.table, field);
-            return [field, await icatClient.getById(entityType!, value.id)];
+            const entity = await icatClient.getById(entityType!, value.id);
+            return [field, entity];
         }
 
         const toResolve = Promise.all(Object.entries(changes)
@@ -104,21 +109,21 @@ const EntityTable = ({
         });
     };
 
-    const markToDelete = id =>
+    const markToDelete = (id: number) =>
         setRowsToDelete(new Set([...rowsToDelete.add(id)]));
 
-    const cancelDeletion = id => {
+    const cancelDeletion = (id: number) => {
         rowsToDelete.delete(id);
         setRowsToDelete(new Set([...rowsToDelete]));
     }
 
-    const deleteEntities = async ids =>
+    const deleteEntities = async (ids: number[]) =>
         icatClient.deleteEntities(filter.table, ids)
             .then(() => {
                 const newData = (data || []).filter(e => !ids.includes(e.id));
                 setData(newData);
             })
-            .then(_ => setRowsToDelete(difference(rowsToDelete, ids)));
+            .then(_ => setRowsToDelete(difference(rowsToDelete, new Set(ids))));
 
     const editCreation = (i: number, k: string, v: IcatEntityValue) => {
         const cur = rowsToCreate[i];
@@ -128,13 +133,13 @@ const EntityTable = ({
         setRowsToCreate(newToCreate);
     };
 
-    const cancelCreate = i => {
+    const cancelCreate = (i: number) => {
         const newToCreate = [...rowsToCreate];
         newToCreate.splice(i, 1);
         setRowsToCreate(newToCreate);
     };
 
-    const insertCreation = async (i, id) => {
+    const insertCreation = async (i: number, id: number) => {
         const created = await icatClient.getById(filter.table, id);
         const withCreated = [...(data || [])];
         withCreated.unshift(created);
@@ -187,7 +192,7 @@ const EntityTable = ({
                 modifyDataRow={changeData}
                 markToDelete={markToDelete}
                 cancelDeletion={cancelDeletion}
-                doDelete={id => deleteEntities([id])}
+                doDelete={(id: number) => deleteEntities([id])}
                 editCreation={editCreation}
                 cancelCreate={cancelCreate}
                 insertCreation={insertCreation}

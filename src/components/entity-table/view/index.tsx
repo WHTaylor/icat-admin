@@ -14,6 +14,7 @@ type Props = {
     data: ExistingIcatEntity[] | null;
     creations: NewIcatEntity[];
     editCreation: (i: number, k: string, v: IcatEntityValue) => void;
+    saveEntity: (e: NewIcatEntity | ExistingIcatEntity) => Promise<number[]>;
     [k: string]: any;
 }
 
@@ -49,7 +50,7 @@ const EntityTableView = ({
 
     const clearContextMenu = () => setContextMenuProps(null);
 
-    const openContextMenu = (x, y, entity) => {
+    const openContextMenu = (x: number, y: number, entity: ExistingIcatEntity) => {
         setContextMenuProps({x, y, entity, openRelated});
         stopEditing();
     };
@@ -142,6 +143,10 @@ const EntityTableView = ({
                 ? isNewRow && fieldBeingEdited.idx === i
                 : !isNewRow && fieldBeingEdited.idx === e.id);
 
+        const openContextMenuAt = isNewRow
+            ? (_: number, __: number) => {}
+            : (x: number, y: number) => openContextMenu(x, y, e);
+
         return <EntityRow
             key={isNewRow ? "new-" + i : e.id}
             headers={keys}
@@ -152,7 +157,7 @@ const EntityTableView = ({
                     ? fieldBeingEdited.field
                     : null}
             relatedEntityDisplayFields={relatedDisplayFields}
-            openContextMenu={(x, y) => openContextMenu(x, y, e)}
+            openContextMenu={openContextMenuAt}
             startEditing={field => {
                 clearContextMenu();
                 setFieldBeingEdited({idx: isNewRow ? i : e.id, field});

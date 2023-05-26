@@ -5,7 +5,7 @@
  * any data concerning ICAT (ie. the names of entities) should be kept in this
  * module.
  */
-import {queryWhereFromInput} from './utils';
+import {queryWhereFromInput, TableFilter} from './utils';
 
 export type IcatEntityValue = string | number | ExistingIcatEntity | ExistingIcatEntity[];
 
@@ -51,7 +51,7 @@ async function formatError(errResponse: Response): Promise<string> {
         .then(r => `${header}: ${r["message"]}`);
 }
 
-function buildQuery(filter) {
+function buildQuery(filter: TableFilter) {
     const where = queryWhereFromInput(filter.where);
     const limit =
         filter.limit == null
@@ -142,7 +142,7 @@ class IcatClient {
             .then(json => json[0] as number);
     }
 
-    async getById(entityType: string, id: number) {
+    async getById(entityType: string, id: number): Promise<ExistingIcatEntity> {
         const query = `${entityType} e include 1`;
         const params = {
             query,
@@ -168,7 +168,9 @@ class IcatClient {
         this.sessionId = null;
     }
 
-    async writeEntity(entityType, entity) {
+    async writeEntity(
+        entityType: string, entity: ExistingIcatEntity | NewIcatEntity)
+    : Promise<number[]> {
         const form = new FormData();
         form.append('entities', JSON.stringify({[entityType]: entity}));
         form.append('sessionId', this.sessionId || "");

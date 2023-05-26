@@ -37,6 +37,8 @@ type Props = {
     modifications?: EntityModification;
     headers: string[];
     editingField: string | null;
+
+    saveEntity: (e: NewIcatEntity | ExistingIcatEntity) => Promise<number[]>;
     [k: string]: any;
 }
 

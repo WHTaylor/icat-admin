@@ -1,4 +1,5 @@
 import dayjs from "dayjs";
+import {ExistingIcatEntity, NewIcatEntity} from "./icat";
 
 const dateFormats = [
     "YYYY-MM-DDTHH:mm:ss.SSSZ",
@@ -17,7 +18,7 @@ export function parseISODate(s) {
  * This allows users to change dates without specifying milliseconds, which are
  * truncated anyway
  */
-export function withCorrectedDateFormats(entity) {
+export function withCorrectedDateFormats(entity: ExistingIcatEntity | NewIcatEntity) {
     return Object.fromEntries(
         Object.entries(entity)
             .map(([k, v]) => {

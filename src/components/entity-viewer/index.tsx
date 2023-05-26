@@ -87,12 +87,11 @@ const EntityViewer = ({server, sessionId, visible}: Props) => {
     const closeTab = closeIdx => {
         const numTabs = tabFilters.length;
         setTabFilters(tabFilters.filter((e, i) => i !== closeIdx));
-
-        if (activeTabIdx === null) return;
-        if (closeIdx < activeTabIdx) {
-            setActiveTabIdx(activeTabIdx - 1);
-        } else if (numTabs === 1) {
+        if (numTabs === 1 || activeTabIdx === null) {
             setActiveTabIdx(null);
+        } else if (closeIdx <= activeTabIdx) {
+            const newActiveTab = Math.max(activeTabIdx - 1, 0);
+            setActiveTabIdx(newActiveTab);
         }
     };
 

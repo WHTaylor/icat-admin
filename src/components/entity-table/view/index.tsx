@@ -87,7 +87,11 @@ const EntityTableView = ({
         setEntityModifications(newModified);
     };
 
-    const removeModifications = (id: number) => delete entityModifications[id];
+    const removeModifications = (id: number) => {
+        const newModifications = {...entityModifications};
+        delete newModifications[id];
+        setEntityModifications(newModifications);
+    }
 
     const dataAttributes = data
         .flatMap(d => Object.keys(d)

@@ -1,3 +1,15 @@
+.entityRow td {
+    padding: 0.1em 0.25em;
+}
+
+/*
+Used to ensure icons with different height don't cause rows to move around.
+Because this is in a table, height acts like min-height.
+*/
+.entityRow button {
+    height: 2em;
+}
+
 .entityRow:nth-child(even) {
     background-color: var(--color-grey-light);
 }

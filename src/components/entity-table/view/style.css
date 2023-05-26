@@ -33,7 +33,3 @@ table {
 .sortButton.activeSort {
     color: black;
 }
-
-td {
-    padding: 0 0.25em;
-}

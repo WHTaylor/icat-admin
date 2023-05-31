@@ -8,7 +8,7 @@ const dateFormats = [
     "YYYY-MM-DDTHH:mm:ss[Z]",
 ];
 
-export function parseISODate(s) {
+export function parseISODate(s: string) {
     return dayjs(s, dateFormats, true);
 }
 
@@ -22,6 +22,10 @@ export function withCorrectedDateFormats(entity: ExistingIcatEntity | NewIcatEnt
     return Object.fromEntries(
         Object.entries(entity)
             .map(([k, v]) => {
+                if (typeof v === "object" || typeof v === "number") {
+                    return [k, v];
+                }
+
                 const asDate = parseISODate(v);
                 if (asDate.isValid()) {
                     const formatted = asDate.format("YYYY-MM-DDTHH:mm:ss.000Z");

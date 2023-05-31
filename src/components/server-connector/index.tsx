@@ -16,7 +16,11 @@ const ServerConnector = ({createConnection}: Props) => {
     const [errMsg, setErrMsg] = useState<string | null>(null);
     const [isLoggingIn, setIsLoggingIn] = useState(false);
 
-    const doLogin = async (server, plugin, username, password) => {
+    const doLogin = async (
+        server: string,
+        plugin: string,
+        username: string,
+        password: string) => {
         if (server.trim().length === 0) {
             setErrMsg("Server must be specified")
             return;

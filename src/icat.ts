@@ -6,6 +6,7 @@
  * module.
  */
 import {queryWhereFromInput, TableFilter} from './utils';
+import {Connection} from "./connectioncache";
 
 export type IcatEntityValue = string | number | ExistingIcatEntity | ExistingIcatEntity[];
 
@@ -72,8 +73,8 @@ class IcatClient {
         this.sessionId = sessionId;
     }
 
-    sessionUrl(sessionId) {
-        return new URL("icat/session/" + sessionId, this.hostUrl);
+    sessionUrl(sessionId: string): URL {
+        return buildSessionUrl(sessionId, this.hostUrl);
     }
 
     entityUrl(queryParams: { [k: string]: string | number }): URL {
@@ -86,7 +87,10 @@ class IcatClient {
             this.hostUrl);
     }
 
-    async login(plugin, username, password): Promise<string | PromiseRejectionEvent> {
+    async login(
+        plugin: string,
+        username: string,
+        password: string):Promise<string | PromiseRejectionEvent> {
         const creds = {
             plugin,
             credentials: [
@@ -110,10 +114,12 @@ class IcatClient {
     }
 
     async refresh() {
+        if (this.sessionId === null) return;
+
         fetch(this.sessionUrl(this.sessionId).toString(), {method: "PUT"});
     }
 
-    async getEntries(filter, signal): Promise<ExistingIcatEntity[]> {
+    async getEntries(filter: TableFilter, signal: AbortSignal): Promise<ExistingIcatEntity[]> {
         const query = buildQuery(filter);
         const params = {
             query,
@@ -127,7 +133,7 @@ class IcatClient {
             .then(unpack);
     }
 
-    async getCount(filter, signal): Promise<number> {
+    async getCount(filter: TableFilter, signal: AbortSignal): Promise<number> {
         const where = queryWhereFromInput(filter.where);
         const query = `select count(e) from ${filter.table} e ${where}`;
         const params = {
@@ -157,12 +163,9 @@ class IcatClient {
             .then(j => j[entityType]);
     }
 
-    async isValidSession(sessionId) {
-        return fetch(this.sessionUrl(sessionId).toString())
-            .then(res => res.ok);
-    }
-
     async logout() {
+        if (this.sessionId === null) return;
+
         await fetch(this.sessionUrl(this.sessionId).toString(),
             {method: "DELETE"});
         this.sessionId = null;
@@ -198,6 +201,15 @@ class IcatClient {
                 : formatError(res)
                     .then(msg => Promise.reject(msg)));
     }
+}
+
+export async function isValidSession(c: Connection) {
+    return fetch(buildSessionUrl(c.sessionId, c.server).toString())
+        .then(res => res.ok);
+}
+
+function buildSessionUrl(sessionId: string, server: string | URL) {
+    return new URL("icat/session/" + sessionId, server);
 }
 
 export const entityNames = ["Affiliation", "Application", "DataCollection", "DataCollectionDatafile", "DataCollectionDataset", "DataCollectionInvestigation", "DataCollectionParameter", "DataPublication", "DataPublicationDate", "DataPublicationFunding", "DataPublicationType", "DataPublicationUser", "Datafile", "DatafileFormat", "DatafileParameter", "Dataset", "DatasetInstrument", "DatasetParameter", "DatasetTechnique", "DatasetType", "Facility", "FacilityCycle", "FundingReference", "Grouping", "Instrument", "InstrumentScientist", "Investigation", "InvestigationFacilityCycle", "InvestigationFunding", "InvestigationGroup", "InvestigationInstrument", "InvestigationParameter", "InvestigationType", "InvestigationUser", "Job", "Keyword", "ParameterType", "PermissibleStringValue", "PublicStep", "Publication", "RelatedDatafile", "RelatedItem", "Rule", "Sample", "SampleParameter", "SampleType", "Shift", "Study", "StudyInvestigation", "Technique", "User", "UserGroup"]

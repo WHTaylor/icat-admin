@@ -19,6 +19,7 @@ type Props = {
     isOpen: boolean;
     setSortingBy: (field: string, asc: boolean) => void;
     refreshData: () => void;
+    key: number;
 }
 
 /**
@@ -200,7 +201,18 @@ const EntityTable = ({
     </>);
 }
 
-const PaginationControl = ({isActive, pageNumber, handleSetPage, handleLimitChange, handlePageChange}) => {
+type PaginationProps = {
+    isActive: boolean;
+    pageNumber: number;
+    handleSetPage: (n: number) => void;
+    handleLimitChange: (n: number) => void;
+    handlePageChange: (n: number) => void;
+}
+
+const PaginationControl = (
+    {
+        isActive, pageNumber, handleSetPage, handleLimitChange, handlePageChange
+    }: PaginationProps) => {
     const decPage = () => handlePageChange(-1);
     const incPage = () => handlePageChange(1);
 
@@ -216,7 +228,7 @@ const PaginationControl = ({isActive, pageNumber, handleSetPage, handleLimitChan
     };
 
     useEffect(() => {
-        const changePage = ev => {
+        const changePage = (ev: KeyboardEvent) => {
             if (!focusOkForPageChange()) return;
             if (ev.key !== "ArrowLeft" && ev.key !== "ArrowRight") return;
             ev.preventDefault();
@@ -235,7 +247,8 @@ const PaginationControl = ({isActive, pageNumber, handleSetPage, handleLimitChan
             <input type="number"
                    value={pageNumber}
                    class={style.pageInput}
-                   onChange={ev => handleSetPage((ev.target as HTMLInputElement).value)}/>
+                   onChange={ev => handleSetPage(
+                       parseInt((ev.target as HTMLInputElement).value))}/>
             <button onClick={incPage} id={nextId}>Next</button>
             <span>
                 <label for="pageSizeInput">Per page:</label>
@@ -250,7 +263,15 @@ const PaginationControl = ({isActive, pageNumber, handleSetPage, handleLimitChan
     );
 }
 
-const DeleteActions = ({deletions, clearDeletions, doDeletions}) => {
+type DeleteProps = {
+    deletions: Set<number>;
+    clearDeletions: () => void;
+    doDeletions: () => void;
+}
+const DeleteActions = (
+    {
+        deletions, clearDeletions, doDeletions
+    }: DeleteProps) => {
     if (deletions.size === 0) return <></>;
     return (
         <span>
@@ -259,7 +280,15 @@ const DeleteActions = ({deletions, clearDeletions, doDeletions}) => {
         </span>);
 };
 
-const CreateActions = ({creations, addCreation, clearCreations}) => {
+type CreateProps = {
+    creations: NewIcatEntity[];
+    addCreation: () => void;
+    clearCreations: () => void;
+}
+const CreateActions = (
+    {
+        creations, addCreation, clearCreations
+    }: CreateProps) => {
     return (
         <span>
             <button onClick={addCreation}>Add new</button>

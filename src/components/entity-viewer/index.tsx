@@ -17,6 +17,7 @@ type Props = {
     server: string;
     sessionId: string;
     visible: boolean;
+    key: string;
 }
 
 /**

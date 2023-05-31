@@ -2,7 +2,7 @@ import {h, Fragment, FunctionComponent} from 'preact';
 import { useLayoutEffect, useState } from 'preact/hooks';
 import {Router, route, Route} from 'preact-router';
 
-import IcatClient from '../icat';
+import IcatClient, {isValidSession} from '../icat';
 import About from './about';
 import Tips from './tips';
 import Header from './header';
@@ -16,13 +16,13 @@ const App = () => {
         useState<number | null>(null);
 
     const createConnection = (login: Connection) => {
-        saveLogin(login.server, login.username, login.sessionId);
+        saveLogin(login);
         setActiveConnection(connections.length);
         setConnections(connections.concat(login));
         route("/icat");
     };
 
-    const removeConnection = i => {
+    const removeConnection = (i: number) => {
         const numConnections = connections.length;
         const c = connections[i];
 
@@ -51,8 +51,7 @@ const App = () => {
         if (connections.length > 0) return;
         const login = getLastLogin();
         if (login === null) return;
-        const client = new IcatClient(login.server);
-        client.isValidSession(login.sessionId)
+        isValidSession(login)
             .then(res => {if (res) createConnection(login)});
     });
 

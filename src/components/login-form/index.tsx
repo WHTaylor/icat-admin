@@ -1,4 +1,4 @@
-import {h} from "preact";
+import {h, JSX} from "preact";
 import {useState} from "preact/hooks";
 
 import style from './style.css';
@@ -26,7 +26,7 @@ type Props = {
 const LoginForm = ({doLogin, errMsg, isLoggingIn}: Props) => {
     const getInput = (id: string) =>
         document.getElementById(id) as HTMLInputElement;
-    const submit = ev => {
+    const submit = (ev: JSX.TargetedEvent<HTMLFormElement, Event>) => {
         ev.preventDefault();
         doLogin(
             // Server input could be an input or a select, but it always has a value

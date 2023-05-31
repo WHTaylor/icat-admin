@@ -41,14 +41,14 @@ if (typeof window === 'undefined') {
     };
 }
 
-export function saveLogin(server, username, sessionId) {
-    const existing = getConnectionNumber(server, username);
+export function saveLogin(c: Connection) {
+    const existing = getConnectionNumber(c.server, c.username);
     const n = existing === null ? nextFreeConnectionNumber() : existing;
     if (existing === null) {
-        localStorage.setItem(`connection|${n}|server`, server);
-        localStorage.setItem(`connection|${n}|username`, username);
+        localStorage.setItem(`connection|${n}|server`, c.server);
+        localStorage.setItem(`connection|${n}|username`, c.username);
     }
-    localStorage.setItem(`connection|${n}|sessionId`, sessionId);
+    localStorage.setItem(`connection|${n}|sessionId`, c.sessionId);
     localStorage.setItem("lastConnection", n.toString());
 }
 
@@ -65,12 +65,12 @@ function nextFreeConnectionNumber(): number {
     return 1;
 }
 
-export function invalidateLogin(serverName, username) {
+export function invalidateLogin(serverName: string, username: string) {
     const n = getConnectionNumber(serverName, username);
     localStorage.removeItem(`connection|${n}|sessionId`);
 }
 
-function getConnectionNumber(server, username) {
+function getConnectionNumber(server: string, username: string) {
     const matchingNs = connectionEntries()
         .filter(([_, k, v]) =>
             (k == "server" && v == server)

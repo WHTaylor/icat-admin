@@ -150,21 +150,24 @@ export function randomSuffix() {
     return (a + b).slice(0, 8);
 }
 
-export function queryWhereFromInput(whereInput) {
+export function queryWhereFromInput(whereInput: string | null) {
     if (whereInput === null || whereInput === undefined || whereInput.trim() === "")
         return " ";
 
-    // Split into words on spaces and any suffixes consisting or (+
+    // Split into words on spaces and any suffixes consisting of (+
     // ie. ((id > 3) and name like '%S') or name like 'M%'
-    // -> ["((", "id", ">", "3)", "and" "name", ...
+    // becomes ["((", "id", ">", "3)", "or" "name", "like" "'M%'"]
     const words = whereInput.split(/\s+/)
-        .map(w => [w, w.match(/([(]+)(.+)/)])
+        .map<[string, RegExpMatchArray | null]>(w =>
+            [w, w.match(/([(]+)(.+)/)])
+        // Take just the word if the regex didn't match, otherwise take the two
+        // matched groups from the regex, the brackets and following characters
         .flatMap(p => p[1] === null ? [p[0]] : [p[1][1], p[1][2]]);
 
     // The first part of the filter and anything after an "and" or "or" are fields
     // being filtered on, which need to have the entity identifier prepended
     // Treat any words starting with parentheses as whitespace
-    const isFieldIdentifier = i => {
+    const isFieldIdentifier = (i: number) => {
         if (words[i].startsWith("(")) return false;
         const wordsBefore = words.slice(0, i)
             .filter(w => !(w.startsWith("(") || w.startsWith(")")))

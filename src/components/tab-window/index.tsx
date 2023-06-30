@@ -63,7 +63,12 @@ const TabWindow = (props: Props) => {
             {props.entityTables.map(([filter, child], i) =>
                 <div
                     key={filter.key}
-                    class={i === props.activeTabIdx ? "" : "hidden"}>{child}</div>)}
+                    class={"entityTable"
+                        + (i === props.activeTabIdx
+                            ? ""
+                            : " hidden")}>
+                    {child}
+                </div>)}
         </div>
     );
 }

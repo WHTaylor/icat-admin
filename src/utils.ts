@@ -18,7 +18,7 @@ export type TableFilter = {
 /**
  * Return the name of the entity which a one-many attribute points at.
  *
- * Most of the time, this is the singularised and uppercased attribute name
+ * Most of the time this is the singularised, uppercased attribute name.
  *
  * @param originEntity the entity the attribute is on
  * @param attribute the attribute on the entity
@@ -78,11 +78,23 @@ export function xToOneAttributeToEntityName(
     return null;
 }
 
+// List of entity types that have a related DataPublication which use
+// "publication" as the field name.
+// Other entities with related DataPublication(s) use "dataPublication(s)".
+const dataPublicationIsPublication = [
+    "DataPublicationDate", "RelatedItem", "DataPublicationUser"
+]
+
 export function idReferenceFromRelatedEntity(
     origin: string,
     related: string,
     isOneToMany: boolean): string {
     if (origin.endsWith("Type")) return "type.id";
+
+    if (origin == "DataPublication"
+        && dataPublicationIsPublication.includes(related)) {
+        return "publication.id";
+    }
 
     return isOneToMany
         ? `${lowercaseFirst(origin)}.id`

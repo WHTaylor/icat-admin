@@ -3,7 +3,7 @@ import {h, Fragment} from "preact";
 
 import style from './style.css';
 
-import {simplifyIcatErrMessage} from '../../../icatErrorHandling.js';
+import {simplifyIcatErrMessage} from '../../../icatErrorHandling';
 import IcatClient, {ExistingIcatEntity, NewIcatEntity, IcatEntityValue} from '../../../icat';
 import EntityTableView from '../view';
 import {difference, xToOneAttributeToEntityName, randomSuffix, TableFilter} from '../../../utils';
@@ -39,7 +39,7 @@ const EntityTable = ({
                          refreshData
                      }: Props) => {
     const [data, setData] = useState<ExistingIcatEntity[] | null>(null);
-    const [errMsg, setErrMsg] = useState(null);
+    const [errMsg, setErrMsg] = useState<string | null>(null);
     // Row indexes that are marked to be deleted
     const [rowsToDelete, setRowsToDelete] = useState<Set<number>>(new Set());
     // Objects without ids to be written to ICAT

@@ -11,7 +11,7 @@ const handlers = {
     badRequest: m => m[1],
 };
 
-export function simplifyIcatErrMessage(err) {
+export function simplifyIcatErrMessage(err: string): string {
     let message = err;
     let match;
     do {

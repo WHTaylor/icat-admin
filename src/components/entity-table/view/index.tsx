@@ -33,7 +33,7 @@ const EntityTableView = ({
                              data, entityType, sortingBy, deletions, creations,
                              openRelated, setSortingBy, saveEntity, modifyDataRow,
                              markToDelete, cancelDeletion, doDelete,
-                             editCreation, cancelCreate, insertCreation
+                             editCreation, cancelCreation, insertCreation
                          }: Props) => {
     const [contextMenuProps, setContextMenuProps] =
         useState<CtxMenuProps | null>(null);
@@ -139,7 +139,7 @@ const EntityTableView = ({
             : async () => await modifyDataRow(i, entityModifications[e.id])
                 .then(() => removeModifications(e.id));
         const revertChanges = isNewRow
-            ? () => cancelCreate(i)
+            ? () => cancelCreation(i)
             : () => removeModifications(e.id);
         const isRowBeingEdited =
             fieldBeingEdited != null

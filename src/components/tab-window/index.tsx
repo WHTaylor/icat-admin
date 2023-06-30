@@ -9,8 +9,7 @@ type Props = {
     closeTab: (i: number) => void;
     handleChangeTabIdx: (i: number) => void;
     swapTabs: (a: number, b: number) => void;
-    entityTables: [TableFilter, JSX.Element][];
-    visible: boolean;
+    tabFilters: TableFilter[];
 }
 
 /**
@@ -43,34 +42,21 @@ const TabWindow = (props: Props) => {
             .map(r => r.x);
 
     return (
-        <div class="mainContentAndRightColumn">
-            {props.visible && props.entityTables.length > 0 &&
-                <div
-                    class={style.tabSwitcher}
-                    onDragOver={ev => ev.preventDefault()}
-                    onDrop={endDrag}>
-                    {props.entityTables.map(([filter,], i) =>
-                        <button
-                            key={filter.key}
-                            onClick={() => props.handleChangeTabIdx(i)}
-                            onMouseDown={ev => handleMouseDown(ev, i)}
-                            class={`entityButton ${i === props.activeTabIdx ? style.selectedTab : ""}`}
-                            draggable={true}
-                            onDragStart={ev => startDrag(ev, i)}>
-                            {filter.table}
-                        </button>)}
-                </div>}
-            {props.entityTables.map(([filter, child], i) =>
-                <div
+        <div
+            class={style.tabSwitcher}
+            onDragOver={ev => ev.preventDefault()}
+            onDrop={endDrag}>
+            {props.tabFilters.map((filter, i) =>
+                <button
                     key={filter.key}
-                    class={"entityTable"
-                        + (i === props.activeTabIdx
-                            ? ""
-                            : " hidden")}>
-                    {child}
-                </div>)}
-        </div>
-    );
+                    onClick={() => props.handleChangeTabIdx(i)}
+                    onMouseDown={ev => handleMouseDown(ev, i)}
+                    class={`entityButton ${i === props.activeTabIdx ? style.selectedTab : ""}`}
+                    draggable={true}
+                    onDragStart={ev => startDrag(ev, i)}>
+                    {filter.table}
+                </button>)}
+        </div>)
 }
 
 export default TabWindow;

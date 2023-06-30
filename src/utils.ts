@@ -1,9 +1,17 @@
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 
-import {entityNames} from './icat';
+import {entityNames, ExistingIcatEntity, NewIcatEntity} from './icat';
 
 dayjs.extend(customParseFormat);
+
+export type EntityTabData = {
+    filter: TableFilter,
+    data?: ExistingIcatEntity[],
+    errMsg?: string,
+    creations?: NewIcatEntity[],
+    deletions?: Set<number>
+}
 
 export type TableFilter = {
     key: number;
@@ -198,4 +206,8 @@ export function difference<T>(set: Set<T>, other: Set<T>): Set<T> {
         diff.delete(e);
     }
     return diff;
+}
+
+export function insert<T>(a: T[], t: T, i: number): T[] {
+    return a.slice(0, i).concat(t).concat(a.slice(i + 1));
 }

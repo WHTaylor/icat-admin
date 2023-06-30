@@ -1,17 +1,23 @@
-import {StateUpdater, useEffect, useState} from "preact/hooks";
-import {h} from "preact";
+import {useEffect, useState} from "preact/hooks";
+import {h, Fragment} from "preact";
 
-import IcatClient, {entityNames} from '../../icat';
+import IcatClient, {
+    entityNames,
+    ExistingIcatEntity,
+    IcatEntityValue, NewIcatEntity
+} from '../../icat';
 import {
     xToManyAttributeToEntityName, xToOneAttributeToEntityName,
     idReferenceFromRelatedEntity,
     TableFilter,
-    tableFilter
+    tableFilter, EntityTabData, difference, insert
 } from '../../utils';
 import EntityTable from '../entity-table/container';
 import TabWindow from '../tab-window';
 import style from './style.css';
 import OpenTabModal from "../open-tab-modal";
+import {simplifyIcatErrMessage} from "../../icatErrorHandling";
+import {EntityModification} from "../entity-table/row";
 
 type Props = {
     server: string;
@@ -28,26 +34,76 @@ type Props = {
  * between the opened tables.
  */
 const EntityViewer = ({server, sessionId, visible}: Props) => {
-    const [tabFilters, setTabFilters]: [TableFilter[], StateUpdater<TableFilter[]>]
-        = useState([]);
+    const [entityTabData, setEntityTabData] = useState<EntityTabData[]>([]);
     const [activeTabIdx, setActiveTabIdx] = useState<number | null>(null);
     const [isOpenTabModalOpen, setIsOpenTabModalOpen] = useState(false);
 
     const icatClient = new IcatClient(server, sessionId);
 
-    const handleFilterChange = (i: number, newFilter: TableFilter) =>
-        setTabFilters(
-            tabFilters.slice(0, i)
-                .concat([newFilter])
-                .concat(tabFilters.slice(i + 1)));
+    // TODO: Work out if there's a way to make this typesafe
+    function changeTabField<T>(
+        k: string,
+        v: T | ((t: T) => T),
+        idx = activeTabIdx
+    ) {
+
+        if (idx === null) return;
+
+        const currentTab = entityTabData[idx];
+        const newValue = typeof (v) === "function"
+            ? (v as (t: T) => T)(currentTab[k])
+            : v;
+
+        const newObject = {...entityTabData[idx], [k]: newValue};
+        setEntityTabData(insert(entityTabData, newObject, idx));
+    }
+
+    const setFilter = (filter: TableFilter) => {
+        changeTabField("data", undefined);
+        changeTabField("errMsg", undefined);
+        changeTabField("filter", filter);
+    }
+
+    const setData = (idx: number, entities: ExistingIcatEntity[]) => {
+        changeTabField("data", entities, idx);
+    }
+
+    const setErrMsg = (idx: number, msg: string) => {
+        changeTabField("errMsg", msg, idx);
+    }
+
+    useEffect(() => {
+        const controller = new AbortController();
+        const signal = controller.signal;
+        for (let i = 0; i < entityTabData.length; i++) {
+            const tableData = entityTabData[i];
+            if (tableData.data === undefined) {
+                icatClient.getEntries(tableData.filter, signal)
+                    .then(d => setData(i, d))
+                    .catch(err => {
+                        // DOMException gets throws if promise is aborted, which it is
+                        // during cleanup `controller.abort()` when table/filter changes
+                        // before request finishes
+                        if (err instanceof DOMException) return;
+
+                        setErrMsg(i, simplifyIcatErrMessage(err));
+                    });
+            }
+        }
+        return () => controller.abort();
+    }, [entityTabData]);
 
     const openTabForFilter = (f: TableFilter) => {
-        const numTabs = tabFilters.length;
-        setTabFilters(tabFilters.concat([f]));
+        const numTabs = entityTabData.length;
+        setEntityTabData(entityTabData.concat({filter: f}));
         setActiveTabIdx(numTabs)
         // Timeout is used as a small hack to make sure scroll happens after component
         // rerenders (or at least, that's what it appears to do).
-        setTimeout(() => window.scrollTo({top: 0, left: 0, behavior: "smooth"}), 1);
+        setTimeout(() => window.scrollTo({
+            top: 0,
+            left: 0,
+            behavior: "smooth"
+        }), 1);
     };
 
     const openTab = (entityName: string, where: string | null = null) =>
@@ -56,16 +112,16 @@ const EntityViewer = ({server, sessionId, visible}: Props) => {
     const swapTabs = (a: number, b: number) => {
         if (a === b) return;
         else if (a < b) {
-            const left = tabFilters.slice(0, a)
-            const middle = tabFilters.slice(a + 1, b + 1);
-            const right = tabFilters.slice(b + 1);
-            setTabFilters([...left, ...middle, tabFilters[a], ...right]);
+            const left = entityTabData.slice(0, a)
+            const middle = entityTabData.slice(a + 1, b + 1);
+            const right = entityTabData.slice(b + 1);
+            setEntityTabData([...left, ...middle, entityTabData[a], ...right]);
         } else {
-            const rearranged = [...tabFilters];
+            const rearranged = [...entityTabData];
             const temp = rearranged[a];
             rearranged[a] = rearranged[b];
             rearranged[b] = temp;
-            setTabFilters(rearranged);
+            setEntityTabData(rearranged);
         }
     };
 
@@ -86,8 +142,8 @@ const EntityViewer = ({server, sessionId, visible}: Props) => {
     };
 
     const closeTab = (closeIdx: number) => {
-        const numTabs = tabFilters.length;
-        setTabFilters(tabFilters.filter((e, i) => i !== closeIdx));
+        const numTabs = entityTabData.length;
+        setEntityTabData(entityTabData.filter((e, i) => i !== closeIdx));
         if (numTabs === 1 || activeTabIdx === null) {
             setActiveTabIdx(null);
         } else if (closeIdx <= activeTabIdx) {
@@ -96,21 +152,107 @@ const EntityViewer = ({server, sessionId, visible}: Props) => {
         }
     };
 
-    const setSortingBy = (i: number, k: string, sortAsc: boolean) => {
-        const f = tabFilters[i];
+    const setSortingBy = (k: string, sortAsc: boolean) => {
+        if (activeTabIdx === null) return;
+
+        const f = entityTabData[activeTabIdx].filter;
         const newFilter = f.sortField !== k || f.sortAsc !== sortAsc
             ? {...f, sortField: k, sortAsc}
             : f.sortAsc === sortAsc
                 ? {...f, sortField: null}
                 : {...f, sortAsc};
-        handleFilterChange(i, newFilter);
+        setFilter(newFilter);
     };
 
-    const refreshTab = (i: number) => {
-        const f = tabFilters[i];
-        const newFilter = {...f, key: Math.random()};
-        handleFilterChange(i, newFilter);
+    const refreshTab = () => changeTabField<TableFilter>(
+        "filter", f => ({...f, key: Math.random()}));
+
+    const markToDelete = (idx: number) =>
+        changeTabField<Set<number>>("deletions", d => {
+            const newDeletions = d ?? new Set();
+            newDeletions.add(idx);
+            return newDeletions;
+        });
+
+    const cancelDeletions = (idxs: number[]) =>
+        changeTabField<Set<number>>("deletions", d =>
+            difference(d ?? new Set(), new Set(idxs))
+        );
+
+    const clearDeletions = () => changeTabField("deletions", undefined);
+
+    const deleteEntities = () => {
+        if (activeTabIdx === null) return;
+
+        const {filter, deletions} = entityTabData[activeTabIdx];
+        if (deletions === undefined) return;
+        const ids = [...deletions];
+
+        icatClient.deleteEntities(filter.table, ids)
+            .then(() => {
+                changeTabField<ExistingIcatEntity[]>("data", d =>
+                    d.filter(e => !ids.includes(e.id)));
+            })
+            .then(_ => cancelDeletions(ids));
     }
+
+    const addCreation = () => changeTabField<NewIcatEntity[]>("creations", c =>
+        (c ?? []).concat({}));
+
+    const clearCreations = () => changeTabField("creations", undefined);
+
+    const editCreation = (i: number, k: string, v: IcatEntityValue) =>
+        changeTabField<NewIcatEntity[] | undefined>("creations", c => {
+            if (c === undefined) return;
+            const changedCreation = {...c[i], [k]: v}
+            return insert(c, changedCreation, i);
+        })
+
+    const cancelCreation = (i: number) =>
+        changeTabField<NewIcatEntity[] | undefined>("creations", c => {
+            if (c === undefined || c.length == 1) return undefined;
+            return c.slice(0, i).concat(c.slice(i + 1));
+        });
+
+    const insertCreation = async (i: number, id: number) => {
+        if (activeTabIdx === null) return;
+
+        const activeTab = entityTabData[activeTabIdx];
+        const created = await icatClient.getById(activeTab.filter.table, id);
+        const withCreated = activeTab.data ?? [];
+        withCreated.unshift(created);
+        setData(activeTabIdx, withCreated);
+        cancelCreation(i);
+    }
+
+    const changeData = async (i: number, changes: EntityModification) => {
+        if (activeTabIdx === null) return;
+
+        const {data, filter} = entityTabData[activeTabIdx];
+        const changed = [...(data || [])];
+
+        // For related entity changes, we need to lookup the new entity in ICAT
+        const resolve = async (
+            field: string,
+            value: string | number | { id: number })
+            : Promise<[string, string | number | ExistingIcatEntity]> => {
+
+            if (typeof (value) !== "object") return [field, value];
+
+            const entityType = xToOneAttributeToEntityName(filter.table, field);
+            const entity = await icatClient.getById(entityType!, value.id);
+            return [field, entity];
+        }
+
+        const toResolve = Promise.all(Object.entries(changes)
+            .map(([k, v]) => resolve(k, v)));
+
+        await toResolve.then(changes => {
+            const changeObj = Object.fromEntries(changes);
+            changed[i] = {...changed[i], ...changeObj};
+            setData(activeTabIdx, changed);
+        });
+    };
 
     useEffect(() => {
         // Could base this on the icat/properties.lifetimeMinutes, but this is simpler
@@ -134,59 +276,70 @@ const EntityViewer = ({server, sessionId, visible}: Props) => {
 
     return (
         <div class={visible ? "page" : "hidden"}>
-            {
-                /*
-                 TODO: Pull EntityTable (and maybe OpenTabModal) state up so we
-                 don't have to do this
-
-                 We have to always render the OpenTabModal and TabWindow, even
-                 if this component is not visible, because they contain state we
-                 want to keep even when viewing other tabs
-                */
-                visible &&
+            {visible &&
+              <>
                 <div class="leftColumn">
-                    <h2>ICAT tables</h2>
-                    <ul className={style.tableList}>
-                        {entityNames.map(en =>
-                            <li key={en}>
-                                <button
-                                    className="entityButton"
-                                    onClick={() => openTab(en)}>
-                                    {en}
-                                </button>
-                            </li>)}
-                    </ul>
+                  <h2>ICAT tables</h2>
+                  <ul className={style.tableList}>
+                      {entityNames.map(en =>
+                          <li key={en}>
+                              <button
+                                  className="entityButton"
+                                  onClick={() => openTab(en)}>
+                                  {en}
+                              </button>
+                          </li>)}
+                  </ul>
                 </div>
-            }
 
-            {isOpenTabModalOpen &&
-                <OpenTabModal
-                    openTab={openTab}
-                    close={() => setIsOpenTabModalOpen(false)}
-                />
-            }
+                  {entityTabData.length > 0 &&
+                    <div className="mainContentAndRightColumn">
+                      <TabWindow
+                        activeTabIdx={activeTabIdx}
+                        closeTab={closeTab}
+                        handleChangeTabIdx={i => setActiveTabIdx(i)}
+                        swapTabs={swapTabs}
+                        tabFilters={entityTabData.map(ed => ed.filter)}/>
 
-            <TabWindow
-                activeTabIdx={activeTabIdx}
-                closeTab={closeTab}
-                handleChangeTabIdx={i => setActiveTabIdx(i)}
-                swapTabs={swapTabs}
-                visible={visible}
-                entityTables={tabFilters.map((f, i) =>
-                    [
-                        f,
-                        <EntityTable
+                        {activeTabIdx !== null &&
+                          <EntityTable
                             server={server}
                             sessionId={sessionId}
-                            filter={f}
-                            handleFilterChange={f => handleFilterChange(i, f)}
-                            openRelated={(attribute, id, isOneToMany) =>
-                                openRelated(f.table, attribute, id, isOneToMany)}
-                            setSortingBy={(k, sortAsc) => setSortingBy(i, k, sortAsc)}
-                            isOpen={i === activeTabIdx}
-                            refreshData={() => refreshTab(i)}
-                            key={f.key}/>
-                    ])}/>
+                            state={entityTabData[activeTabIdx]}
+                            handleFilterChange={setFilter}
+                            openRelated={(attribute, id, isOneToMay) =>
+                                openRelated(
+                                    entityTabData[activeTabIdx].filter.table,
+                                    attribute,
+                                    id,
+                                    isOneToMay)}
+                            setSortingBy={setSortingBy}
+                            refreshData={refreshTab}
+                            markToDelete={markToDelete}
+                            cancelDeletions={cancelDeletions}
+                            clearDeletions={clearDeletions}
+                            deleteEntities={deleteEntities}
+                            addCreation={addCreation}
+                            editCreation={editCreation}
+                            cancelCreation={cancelCreation}
+                            clearCreations={clearCreations}
+                            insertCreation={insertCreation}
+                            changeData={changeData}
+                          />
+                        }
+                    </div>
+                  }
+              </>
+            }
+
+            {
+                // Even if tab is not visible, have to render this because it
+                // holds state we want to persist when on other top level tab
+                isOpenTabModalOpen && <OpenTabModal
+                openTab={openTab}
+                close={() => setIsOpenTabModalOpen(false)}
+              />
+            }
         </div>
     );
 }

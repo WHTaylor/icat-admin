@@ -6,5 +6,9 @@
 }
 
 .successIndicator {
+    user-select: none;
+}
+
+.helpIndicator {
     cursor: help;
 }

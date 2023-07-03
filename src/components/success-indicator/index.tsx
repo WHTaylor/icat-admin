@@ -39,10 +39,14 @@ const SuccessIndicator = ({saveState, clearTimeoutMs = 2000}: Props) => {
         return () => clearInterval(id);
     }, [timer, saveState, mousePos, clearTimeoutMs]);
 
+    const classes = saveState.failed
+        ? [style.successIndicator, style.helpIndicator]
+        : [style.successIndicator];
+
     return (
         <>
         <span
-            class={style.successIndicator}
+            class={classes.join(" ")}
             onMouseMove={ev => {
                 setMousePos({x: ev.pageX + 10, y: ev.pageY - 10});
             }}
@@ -50,14 +54,14 @@ const SuccessIndicator = ({saveState, clearTimeoutMs = 2000}: Props) => {
             {icon}
         </span>
             {mousePos !== null && saveState.failed &&
-                <div
-                    class={style.messageContainer}
-                    style={{
-                        top: (mousePos as MousePos).y,
-                        left: (mousePos as MousePos).x
-                    }}>
-                    {saveState.message}
-                </div>}
+              <div
+                class={style.messageContainer}
+                style={{
+                    top: (mousePos as MousePos).y,
+                    left: (mousePos as MousePos).x
+                }}>
+                  {saveState.message}
+              </div>}
         </>
     );
 }

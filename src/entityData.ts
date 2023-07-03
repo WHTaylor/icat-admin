@@ -36,7 +36,7 @@ type EntityTabCreateAction = {
 }
 
 type EntityTabCloseAction = {
-    type: "close"
+    type: "close_tab"
     idx: number
 }
 
@@ -125,7 +125,7 @@ export function entityTabReducer(
         case "create":
             return state.concat({filter: action.filter});
 
-        case "close":
+        case "close_tab":
             return state.slice(0, action.idx).concat(state.slice(action.idx + 1));
 
         case "swap":

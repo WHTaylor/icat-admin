@@ -105,13 +105,14 @@ const EntityViewer = ({server, sessionId, visible}: Props) => {
     };
 
     const closeTab = (idx: number) => {
-        dispatch({type: "close", idx: idx})
         if (entityTabs.length === 1 || activeTabIdx === null) {
             setActiveTabIdx(null);
-        } else if (idx <= activeTabIdx) {
-            const newActiveTab = Math.max(activeTabIdx - 1, 0);
-            setActiveTabIdx(newActiveTab);
+        } else if (idx < activeTabIdx) {
+            setActiveTabIdx(activeTabIdx - 1);
+        } else if (activeTabIdx === idx) {
+            setActiveTabIdx(Math.min(activeTabIdx, entityTabs.length - 2));
         }
+        dispatch({type: "close_tab", idx: idx})
     };
 
     const cancelDeletions = (ids: number[]) =>

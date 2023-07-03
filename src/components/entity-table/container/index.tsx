@@ -3,42 +3,32 @@ import {h, Fragment} from "preact";
 
 import style from './style.css';
 
-import IcatClient, {NewIcatEntity, IcatEntityValue} from '../../../icat';
+import IcatClient, {
+    NewIcatEntity,
+    IcatEntityValue,
+} from '../../../icat';
 import EntityTableView from '../view';
-import {
-    randomSuffix,
-    TableFilter,
-    EntityTabData
-} from '../../../utils';
+import {randomSuffix, TableFilter, EntityTabState, range} from '../../../utils';
 import {OpenRelatedHandler} from "../../context-menu";
-import {EntityModification} from "../row";
 
 type Props = {
     server: string;
     sessionId: string;
-    state: EntityTabData;
+    state: EntityTabState;
     handleFilterChange: (filter: TableFilter) => void;
     openRelated: OpenRelatedHandler;
     setSortingBy: (field: string, asc: boolean) => void;
     refreshData: () => void;
     markToDelete: (idx: number) => void;
     cancelDeletions: (idxs: number[]) => void;
-    clearDeletions: () => void;
-    deleteEntities: () => void;
+    deleteEntities: (ids: number[]) => void;
     addCreation: () => void;
     editCreation: (i: number, k: string, v: IcatEntityValue) => void;
-    cancelCreation: (i: number) => void;
-    clearCreations: () => void;
+    cancelCreations: (idxs: number[]) => void;
     insertCreation: (i: number, id: number) => void;
-    changeData: (i: number, changes: EntityModification) => void;
+    reloadEntity: (id: number) => Promise<void>;
 }
 
-/**
- * EntityTable manages the state for a single opened table of entities.
- *
- * Contains controls for changing the data, and an {@link EntityTableView} to
- * display it.
- */
 const EntityTable = (
     {
         server,
@@ -50,14 +40,12 @@ const EntityTable = (
         refreshData,
         markToDelete,
         cancelDeletions,
-        clearDeletions,
         deleteEntities,
         addCreation,
         editCreation,
-        cancelCreation,
-        clearCreations,
+        cancelCreations,
         insertCreation,
-        changeData
+        reloadEntity
     }: Props) => {
     const icatClient = new IcatClient(server, sessionId);
     // TODO: these slightly weird coercions are maintaining compatibility from
@@ -82,6 +70,8 @@ const EntityTable = (
     };
     const pageNumber = Math.floor(filter.offset / filter.limit) + 1;
 
+    const clearDeletions = () => cancelDeletions([...deletions]);
+
     return (<>
         <span class={style.tableTitleBar}>
             <h2>{filter.table}</h2>
@@ -104,11 +94,11 @@ const EntityTable = (
             <CreateActions
                 creations={creations}
                 addCreation={addCreation}
-                clearCreations={clearCreations}/>
+                clearCreations={() => cancelCreations(range(creations.length))}/>
             <DeleteActions
                 deletions={deletions}
                 clearDeletions={clearDeletions}
-                doDeletions={deleteEntities}/>
+                deleteAll={() => deleteEntities([...deletions])}/>
         </span>
 
         {errMsg
@@ -123,12 +113,12 @@ const EntityTable = (
                 setSortingBy={setSortingBy}
                 saveEntity={e =>
                     icatClient.writeEntity(filter.table, e)}
-                modifyDataRow={changeData}
+                reloadEntity={reloadEntity}
                 markToDelete={markToDelete}
-                cancelDeletion={idx => cancelDeletions([idx])}
-                doDeletions={deleteEntities}
+                cancelDeletion={id => cancelDeletions([id])}
+                deleteEntities={deleteEntities}
                 editCreation={editCreation}
-                cancelCreation={cancelCreation}
+                cancelCreation={idx => cancelCreations([idx])}
                 insertCreation={insertCreation}
             />}
     </>);
@@ -190,16 +180,16 @@ const PaginationControl = (
 type DeleteProps = {
     deletions: Set<number>;
     clearDeletions: () => void;
-    doDeletions: () => void;
+    deleteAll: () => void;
 }
 const DeleteActions = (
     {
-        deletions, clearDeletions, doDeletions
+        deletions, clearDeletions, deleteAll
     }: DeleteProps) => {
     if (deletions.size === 0) return <></>;
     return (
         <span>
-            <button onClick={doDeletions}>Delete {deletions.size} rows</button>
+            <button onClick={deleteAll}>Delete {deletions.size} rows</button>
             <button onClick={clearDeletions}>Cancel deletions</button>
         </span>);
 };
@@ -240,7 +230,7 @@ const EntityCounter = ({filter, icatClient}: CounterProps) => {
                     .catch(() => {
                     });
             };
-            getCount();
+            const _ = getCount();
             return () => controller.abort();
         }
 

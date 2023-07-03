@@ -1,23 +1,19 @@
-import {useEffect, useState} from "preact/hooks";
+import {useEffect, useReducer, useState} from "preact/hooks";
 import {h, Fragment} from "preact";
 
-import IcatClient, {
-    entityNames,
-    ExistingIcatEntity,
-    IcatEntityValue, NewIcatEntity
-} from '../../icat';
+import IcatClient, {entityNames,} from '../../icat';
 import {
     xToManyAttributeToEntityName, xToOneAttributeToEntityName,
     idReferenceFromRelatedEntity,
     TableFilter,
-    tableFilter, EntityTabData, difference, withReplaced
+    tableFilter,
 } from '../../utils';
 import EntityTable from '../entity-table/container';
 import TabWindow from '../tab-window';
 import style from './style.css';
 import OpenTabModal from "../open-tab-modal";
 import {simplifyIcatErrMessage} from "../../icatErrorHandling";
-import {EntityModification} from "../entity-table/row";
+import {entityTabReducer} from "../../entityData";
 
 type Props = {
     server: string;
@@ -34,67 +30,43 @@ type Props = {
  * between the opened tables.
  */
 const EntityViewer = ({server, sessionId, visible}: Props) => {
-    const [entityTabData, setEntityTabData] = useState<EntityTabData[]>([]);
+    const [entityTabs, dispatch] = useReducer(entityTabReducer, [])
     const [activeTabIdx, setActiveTabIdx] = useState<number | null>(null);
     const [isOpenTabModalOpen, setIsOpenTabModalOpen] = useState(false);
 
     const icatClient = new IcatClient(server, sessionId);
 
-    // TODO: Work out if there's a way to make this typesafe
-    function changeTabField<T>(
-        k: string,
-        v: T | ((t: T) => T),
-        idx = activeTabIdx) {
-
-        if (idx === null) return;
-
-        const currentTab = entityTabData[idx];
-        const newValue = typeof (v) === "function"
-            ? (v as (t: T) => T)(currentTab[k])
-            : v;
-
-        const newObject = {...entityTabData[idx], [k]: newValue};
-        setEntityTabData(withReplaced(entityTabData, newObject, idx));
-    }
-
-    const setFilter = (filter: TableFilter) => {
-        changeTabField("data", undefined);
-        changeTabField("errMsg", undefined);
-        changeTabField("filter", filter);
-    }
-
-    const setData = (idx: number, entities: ExistingIcatEntity[]) => {
-        changeTabField("data", entities, idx);
-    }
-
-    const setErrMsg = (idx: number, msg: string) => {
-        changeTabField("errMsg", msg, idx);
-    }
-
+    // Fetch data for the first tab which hasn't loaded its data yet
+    // TODO: load everything in parallel without being interrupted by rendering
     useEffect(() => {
         const controller = new AbortController();
         const signal = controller.signal;
-        for (let i = 0; i < entityTabData.length; i++) {
-            const tableData = entityTabData[i];
-            if (tableData.data === undefined) {
+        for (let i = 0; i < entityTabs.length; i++) {
+            const tableData = entityTabs[i];
+            if (tableData.data === undefined && tableData.errMsg === undefined) {
                 icatClient.getEntries(tableData.filter, signal)
-                    .then(d => setData(i, d))
+                    .then(data => dispatch({type: "set_data", data, idx: i}))
                     .catch(err => {
                         // DOMException gets throws if promise is aborted, which it is
                         // during cleanup `controller.abort()` when table/filter changes
                         // before request finishes
                         if (err instanceof DOMException) return;
 
-                        setErrMsg(i, simplifyIcatErrMessage(err));
+                        dispatch({
+                            type: "set_error",
+                            message: simplifyIcatErrMessage(err),
+                            idx: i
+                        })
                     });
+                break;
             }
         }
         return () => controller.abort();
-    }, [entityTabData]);
+    });
 
     const openTabForFilter = (f: TableFilter) => {
-        const numTabs = entityTabData.length;
-        setEntityTabData(entityTabData.concat({filter: f}));
+        const numTabs = entityTabs.length;
+        dispatch({type: "create", filter: f})
         setActiveTabIdx(numTabs)
         // Timeout is used as a small hack to make sure scroll happens after component
         // rerenders (or at least, that's what it appears to do).
@@ -110,18 +82,8 @@ const EntityViewer = ({server, sessionId, visible}: Props) => {
 
     const swapTabs = (a: number, b: number) => {
         if (a === b) return;
-        else if (a < b) {
-            const left = entityTabData.slice(0, a)
-            const middle = entityTabData.slice(a + 1, b + 1);
-            const right = entityTabData.slice(b + 1);
-            setEntityTabData([...left, ...middle, entityTabData[a], ...right]);
-        } else {
-            const rearranged = [...entityTabData];
-            const temp = rearranged[a];
-            rearranged[a] = rearranged[b];
-            rearranged[b] = temp;
-            setEntityTabData(rearranged);
-        }
+        dispatch({type: "swap", a, b});
+
         if (activeTabIdx === a) setActiveTabIdx(b);
         else if (activeTabIdx === b) setActiveTabIdx(a);
     };
@@ -142,117 +104,40 @@ const EntityViewer = ({server, sessionId, visible}: Props) => {
         openTab(relatedEntity, `${originIdAttribute} = ${originId}`);
     };
 
-    const closeTab = (closeIdx: number) => {
-        const numTabs = entityTabData.length;
-        setEntityTabData(entityTabData.filter((e, i) => i !== closeIdx));
-        if (numTabs === 1 || activeTabIdx === null) {
+    const closeTab = (idx: number) => {
+        dispatch({type: "close", idx: idx})
+        if (entityTabs.length === 1 || activeTabIdx === null) {
             setActiveTabIdx(null);
-        } else if (closeIdx <= activeTabIdx) {
+        } else if (idx <= activeTabIdx) {
             const newActiveTab = Math.max(activeTabIdx - 1, 0);
             setActiveTabIdx(newActiveTab);
         }
     };
 
-    const setSortingBy = (k: string, sortAsc: boolean) => {
+    const cancelDeletions = (ids: number[]) =>
+        dispatchEdit("cancel_delete", {ids});
+
+    const deleteEntities = ids => {
         if (activeTabIdx === null) return;
+        const tab = entityTabs[activeTabIdx];
+        if ((tab.deletions ?? new Set()).size === 0) return;
 
-        const f = entityTabData[activeTabIdx].filter;
-        const newFilter = f.sortField !== k || f.sortAsc !== sortAsc
-            ? {...f, sortField: k, sortAsc}
-            : f.sortAsc === sortAsc
-                ? {...f, sortField: null}
-                : {...f, sortAsc};
-        setFilter(newFilter);
-    };
-
-    const refreshTab = () => changeTabField<TableFilter>(
-        "filter", f => ({...f, key: Math.random()}));
-
-    const markToDelete = (idx: number) =>
-        changeTabField<Set<number>>("deletions", d => {
-            const newDeletions = d ?? new Set();
-            newDeletions.add(idx);
-            return newDeletions;
-        });
-
-    const cancelDeletions = (idxs: number[]) =>
-        changeTabField<Set<number>>("deletions", d =>
-            difference(d ?? new Set(), new Set(idxs))
-        );
-
-    const clearDeletions = () => changeTabField("deletions", undefined);
-
-    const deleteEntities = () => {
-        if (activeTabIdx === null) return;
-
-        const {filter, deletions} = entityTabData[activeTabIdx];
-        if (deletions === undefined) return;
-        const ids = [...deletions];
-
-        icatClient.deleteEntities(filter.table, ids)
-            .then(() => {
-                changeTabField<ExistingIcatEntity[]>("data", d =>
-                    d.filter(e => !ids.includes(e.id)));
-            })
-            .then(_ => cancelDeletions(ids));
+        icatClient.deleteEntities(tab.filter.table, ids)
+            .then(() => dispatchEdit("sync_delete", {ids}));
     }
-
-    const addCreation = () => changeTabField<NewIcatEntity[]>("creations", c =>
-        (c ?? []).concat({}));
-
-    const clearCreations = () => changeTabField("creations", undefined);
-
-    const editCreation = (i: number, k: string, v: IcatEntityValue) =>
-        changeTabField<NewIcatEntity[] | undefined>("creations", c => {
-            if (c === undefined) return;
-            const changedCreation = {...c[i], [k]: v}
-            return withReplaced(c, changedCreation, i);
-        })
-
-    const cancelCreation = (i: number) =>
-        changeTabField<NewIcatEntity[] | undefined>("creations", c => {
-            if (c === undefined || c.length == 1) return undefined;
-            return c.slice(0, i).concat(c.slice(i + 1));
-        });
-
     const insertCreation = async (i: number, id: number) => {
         if (activeTabIdx === null) return;
 
-        const activeTab = entityTabData[activeTabIdx];
-        const created = await icatClient.getById(activeTab.filter.table, id);
-        const withCreated = activeTab.data ?? [];
-        withCreated.unshift(created);
-        setData(activeTabIdx, withCreated);
-        cancelCreation(i);
+        const activeTab = entityTabs[activeTabIdx];
+        const entity = await icatClient.getById(activeTab.filter.table, id);
+        dispatchEdit("sync_creation", {i, entity});
     }
 
-    const changeData = async (i: number, changes: EntityModification) => {
+    const reloadEntity = async (id: number) => {
         if (activeTabIdx === null) return;
-
-        const {data, filter} = entityTabData[activeTabIdx];
-        const changed = [...(data || [])];
-
-        // For related entity changes, we need to lookup the new entity in ICAT
-        const resolve = async (
-            field: string,
-            value: string | number | { id: number })
-            : Promise<[string, string | number | ExistingIcatEntity]> => {
-
-            if (typeof (value) !== "object") return [field, value];
-
-            const entityType = xToOneAttributeToEntityName(filter.table, field);
-            const entity = await icatClient.getById(entityType!, value.id);
-            return [field, entity];
-        }
-
-        const toResolve = Promise.all(Object.entries(changes)
-            .map(([k, v]) => resolve(k, v)));
-
-        await toResolve.then(changes => {
-            const changeObj = Object.fromEntries(changes);
-            changed[i] = {...changed[i], ...changeObj};
-            setData(activeTabIdx, changed);
-        });
+        const entity = await icatClient.getById(
+            entityTabs[activeTabIdx].filter.table, id);
+        dispatchEdit("sync_modification", {entity});
     };
 
     useEffect(() => {
@@ -275,6 +160,15 @@ const EntityViewer = ({server, sessionId, visible}: Props) => {
         return () => document.removeEventListener("keydown", readKey);
     }, [visible, isOpenTabModalOpen])
 
+    function dispatchEdit(type, args = {}) {
+        if (activeTabIdx === null) return;
+        dispatch({
+            type,
+            idx: activeTabIdx,
+            ...args
+        });
+    }
+
     return (
         <div class={visible ? "page" : "hidden"}>
             {visible &&
@@ -293,41 +187,43 @@ const EntityViewer = ({server, sessionId, visible}: Props) => {
                   </ul>
                 </div>
 
-                  {entityTabData.length > 0 &&
+                  {entityTabs.length > 0 &&
                     <div className="mainContentAndRightColumn">
                       <TabWindow
                         activeTabIdx={activeTabIdx}
                         closeTab={closeTab}
                         handleChangeTabIdx={i => setActiveTabIdx(i)}
                         swapTabs={swapTabs}
-                        tabFilters={entityTabData.map(ed => ed.filter)}/>
+                        tabFilters={entityTabs.map(ed => ed.filter)}/>
 
-                    {activeTabIdx !== null &&
-                      <EntityTable
-                        server={server}
-                        sessionId={sessionId}
-                        state={entityTabData[activeTabIdx]}
-                        handleFilterChange={setFilter}
-                        openRelated={(attribute, id, isOneToMay) =>
-                            openRelated(
-                                entityTabData[activeTabIdx].filter.table,
-                                attribute,
-                                id,
-                                isOneToMay)}
-                        setSortingBy={setSortingBy}
-                        refreshData={refreshTab}
-                        markToDelete={markToDelete}
-                        cancelDeletions={cancelDeletions}
-                        clearDeletions={clearDeletions}
-                        deleteEntities={deleteEntities}
-                        addCreation={addCreation}
-                        editCreation={editCreation}
-                        cancelCreation={cancelCreation}
-                        clearCreations={clearCreations}
-                        insertCreation={insertCreation}
-                        changeData={changeData}
-                      />
-                    }
+                        {activeTabIdx !== null &&
+                          <EntityTable
+                            server={server}
+                            sessionId={sessionId}
+                            state={entityTabs[activeTabIdx]}
+                            openRelated={(attribute, id, isOneToMay) =>
+                                openRelated(
+                                    entityTabs[activeTabIdx].filter.table,
+                                    attribute,
+                                    id,
+                                    isOneToMay)}
+                            handleFilterChange={filter =>
+                                dispatchEdit("edit_filter", {filter})}
+                            setSortingBy={(field, asc) =>
+                                dispatchEdit("sort", {field, asc})}
+                            refreshData={() => dispatchEdit("refresh")}
+                            markToDelete={id => dispatchEdit("mark_delete", {id})}
+                            cancelDeletions={cancelDeletions}
+                            deleteEntities={deleteEntities}
+                            addCreation={() => dispatchEdit("add_creation")}
+                            editCreation={(i, k, v) =>
+                                dispatchEdit("edit_creation", {i, k, v})}
+                            cancelCreations={
+                                idxs => dispatchEdit("cancel_creations", {idxs})}
+                            insertCreation={insertCreation}
+                            reloadEntity={reloadEntity}
+                          />
+                        }
                     </div>
                   }
               </>

@@ -40,11 +40,12 @@ describe('Data publication links work', () => {
           cy.get('[class*="entityRow"]').first().trigger('contextmenu', {force: true})
             .get('li[class*="contextMenuRow"]')
             .eq(i).click({force: true});
-          cy.get('[class*="tabSwitcher"] button').last().trigger('mousedown')
+          cy.get('[class*="tabSwitcher"]')
+            .children()
+            .should('have.length', 2)
+            .last().trigger('mousedown')
             .then(_ => {
-              cy.get('.entityTable')
-                .children()
-                .should('have.length', 3)
+              cy.get('.mainContentAndRightColumn')
                 .should('not.include.text', 'Loading')
                 .last()
                 .should('not.include.text', 'xception');

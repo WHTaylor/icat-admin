@@ -13,8 +13,11 @@ type Props = {
     openRelated: OpenRelatedHandler;
     data: ExistingIcatEntity[] | null;
     creations: NewIcatEntity[];
+    deleteEntities: (ids: number[]) => void;
     editCreation: (i: number, k: string, v: IcatEntityValue) => void;
     saveEntity: (e: NewIcatEntity | ExistingIcatEntity) => Promise<number[]>;
+    cancelCreation: (number) => void
+    reloadEntity: (id: number) => Promise<void>
     [k: string]: any;
 }
 
@@ -31,8 +34,8 @@ type FieldEdit = {
  */
 const EntityTableView = ({
                              data, entityType, sortingBy, deletions, creations,
-                             openRelated, setSortingBy, saveEntity, modifyDataRow,
-                             markToDelete, cancelDeletion, doDelete,
+                             openRelated, setSortingBy, saveEntity, reloadEntity,
+                             markToDelete, cancelDeletion, deleteEntities,
                              editCreation, cancelCreation, insertCreation
                          }: Props) => {
     const [contextMenuProps, setContextMenuProps] =
@@ -136,7 +139,7 @@ const EntityTableView = ({
         }
         const syncModifications = isNewRow
             ? async id => await insertCreation(i, id)
-            : async () => await modifyDataRow(i, entityModifications[e.id])
+            : async () => await reloadEntity(e.id)
                 .then(() => removeModifications(e.id));
         const revertChanges = isNewRow
             ? () => cancelCreation(i)
@@ -174,7 +177,7 @@ const EntityTableView = ({
             syncModifications={syncModifications}
             markToDelete={() => markToDelete(e.id)}
             cancelDeletion={() => cancelDeletion(e.id)}
-            doDelete={() => doDelete(e.id)}
+            doDelete={() => deleteEntities([(e as ExistingIcatEntity).id])}
             markedForDeletion={deletions.has(e.id)}/>;
     };
 

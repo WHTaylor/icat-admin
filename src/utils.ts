@@ -5,7 +5,7 @@ import {entityNames, ExistingIcatEntity, NewIcatEntity} from './icat';
 
 dayjs.extend(customParseFormat);
 
-export type EntityTabData = {
+export type EntityTabState = {
     filter: TableFilter,
     data?: ExistingIcatEntity[],
     errMsg?: string,
@@ -200,7 +200,7 @@ export function queryWhereFromInput(whereInput: string | null) {
     return ` where ${withEntityIdentifier}`;
 }
 
-export function difference<T>(set: Set<T>, other: Set<T>): Set<T> {
+export function difference<T>(set: Set<T>, other: Iterable<T>): Set<T> {
     let diff = new Set(set);
     for (let e of other) {
         diff.delete(e);
@@ -210,4 +210,22 @@ export function difference<T>(set: Set<T>, other: Set<T>): Set<T> {
 
 export function withReplaced<T>(a: T[], t: T, i: number): T[] {
     return a.slice(0, i).concat(t).concat(a.slice(i + 1));
+}
+
+/**
+ * Generate an array of contiguous integers, like a basic version of python's
+ * range function.
+ *
+ * @param a Exclusive top of the range if only argument, or the bottom of the
+ * range if b is also specified.
+ * @param b Exclusive top of the range if specified
+ */
+export function range(a: number, b: number | null = null): number[] {
+    const bot = b === null
+        ? 0
+        : a;
+    const top = b === null
+        ? a
+        : b;
+    return [...Array(top - bot).keys()].map(n => n + bot);
 }

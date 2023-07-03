@@ -42,7 +42,7 @@ describe('Data publication links work', () => {
             .eq(i).click({force: true});
           cy.get('[class*="tabSwitcher"] button').last().trigger('mousedown')
             .then(_ => {
-              cy.get('.entityTable:not(.hidden)')
+              cy.get('.entityTable')
                 .children()
                 .should('have.length', 3)
                 .should('not.include.text', 'Loading')

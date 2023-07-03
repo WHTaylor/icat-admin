@@ -1,6 +1,6 @@
 import {entityNames} from '../../icat';
 
-import {StateUpdater, useEffect, useRef, useState} from "preact/hooks";
+import {useEffect, useRef, useState} from "preact/hooks";
 import style from './style.css';
 import {h} from "preact";
 
@@ -11,12 +11,9 @@ type Props = {
     close: () => void;
 }
 
-type OptIdx = number | null;
-
 const OpenTabModal = ({openTab, close}: Props) => {
-    const [matches, setMatches]: [string[], StateUpdater<string[]>] = useState([]);
-    const [selectedIdx, setSelectedIdx]: [OptIdx, StateUpdater<OptIdx>] =
-        useState(null);
+    const [matches, setMatches] = useState<string[]>([]);
+    const [selectedIdx, setSelectedIdx] = useState<number | null>(null);
 
     const inputEl = useRef<HTMLInputElement>(null)
 

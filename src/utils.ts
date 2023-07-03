@@ -208,6 +208,6 @@ export function difference<T>(set: Set<T>, other: Set<T>): Set<T> {
     return diff;
 }
 
-export function insert<T>(a: T[], t: T, i: number): T[] {
+export function withReplaced<T>(a: T[], t: T, i: number): T[] {
     return a.slice(0, i).concat(t).concat(a.slice(i + 1));
 }

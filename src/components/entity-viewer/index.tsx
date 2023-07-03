@@ -10,7 +10,7 @@ import {
     xToManyAttributeToEntityName, xToOneAttributeToEntityName,
     idReferenceFromRelatedEntity,
     TableFilter,
-    tableFilter, EntityTabData, difference, insert
+    tableFilter, EntityTabData, difference, withReplaced
 } from '../../utils';
 import EntityTable from '../entity-table/container';
 import TabWindow from '../tab-window';
@@ -44,8 +44,7 @@ const EntityViewer = ({server, sessionId, visible}: Props) => {
     function changeTabField<T>(
         k: string,
         v: T | ((t: T) => T),
-        idx = activeTabIdx
-    ) {
+        idx = activeTabIdx) {
 
         if (idx === null) return;
 
@@ -55,7 +54,7 @@ const EntityViewer = ({server, sessionId, visible}: Props) => {
             : v;
 
         const newObject = {...entityTabData[idx], [k]: newValue};
-        setEntityTabData(insert(entityTabData, newObject, idx));
+        setEntityTabData(withReplaced(entityTabData, newObject, idx));
     }
 
     const setFilter = (filter: TableFilter) => {
@@ -123,6 +122,8 @@ const EntityViewer = ({server, sessionId, visible}: Props) => {
             rearranged[b] = temp;
             setEntityTabData(rearranged);
         }
+        if (activeTabIdx === a) setActiveTabIdx(b);
+        else if (activeTabIdx === b) setActiveTabIdx(a);
     };
 
     const openRelated = (originEntity: string,
@@ -205,7 +206,7 @@ const EntityViewer = ({server, sessionId, visible}: Props) => {
         changeTabField<NewIcatEntity[] | undefined>("creations", c => {
             if (c === undefined) return;
             const changedCreation = {...c[i], [k]: v}
-            return insert(c, changedCreation, i);
+            return withReplaced(c, changedCreation, i);
         })
 
     const cancelCreation = (i: number) =>
@@ -301,41 +302,41 @@ const EntityViewer = ({server, sessionId, visible}: Props) => {
                         swapTabs={swapTabs}
                         tabFilters={entityTabData.map(ed => ed.filter)}/>
 
-                        {activeTabIdx !== null &&
-                          <EntityTable
-                            server={server}
-                            sessionId={sessionId}
-                            state={entityTabData[activeTabIdx]}
-                            handleFilterChange={setFilter}
-                            openRelated={(attribute, id, isOneToMay) =>
-                                openRelated(
-                                    entityTabData[activeTabIdx].filter.table,
-                                    attribute,
-                                    id,
-                                    isOneToMay)}
-                            setSortingBy={setSortingBy}
-                            refreshData={refreshTab}
-                            markToDelete={markToDelete}
-                            cancelDeletions={cancelDeletions}
-                            clearDeletions={clearDeletions}
-                            deleteEntities={deleteEntities}
-                            addCreation={addCreation}
-                            editCreation={editCreation}
-                            cancelCreation={cancelCreation}
-                            clearCreations={clearCreations}
-                            insertCreation={insertCreation}
-                            changeData={changeData}
-                          />
-                        }
+                    {activeTabIdx !== null &&
+                      <EntityTable
+                        server={server}
+                        sessionId={sessionId}
+                        state={entityTabData[activeTabIdx]}
+                        handleFilterChange={setFilter}
+                        openRelated={(attribute, id, isOneToMay) =>
+                            openRelated(
+                                entityTabData[activeTabIdx].filter.table,
+                                attribute,
+                                id,
+                                isOneToMay)}
+                        setSortingBy={setSortingBy}
+                        refreshData={refreshTab}
+                        markToDelete={markToDelete}
+                        cancelDeletions={cancelDeletions}
+                        clearDeletions={clearDeletions}
+                        deleteEntities={deleteEntities}
+                        addCreation={addCreation}
+                        editCreation={editCreation}
+                        cancelCreation={cancelCreation}
+                        clearCreations={clearCreations}
+                        insertCreation={insertCreation}
+                        changeData={changeData}
+                      />
+                    }
                     </div>
                   }
               </>
             }
 
-            {
-                // Even if tab is not visible, have to render this because it
-                // holds state we want to persist when on other top level tab
-                isOpenTabModalOpen && <OpenTabModal
+            {isOpenTabModalOpen &&
+              // Even if tab is not visible, have to render this because it
+              // holds state we want to persist when on other top level tab
+              <OpenTabModal
                 openTab={openTab}
                 close={() => setIsOpenTabModalOpen(false)}
               />

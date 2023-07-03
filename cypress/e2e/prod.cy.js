@@ -36,10 +36,9 @@ describe('Read more works', () => {
   })
 })
 
-// We don't test opening _all_ tables, because around the 80% mark they get quite slow
 describe('Can open many tables at once', () => {
-  it('passes', () => {
-    const buttons = cy.get('.leftColumn ul li:nth-child(odd) button');
+  it.only('passes', () => {
+    const buttons = cy.get('.leftColumn ul li button');
     buttons.should('have.length.greaterThan', 0);
     const numButtons = buttons.click({multiple: true})
       .then($b => {

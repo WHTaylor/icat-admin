@@ -33,7 +33,7 @@ const TabWindow = (props: Props) => {
             .filter(x => x < ev.clientX)
             .length;
         const i = Number.parseInt(ev.dataTransfer.getData("index"));
-        props.swapTabs(i, numTabsToLeft - 1);
+        props.swapTabs(i, Math.max(numTabsToLeft - 1, 0));
     }
 
     const getTabXs = () =>

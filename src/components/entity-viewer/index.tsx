@@ -195,7 +195,7 @@ const EntityViewer = ({server, sessionId, visible}: Props) => {
                         closeTab={closeTab}
                         handleChangeTabIdx={i => setActiveTabIdx(i)}
                         swapTabs={swapTabs}
-                        tabFilters={entityTabs.map(ed => ed.filter)}/>
+                        tabFilters={entityTabs.map(tab => tab.filter)}/>
 
                         {activeTabIdx !== null &&
                           <EntityTable

@@ -142,9 +142,16 @@ const PaginationControl = (
     const prevId = `previousPageBtn_${suffix}`;
     const nextId = `nextPageBtn_${suffix}`;
 
+    const focusOkForPageChange = () =>
+        document.activeElement === document.body
+        || document.activeElement === document.getElementById(prevId)
+        || document.activeElement === document.getElementById(nextId);
+
     useEffect(() => {
         const changePage = (ev: KeyboardEvent) => {
             if (ev.key !== "ArrowLeft" && ev.key !== "ArrowRight") return;
+            if (!focusOkForPageChange()) return;
+
             ev.preventDefault();
             if (ev.key === "ArrowLeft") document.getElementById(prevId)!.click();
             else document.getElementById(nextId)!.click();

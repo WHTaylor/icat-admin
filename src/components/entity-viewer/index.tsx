@@ -13,7 +13,7 @@ import TabWindow from '../tab-window';
 import style from './style.css';
 import OpenTabModal from "../open-tab-modal";
 import {simplifyIcatErrMessage} from "../../icatErrorHandling";
-import {entityTabReducer} from "../../entityData";
+import {entityTabReducer} from "../../entityState";
 
 type Props = {
     server: string;

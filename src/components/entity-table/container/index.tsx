@@ -11,6 +11,7 @@ import EntityTableView from '../view';
 import {randomSuffix, TableFilter, EntityTabState, range} from '../../../utils';
 import {OpenRelatedHandler} from "../../context-menu";
 import {useQuery} from "@tanstack/react-query";
+import OnChangeInput from "../../generic/on-change-input";
 
 type Props = {
     server: string;
@@ -76,7 +77,7 @@ const EntityTable = (
     return (<>
         <span class={style.tableTitleBar}>
             <h2>{filter.table}</h2>
-            <input
+            <OnChangeInput
                 type="text"
                 class={style.filterInput}
                 value={filter.where || ""}

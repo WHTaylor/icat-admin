@@ -8,6 +8,7 @@ import ReadMore from '../../generic/read-more';
 import SuccessIndicator from '../../success-indicator';
 import {ExistingIcatEntity, NewIcatEntity, IcatEntityValue} from "../../../icat";
 import {parseISODate, withCorrectedDateFormats} from "../../../dateUtils";
+import OnChangeInput from "../../generic/on-change-input";
 
 function formatCellContent(cellContent: IcatEntityValue | undefined | null) : string {
     if (cellContent === undefined || cellContent === null) return "";
@@ -171,13 +172,10 @@ const EntityRow = ({
             {headers.map(k =>
                 k === editingField
                     ? <td>
-                        <input type="text"
+                        <OnChangeInput type="text"
                                ref={inputEl}
                                value={getInitialEditValue(k)}
                                class={style.editInput}
-                            // Stop propagation to avoid stop editing event bound to
-                            // document.onClick
-                               onClick={ev => ev.stopPropagation()}
                                onChange={ev => makeEdit(editingField, (ev.target as HTMLInputElement).value)}/>
                     </td>
                     : <td

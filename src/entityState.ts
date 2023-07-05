@@ -2,9 +2,9 @@
  * Types and functions for the reducer which manages the main app state
  */
 import {difference, EntityTabState, TableFilter, withReplaced} from "./utils";
-import {ExistingIcatEntity, IcatEntityValue} from "./icat";
+import {ExistingIcatEntity, IcatEntity, IcatEntityValue} from "./icat";
 
-type EntityStateAction =
+export type EntityStateAction =
     EntityTabAction |
     EntityTabEditAction
 
@@ -28,6 +28,8 @@ export type EntityTabEditAction =
     EntityCancelCreationsAction |
     EntityEditCreationAction |
     EntitySyncCreationAction |
+    EntityModifyAction |
+    EntityCancelModificationsAction |
     EntitySyncModificationAction
 
 type EntityTabCreateAction = {
@@ -110,6 +112,18 @@ type EntitySyncCreationAction = EditAction & {
     type: "sync_creation"
     i: number
     entity: ExistingIcatEntity
+}
+
+type EntityModifyAction = EditAction & {
+    type: "edit_entity"
+    id: number
+    k: string
+    v: string | number | { id: number }
+}
+
+type EntityCancelModificationsAction = EditAction & {
+    type: "cancel_modifications"
+    id: number
 }
 
 type EntitySyncModificationAction = EditAction & {
@@ -228,14 +242,53 @@ function makeEditFunction(
             }
         }
 
+        case "edit_entity": {
+            return (ets: EntityTabState) => {
+                const entityModifications = (ets.modifications ?? {})[action.id] ?? {};
+                const originalValue = ets.data!.find(e => e.id === action.id)![action.k];
+                const edited = {
+                    ...entityModifications,
+                    [action.k]: action.v
+                };
+
+                // If we've modified the value back to the original, remove the modification
+                if (action.v === originalValue
+                    || (typeof originalValue === "object" && !Array.isArray(originalValue))
+                    && originalValue.id === (action.v as IcatEntity).id) {
+                    delete edited[action.k];
+                }
+
+                // If all values have been reverted back to the originals, remove modifications
+                const modifications = {
+                    ...(ets.modifications ?? {}),
+                    [action.id]: edited
+                }
+
+                if (Object.keys(edited).length === 0) {
+                    delete modifications[action.id];
+                }
+                return {...ets, modifications};
+            };
+        }
+
+        case "cancel_modifications":
+            return ets => cancelModifications(ets, action.id);
+
         case "sync_modification":
-            return ets => ({
+            return ets => cancelModifications({
                 ...ets,
                 data: ets.data?.map(e => e.id === action.entity.id
                     ? action.entity
                     : e)
-            });
+            }, action.entity.id);
     }
+}
+
+function cancelModifications(ets: EntityTabState, id: number): EntityTabState {
+    if (ets.modifications === undefined) return ets;
+    const modifications = {...ets.modifications};
+    delete modifications[id];
+    return {...ets, modifications};
 }
 
 function cancelCreations(ets: EntityTabState, idxs: number[]): EntityTabState {

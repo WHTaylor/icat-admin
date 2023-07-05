@@ -29,6 +29,8 @@ type Props = {
     cancelCreations: (idxs: number[]) => void;
     insertCreation: (i: number, id: number) => void;
     reloadEntity: (id: number) => Promise<void>;
+    editEntity: (id: number, k: string, v: string | number | {id: number}) => void;
+    cancelModifications: (id: number) => void;
 }
 
 const EntityTable = (
@@ -47,7 +49,9 @@ const EntityTable = (
         editCreation,
         cancelCreations,
         insertCreation,
-        reloadEntity
+        reloadEntity,
+        editEntity,
+        cancelModifications
     }: Props) => {
     const icatClient = new IcatClient(server, sessionId);
     // TODO: these slightly weird coercions are maintaining compatibility from
@@ -107,11 +111,12 @@ const EntityTable = (
             ? <p>{errMsg}</p>
             : <EntityTableView
                 data={data}
-                entityType={filter.table}
-                sortingBy={{field: filter.sortField, asc: filter.sortAsc}}
                 deletions={deletions}
                 creations={creations}
+                modifications={state.modifications ?? {}}
                 openRelated={openRelated}
+                entityType={filter.table}
+                sortingBy={{field: filter.sortField, asc: filter.sortAsc}}
                 setSortingBy={setSortingBy}
                 saveEntity={e =>
                     icatClient.writeEntity(filter.table, e)}
@@ -122,6 +127,8 @@ const EntityTable = (
                 editCreation={editCreation}
                 cancelCreation={idx => cancelCreations([idx])}
                 insertCreation={insertCreation}
+                editEntity={editEntity}
+                cancelModifications={cancelModifications}
             />}
     </>);
 }

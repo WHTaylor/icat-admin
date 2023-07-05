@@ -223,6 +223,10 @@ const EntityViewer = ({server, sessionId, visible}: Props) => {
                                 idxs => dispatchEdit("cancel_creations", {idxs})}
                             insertCreation={insertCreation}
                             reloadEntity={reloadEntity}
+                            editEntity={(id, k, v) =>
+                                dispatchEdit("edit_entity", {id, k, v})}
+                            cancelModifications={id =>
+                                dispatchEdit("cancel_modifications", {id})}
                           />
                         }
                     </div>

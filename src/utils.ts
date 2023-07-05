@@ -2,6 +2,7 @@ import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 
 import {entityNames, ExistingIcatEntity, NewIcatEntity} from './icat';
+import {EntityModification} from "./components/entity-table/row";
 
 dayjs.extend(customParseFormat);
 
@@ -10,7 +11,8 @@ export type EntityTabState = {
     data?: ExistingIcatEntity[],
     errMsg?: string,
     creations?: NewIcatEntity[],
-    deletions?: Set<number>
+    deletions?: Set<number>,
+    modifications?: {[id: number]: EntityModification}
 }
 
 export type TableFilter = {

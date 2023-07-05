@@ -6,18 +6,22 @@ import style from './style.css';
 import EntityRow, {EntityModification} from '../row';
 import ContextMenu, {CtxMenuProps, OpenRelatedHandler} from '../../context-menu';
 import {defaultHeaderSort, xToOneAttributeToEntityName} from '../../../utils';
-import {ExistingIcatEntity, IcatEntity, IcatEntityValue, NewIcatEntity} from "../../../icat";
+import {ExistingIcatEntity, IcatEntityValue, NewIcatEntity} from "../../../icat";
 import JSX = h.JSX;
 
 type Props = {
     openRelated: OpenRelatedHandler;
     data: ExistingIcatEntity[] | null;
+    deletions: Set<number>,
     creations: NewIcatEntity[];
+    modifications: {[id: number]: EntityModification},
     deleteEntities: (ids: number[]) => void;
     editCreation: (i: number, k: string, v: IcatEntityValue) => void;
     saveEntity: (e: NewIcatEntity | ExistingIcatEntity) => Promise<number[]>;
-    cancelCreation: (number) => void
-    reloadEntity: (id: number) => Promise<void>
+    cancelCreation: (number) => void;
+    reloadEntity: (id: number) => Promise<void>;
+    editEntity: (id: number, field: string, value: string | number | { id: number }) => void;
+    cancelModifications: (id: number) => void;
     [k: string]: any;
 }
 
@@ -33,16 +37,16 @@ type FieldEdit = {
  * each row being rendered as an {@link EntityRow}
  */
 const EntityTableView = ({
-                             data, entityType, sortingBy, deletions, creations,
-                             openRelated, setSortingBy, saveEntity, reloadEntity,
+                             data, deletions, creations, modifications,
+                             entityType, openRelated,
+                             sortingBy, setSortingBy, saveEntity, reloadEntity,
                              markToDelete, cancelDeletion, deleteEntities,
-                             editCreation, cancelCreation, insertCreation
+                             editCreation, cancelCreation, insertCreation,
+                             editEntity, cancelModifications
                          }: Props) => {
     const [contextMenuProps, setContextMenuProps] =
         useState<CtxMenuProps | null>(null);
     // Locally saved changes to entities
-    const [entityModifications, setEntityModifications] =
-        useState<{[id: number]: EntityModification }>({});
     const [editingNewRow, setEditingNewRow] = useState(false);
     const [fieldBeingEdited, setFieldBeingEdited] =
         useState<FieldEdit | null>(null);
@@ -70,31 +74,6 @@ const EntityTableView = ({
     // Note: early returns need to be after all hooks
     if (data === null) return <p>Loading...</p>;
     if (data.length === 0) return <p>No entries</p>;
-
-    const editEntity = (id: number, field: string, newValue: string | number | {id: number}) => {
-        const cur = entityModifications[id] === undefined
-            ? {}
-            : entityModifications[id];
-        const originalValue = data.find(e => e.id === id)![field];
-        const edited = {...cur, [field]: newValue};
-        // If we've modified the value back to the original, remove the modification
-        if (newValue === originalValue
-            || typeof originalValue === "object" && (originalValue as IcatEntity).id === (newValue as IcatEntity).id) {
-            delete edited[field];
-        }
-        const newModified = {...entityModifications, [id]: edited};
-        // If all values have been reverted back to the originals, remove modifications
-        if (Object.keys(edited).length === 0) {
-            delete newModified[id];
-        }
-        setEntityModifications(newModified);
-    };
-
-    const removeModifications = (id: number) => {
-        const newModifications = {...entityModifications};
-        delete newModifications[id];
-        setEntityModifications(newModifications);
-    }
 
     const dataAttributes = data
         .flatMap(d => Object.keys(d)
@@ -139,11 +118,10 @@ const EntityTableView = ({
         }
         const syncModifications = isNewRow
             ? async id => await insertCreation(i, id)
-            : async () => await reloadEntity(e.id)
-                .then(() => removeModifications(e.id));
+            : async () => await reloadEntity(e.id);
         const revertChanges = isNewRow
             ? () => cancelCreation(i)
-            : () => removeModifications(e.id);
+            : () => cancelModifications(e.id);
         const isRowBeingEdited =
             fieldBeingEdited != null
             && (editingNewRow
@@ -158,7 +136,7 @@ const EntityTableView = ({
             key={isNewRow ? "new-" + i : e.id}
             headers={keys}
             entity={e}
-            modifications={isNewRow ? undefined : entityModifications[e.id]}
+            modifications={isNewRow ? undefined : modifications[e.id]}
             editingField={
                 isRowBeingEdited
                     ? fieldBeingEdited.field
@@ -178,7 +156,7 @@ const EntityTableView = ({
             markToDelete={() => markToDelete(e.id)}
             cancelDeletion={() => cancelDeletion(e.id)}
             doDelete={() => deleteEntities([(e as ExistingIcatEntity).id])}
-            markedForDeletion={deletions.has(e.id)}/>;
+            markedForDeletion={deletions.has((e as ExistingIcatEntity).id)}/>;
     };
 
     // Slightly awkward array combination to make tsc happy

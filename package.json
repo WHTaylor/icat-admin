@@ -38,6 +38,7 @@
     "sirv-cli": "2.0.2"
   },
   "dependencies": {
+    "@tanstack/react-query": "^4.29.19",
     "dayjs": "^1.11.3",
     "preact": "^10.3.2",
     "preact-render-to-string": "^6.0.2",

@@ -133,13 +133,15 @@ class IcatClient {
             .then(unpack);
     }
 
-    async getCount(filter: TableFilter, signal: AbortSignal): Promise<number> {
+    async getCount(filter: TableFilter, signal: AbortSignal | null = null)
+        : Promise<number> {
+
         const where = queryWhereFromInput(filter.where);
         const query = `select count(e) from ${filter.table} e ${where}`;
         const params = {
             query,
-        }
-        return fetch(this.entityUrl(params).toString(), {signal})
+        };
+        return fetch(this.entityUrl(params).toString(), {signal: signal})
             .then(res => res.ok
                 ? res
                 : formatError(res)

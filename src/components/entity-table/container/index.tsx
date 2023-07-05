@@ -1,4 +1,4 @@
-import {useEffect, useState} from "preact/hooks";
+import {useEffect} from "preact/hooks";
 import {h, Fragment} from "preact";
 
 import style from './style.css';
@@ -10,6 +10,7 @@ import IcatClient, {
 import EntityTableView from '../view';
 import {randomSuffix, TableFilter, EntityTabState, range} from '../../../utils';
 import {OpenRelatedHandler} from "../../context-menu";
+import {useQuery} from "@tanstack/react-query";
 
 type Props = {
     server: string;
@@ -224,27 +225,18 @@ type CounterProps = {
     icatClient: IcatClient
 }
 const EntityCounter = ({filter, icatClient}: CounterProps) => {
-    const [count, setCount] = useState<number | null>(null);
-    useEffect(() => {
-        const retrieveCount = () => {
-            setCount(null);
-            const controller = new AbortController();
-            const signal = controller.signal;
-            const getCount = async () => {
-                icatClient.getCount(filter, signal)
-                    .then(c => setCount(c))
-                    // Silently ignore errors, this is only a nice to have
-                    .catch(() => {
-                    });
-            };
-            const _ = getCount();
-            return () => controller.abort();
-        }
+    const key = {
+        table: filter.table,
+        where: filter.where
+    }
+    const {isSuccess, data} = useQuery({
+        queryKey: ['count', key],
+        queryFn: async () => await icatClient.getCount(filter)
+    });
 
-        return retrieveCount();
-    }, [filter, icatClient]); // eslint-disable-line react-hooks/exhaustive-deps
-
-    return <>{count !== null && <p class={style.tableTitleCount}>{count} matches</p>}</>
+    return isSuccess
+        ? <p class={style.tableTitleCount}>{data} matches</p>
+        : <></>;
 }
 
 export default EntityTable;

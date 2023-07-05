@@ -9,6 +9,16 @@ import Header from './header';
 import EntityViewer from './entity-viewer';
 import ServerConnector from './server-connector';
 import {getLastLogin, saveLogin, invalidateLogin, Connection} from '../connectioncache';
+import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
+
+const queryClient = new QueryClient({
+    defaultOptions: {
+        queries: {
+            retry: false,
+            refetchInterval: false,
+        }
+    }
+});
 
 const App = () => {
     const [connections, setConnections] = useState<Connection[]>([]);
@@ -56,7 +66,7 @@ const App = () => {
     });
 
     return (
-        <>
+        <QueryClientProvider client={queryClient}>
             <Header
                 connections={connections}
                 closeConnection={removeConnection}
@@ -80,7 +90,7 @@ const App = () => {
                     server={c.server}
                     sessionId={c.sessionId}
                     visible={i === activeConnection} />) }
-        </>
+        </QueryClientProvider>
     );
 }
 

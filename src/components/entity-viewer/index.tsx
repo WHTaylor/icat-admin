@@ -38,7 +38,7 @@ const EntityViewer = ({server, sessionId, visible}: Props) => {
     const icatClient = new IcatClient(server, sessionId);
 
     const queries = entityTabs.map(et => ({
-        queryKey: [icatClient.cacheKey(et.filter)],
+        queryKey: [icatClient.buildUrl(et.filter)],
         queryFn: async () => await icatClient.getEntries(et.filter),
     }));
     const results = useQueries({

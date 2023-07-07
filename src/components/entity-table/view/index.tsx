@@ -116,7 +116,7 @@ const EntityTableView = ({
                     type: "edit_creation", i, k, v: newValue, idx
                 })
                 : dispatch({
-                    type: "edit_entity", id: e.id, k, v, idx
+                    type: "edit_entity", id: e.id, k, v: newValue, idx
                 });
             stopEditing();
         }

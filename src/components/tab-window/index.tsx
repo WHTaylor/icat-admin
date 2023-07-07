@@ -1,5 +1,5 @@
 import style from './style.css';
-import {TableFilter} from "../../utils";
+import {TableFilter} from "../../types";
 
 type Props = {
     activeTabIdx: number | null;

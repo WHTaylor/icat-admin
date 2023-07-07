@@ -1,6 +1,5 @@
 import style from './style.css';
-import {h, Fragment} from "preact";
-import {ExistingIcatEntity} from "../../icat";
+import {ExistingIcatEntity} from "../../types";
 
 export type OpenRelatedHandler =
     (attribute: string, originId: number, isOneToMany: boolean) => void;

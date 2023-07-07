@@ -2,13 +2,14 @@ import {useEffect} from "preact/hooks";
 
 import style from './style.css';
 
-import IcatClient, {NewIcatEntity,} from '../../../icat';
+import IcatClient from '../../../icat';
 import EntityTableView from '../view';
-import {EntityTabState, randomSuffix, range, TableFilter,} from '../../../utils';
+import {randomSuffix, range} from '../../../utils';
 import {OpenRelatedHandler} from "../../context-menu";
 import {useQuery, useQueryClient} from "@tanstack/react-query";
 import OnChangeInput from "../../generic/on-change-input";
 import {EntityStateAction} from "../../../entityState";
+import {EntityTabState, NewIcatEntity, TableFilter} from "../../../types";
 
 type Props = {
     server: string;
@@ -44,7 +45,7 @@ const EntityTable = (
     const errMsg = state.errMsg ?? null;
 
     const handleFilterChange =
-            f => dispatch({type: "edit_filter", idx, filter: f});
+        f => dispatch({type: "edit_filter", idx, filter: f});
     const cancelCreations = idxs =>
         dispatch({type: "cancel_creations", idxs, idx});
     const changeWhere = (w: string) => handleFilterChange({...filter, where: w});
@@ -212,7 +213,7 @@ const CreateActions = (
         <span>
             <button onClick={addCreation}>Add new</button>
             {creations.length > 0 &&
-                <button onClick={clearCreations}>Cancel creations</button>
+              <button onClick={clearCreations}>Cancel creations</button>
             }
         </span>);
 };

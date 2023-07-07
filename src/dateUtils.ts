@@ -1,5 +1,5 @@
 import dayjs from "dayjs";
-import {ExistingIcatEntity, NewIcatEntity} from "./icat";
+import {ExistingIcatEntity, NewIcatEntity} from "./types";
 
 const dateFormats = [
     "YYYY-MM-DDTHH:mm:ss.SSSZ",

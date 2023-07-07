@@ -6,7 +6,7 @@ import style from './style.css';
 import EntityRow, {EntityModification} from '../row';
 import ContextMenu, {CtxMenuProps, OpenRelatedHandler} from '../../context-menu';
 import {defaultHeaderSort, xToOneAttributeToEntityName} from '../../../utils';
-import {ExistingIcatEntity, NewIcatEntity} from "../../../icat";
+import {ExistingIcatEntity, NewIcatEntity} from "../../../types";
 import {EntityStateAction} from "../../../entityState";
 import JSX = h.JSX;
 

@@ -1,8 +1,14 @@
 /**
  * Types and functions for the reducer which manages the main app state
  */
-import {difference, EntityTabState, TableFilter, withReplaced} from "./utils";
-import {ExistingIcatEntity, IcatEntity, IcatEntityValue} from "./icat";
+import {difference, withReplaced} from "./utils";
+import {
+    EntityTabState,
+    ExistingIcatEntity,
+    IcatEntity,
+    IcatEntityValue,
+    TableFilter
+} from "./types";
 
 export type EntityStateAction =
     EntityTabAction |
@@ -15,7 +21,7 @@ type EntityTabAction =
     EntityTabSwapAction
 
 // Actions which change a property of a tab
-export type EntityTabEditAction =
+type EntityTabEditAction =
     EntityDataAction |
     EntityErrorAction |
     EntitySortAction |

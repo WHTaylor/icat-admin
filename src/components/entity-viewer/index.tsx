@@ -3,7 +3,6 @@ import {useEffect, useReducer, useState} from "preact/hooks";
 import IcatClient, {entityNames,} from '../../icat';
 import {
     idReferenceFromRelatedEntity,
-    TableFilter,
     tableFilter,
     xToManyAttributeToEntityName,
     xToOneAttributeToEntityName,
@@ -15,6 +14,7 @@ import OpenTabModal from "../open-tab-modal";
 import {simplifyIcatErrMessage} from "../../icatErrorHandling";
 import {entityTabReducer} from "../../entityState";
 import {useQueries} from "@tanstack/react-query";
+import {TableFilter} from "../../types";
 
 type Props = {
     server: string;

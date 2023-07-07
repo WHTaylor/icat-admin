@@ -1,29 +1,10 @@
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 
-import {entityNames, ExistingIcatEntity, NewIcatEntity} from './icat';
-import {EntityModification} from "./components/entity-table/row";
+import {entityNames} from './icat';
+import {TableFilter} from "./types";
 
 dayjs.extend(customParseFormat);
-
-export type EntityTabState = {
-    filter: TableFilter,
-    data?: ExistingIcatEntity[],
-    errMsg?: string,
-    creations?: NewIcatEntity[],
-    deletions?: Set<number>,
-    modifications?: {[id: number]: EntityModification}
-}
-
-export type TableFilter = {
-    key: number;
-    table: string;
-    offset: number;
-    limit: number;
-    where: string | null;
-    sortField: string | null;
-    sortAsc: boolean | null;
-}
 
 /**
  * Return the name of the entity which a one-many attribute points at.

@@ -5,28 +5,9 @@
  * any data concerning ICAT (ie. the names of entities) should be kept in this
  * module.
  */
-import {queryWhereFromInput, TableFilter} from './utils';
+import {queryWhereFromInput} from './utils';
 import {Connection} from "./connectioncache";
-
-export type IcatEntityValue = string | number | ExistingIcatEntity | ExistingIcatEntity[];
-
-export type IcatEntity = {
-    [k: string]: IcatEntityValue;
-}
-
-/**
- * An entity which already exists, and so has an ID assigned to it
- */
-export type ExistingIcatEntity = IcatEntity & {
-    id: number;
-}
-
-/**
- * An entity which hasn't been created in ICAT yet, so doesn't have an ID
- */
-export type NewIcatEntity = IcatEntity & {
-    id?: never
-};
+import {ExistingIcatEntity, NewIcatEntity, TableFilter} from "./types";
 
 type IcatResponse = { [k: string]: ExistingIcatEntity }[]
 

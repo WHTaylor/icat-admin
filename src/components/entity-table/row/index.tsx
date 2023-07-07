@@ -5,11 +5,12 @@ import style from './style.css';
 import {commonFields} from '../../../utils';
 import ReadMore from '../../generic/read-more';
 import SuccessIndicator from '../../success-indicator';
-import {ExistingIcatEntity, IcatEntityValue, NewIcatEntity} from "../../../icat";
+import {ExistingIcatEntity, IcatEntityValue, NewIcatEntity} from "../../../types";
 import {parseISODate, withCorrectedDateFormats} from "../../../dateUtils";
 import OnChangeInput from "../../generic/on-change-input";
 
-function formatCellContent(cellContent: IcatEntityValue | undefined | null) : string {
+function formatCellContent(cellContent: IcatEntityValue | undefined | null)
+    : string {
     if (cellContent === undefined || cellContent === null) return "";
     if (typeof cellContent === "string") {
         const asDate = parseISODate(cellContent);
@@ -29,7 +30,7 @@ function formatCellContent(cellContent: IcatEntityValue | undefined | null) : st
  * related entity.
  */
 export type EntityModification = {
-    [k: string]: string | number | {id: number}
+    [k: string]: string | number | { id: number }
 }
 
 type Props = {
@@ -47,12 +48,22 @@ type Props = {
  * the entity
  */
 const EntityRow = ({
-                       entity, modifications, headers,
-                       editingField, relatedEntityDisplayFields, markedForDeletion,
+                       entity,
+                       modifications,
+                       headers,
+                       editingField,
+                       relatedEntityDisplayFields,
+                       markedForDeletion,
                        openContextMenu,
-                       startEditing, stopEditing, makeEdit,
-                       saveEntity, revertChanges, syncModifications,
-                       markToDelete, cancelDeletion, doDelete
+                       startEditing,
+                       stopEditing,
+                       makeEdit,
+                       saveEntity,
+                       revertChanges,
+                       syncModifications,
+                       markToDelete,
+                       cancelDeletion,
+                       doDelete
                    }: Props) => {
     const inputEl = useRef<HTMLInputElement>(null);
     const [saveState, setSaveState] = useState(null);
@@ -150,7 +161,7 @@ const EntityRow = ({
     const getStyleForField = (k: string): string | undefined => {
         if (markedForDeletion) return style.markedForDeletion;
         if (isNewRow) return style.newRow
-        if(modifications && k in modifications) return style.modified;
+        if (modifications && k in modifications) return style.modified;
     }
 
     return (
@@ -171,11 +182,12 @@ const EntityRow = ({
             {headers.map(k =>
                 k === editingField
                     ? <td>
-                        <OnChangeInput type="text"
-                               ref={inputEl}
-                               value={getInitialEditValue(k)}
-                               class={style.editInput}
-                               onChange={ev => makeEdit(editingField, (ev.target as HTMLInputElement).value)}/>
+                        <OnChangeInput
+                            type="text"
+                            ref={inputEl}
+                            value={getInitialEditValue(k)}
+                            class={style.editInput}
+                            onChange={ev => makeEdit(editingField, (ev.target as HTMLInputElement).value)}/>
                     </td>
                     : <td
                         onClick={ev => handleFieldClick(ev, k)}
@@ -193,8 +205,15 @@ type ActionButtonData = {
     icon: string;
 }
 const RowActions = ({
-                        isNewRow, saveState, isModified, markedForDeletion,
-                        revertChanges, saveChanges, markToDelete, cancelDeletion, doDelete
+                        isNewRow,
+                        saveState,
+                        isModified,
+                        markedForDeletion,
+                        revertChanges,
+                        saveChanges,
+                        markToDelete,
+                        cancelDeletion,
+                        doDelete
                     }) => {
     if (saveState != null) {
         return <SuccessIndicator saveState={saveState}/>;

@@ -1,7 +1,7 @@
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 
-import {entityNames, ExistingIcatEntity, NewIcatEntity} from './icat';
+import IcatClient, {entityNames, ExistingIcatEntity, NewIcatEntity} from './icat';
 import {EntityModification} from "./components/entity-table/row";
 
 dayjs.extend(customParseFormat);

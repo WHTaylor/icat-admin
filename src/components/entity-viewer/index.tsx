@@ -6,7 +6,7 @@ import {
     xToManyAttributeToEntityName, xToOneAttributeToEntityName,
     idReferenceFromRelatedEntity,
     TableFilter,
-    tableFilter, except,
+    tableFilter,
 } from '../../utils';
 import EntityTable from '../entity-table/container';
 import TabWindow from '../tab-window';
@@ -38,7 +38,7 @@ const EntityViewer = ({server, sessionId, visible}: Props) => {
     const icatClient = new IcatClient(server, sessionId);
 
     const queries = entityTabs.map(et => ({
-        queryKey: [except(et.filter, 'key')],
+        queryKey: [icatClient.cacheKey(et.filter)],
         queryFn: async () => await icatClient.getEntries(et.filter),
     }));
     const results = useQueries({
@@ -47,6 +47,7 @@ const EntityViewer = ({server, sessionId, visible}: Props) => {
 
     results.map((res, i) => {
         const {data, error} = res;
+
         const tab = entityTabs[i]
         if (tab.data !== undefined || tab.errMsg !== undefined) return;
 

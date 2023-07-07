@@ -7,9 +7,14 @@ import IcatClient, {
     NewIcatEntity,
 } from '../../../icat';
 import EntityTableView from '../view';
-import {randomSuffix, TableFilter, EntityTabState, range} from '../../../utils';
+import {
+    randomSuffix,
+    TableFilter,
+    EntityTabState,
+    range,
+} from '../../../utils';
 import {OpenRelatedHandler} from "../../context-menu";
-import {useQuery} from "@tanstack/react-query";
+import {useQuery, useQueryClient} from "@tanstack/react-query";
 import OnChangeInput from "../../generic/on-change-input";
 import {EntityStateAction} from "../../../entityState";
 
@@ -63,6 +68,7 @@ const EntityTable = (
         handleFilterChange({...filter, offset: newOffset});
     };
     const pageNumber = Math.floor(filter.offset / filter.limit) + 1;
+    const qc = useQueryClient();
 
     return (<>
         <span class={style.tableTitleBar}>
@@ -75,7 +81,10 @@ const EntityTable = (
                 onChange={ev => changeWhere((ev.target as HTMLInputElement).value)}/>
             <button
                 title="Refresh data"
-                onClick={() => dispatch({type: "refresh", idx})}>
+                onClick={() => {
+                    qc.removeQueries([icatClient.cacheKey(filter)])
+                    dispatch({type: "refresh", idx});
+                }}>
                 ↻
             </button>
             <PaginationControl

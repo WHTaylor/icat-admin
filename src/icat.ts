@@ -5,7 +5,7 @@
  * any data concerning ICAT (ie. the names of entities) should be kept in this
  * module.
  */
-import {queryWhereFromInput, TableFilter} from './utils';
+import {except, queryWhereFromInput, TableFilter} from './utils';
 import {Connection} from "./connectioncache";
 
 export type IcatEntityValue = string | number | ExistingIcatEntity | ExistingIcatEntity[];
@@ -202,6 +202,11 @@ class IcatClient {
                 ? res
                 : formatError(res)
                     .then(msg => Promise.reject(msg)));
+    }
+
+    public cacheKey(filter: TableFilter): string {
+        const query = buildQuery(filter);
+        return this.entityUrl({query}).toString();
     }
 }
 

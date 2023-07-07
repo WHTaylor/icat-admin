@@ -8,8 +8,8 @@ export type EntityTabState = {
     filter: TableFilter,
     data?: ExistingIcatEntity[],
     errMsg?: string,
-    creations?: NewIcatEntity[],
-    deletions?: Set<number>,
+    creations: NewIcatEntity[],
+    deletions: Set<number>,
     modifications?: {[id: number]: EntityModification}
 }
 

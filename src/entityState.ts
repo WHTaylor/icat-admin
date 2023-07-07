@@ -143,7 +143,12 @@ export function entityTabReducer(
 ): EntityTabState[] {
     switch (action.type) {
         case "create_tab":
-            return state.concat({filter: action.filter, key: Math.random()});
+            return state.concat({
+                filter: action.filter,
+                key: Math.random(),
+                creations: [],
+                deletions: new Set<number>()
+            });
 
         case "close_tab":
             return state.slice(0, action.idx).concat(state.slice(action.idx + 1));
@@ -212,7 +217,7 @@ function makeEditFunction(
                 return {
                     ...ets,
                     data: ets.data?.filter(e => !action.ids.includes(e.id)),
-                    deletions: undefined
+                    deletions: new Set()
                 }
             };
         }
@@ -225,7 +230,7 @@ function makeEditFunction(
 
         case "edit_creation": {
             return ets => {
-                if (ets.creations === undefined) return ets;
+                if (ets.creations.length === 0) return ets;
                 const edited = {
                     ...(ets.creations[action.i]),
                     [action.k]: action.v
@@ -298,7 +303,6 @@ function cancelModifications(ets: EntityTabState, id: number): EntityTabState {
 }
 
 function cancelCreations(ets: EntityTabState, idxs: number[]): EntityTabState {
-    if (ets.creations === undefined) return ets;
     return {
         ...ets,
         creations:

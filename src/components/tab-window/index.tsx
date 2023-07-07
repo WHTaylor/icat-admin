@@ -9,7 +9,8 @@ type Props = {
 }
 
 /**
- * Displays the list of tabs for open {@link EntityTable}s
+ * Displays the list of open {@link EntityTabState}s and allows rearranging and
+ * closing them
  */
 const TabWindow = (props: Props) => {
     const handleMouseDown = (ev, i) => {

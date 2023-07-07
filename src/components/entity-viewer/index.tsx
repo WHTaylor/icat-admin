@@ -115,9 +115,6 @@ const EntityViewer = ({server, sessionId, visible}: Props) => {
         dispatch({type: "close_tab", idx: idx})
     };
 
-    const cancelDeletions = (ids: number[]) =>
-        dispatchEdit("cancel_delete", {ids});
-
     const deleteEntities = ids => {
         if (activeTabIdx === null) return;
         const tab = entityTabs[activeTabIdx];
@@ -208,21 +205,22 @@ const EntityViewer = ({server, sessionId, visible}: Props) => {
                                     attribute,
                                     id,
                                     isOneToMay)}
+                            insertCreation={insertCreation}
+                            reloadEntity={reloadEntity}
+                            deleteEntities={deleteEntities}
                             handleFilterChange={filter =>
                                 dispatchEdit("edit_filter", {filter})}
                             setSortingBy={(field, asc) =>
                                 dispatchEdit("sort", {field, asc})}
                             refreshData={() => dispatchEdit("refresh")}
                             markToDelete={id => dispatchEdit("mark_delete", {id})}
-                            cancelDeletions={cancelDeletions}
-                            deleteEntities={deleteEntities}
+                            cancelDeletions={ids =>
+                                dispatchEdit("cancel_delete", {ids})}
                             addCreation={() => dispatchEdit("add_creation")}
                             editCreation={(i, k, v) =>
                                 dispatchEdit("edit_creation", {i, k, v})}
                             cancelCreations={
                                 idxs => dispatchEdit("cancel_creations", {idxs})}
-                            insertCreation={insertCreation}
-                            reloadEntity={reloadEntity}
                             editEntity={(id, k, v) =>
                                 dispatchEdit("edit_entity", {id, k, v})}
                             cancelModifications={id =>

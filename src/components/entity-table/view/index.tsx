@@ -12,7 +12,7 @@ import JSX = h.JSX;
 
 type Props = {
     openRelated: OpenRelatedHandler;
-    data: ExistingIcatEntity[] | null;
+    data?: ExistingIcatEntity[];
     deletions: Set<number>,
     creations: NewIcatEntity[];
     modifications: {[id: number]: EntityModification},
@@ -72,7 +72,7 @@ const EntityTableView = ({
     });
 
     // Note: early returns need to be after all hooks
-    if (data === null) return <p>Loading...</p>;
+    if (data === undefined) return <p>Loading...</p>;
     if (data.length === 0) return <p>No entries</p>;
 
     const dataAttributes = data

@@ -36,13 +36,7 @@ const EntityTable = (
         idx
     }: Props) => {
     const icatClient = new IcatClient(server, sessionId);
-    // TODO: these slightly weird coercions are maintaining compatibility from
-    //       before lifting this state up from here to EntityViewer. Sort them out
-    const filter = state.filter;
-    const data = state.data ?? null;
-    const deletions = state.deletions ?? new Set();
-    const creations = state.creations ?? [];
-    const errMsg = state.errMsg ?? null;
+    const {filter, data, deletions, creations, errMsg} = state;
 
     const handleFilterChange =
         f => dispatch({type: "edit_filter", idx, filter: f});
@@ -101,7 +95,7 @@ const EntityTable = (
                 deleteAll={() => deleteEntities([...deletions])}/>
         </span>
 
-        {errMsg
+        {errMsg !== undefined
             ? <p>{errMsg}</p>
             : <EntityTableView
                 data={data}

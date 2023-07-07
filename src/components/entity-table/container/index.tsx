@@ -5,32 +5,24 @@ import style from './style.css';
 
 import IcatClient, {
     NewIcatEntity,
-    IcatEntityValue,
 } from '../../../icat';
 import EntityTableView from '../view';
 import {randomSuffix, TableFilter, EntityTabState, range} from '../../../utils';
 import {OpenRelatedHandler} from "../../context-menu";
 import {useQuery} from "@tanstack/react-query";
 import OnChangeInput from "../../generic/on-change-input";
+import {EntityStateAction} from "../../../entityState";
 
 type Props = {
     server: string;
     sessionId: string;
     state: EntityTabState;
-    handleFilterChange: (filter: TableFilter) => void;
     openRelated: OpenRelatedHandler;
-    setSortingBy: (field: string, asc: boolean) => void;
-    refreshData: () => void;
-    markToDelete: (idx: number) => void;
-    cancelDeletions: (idxs: number[]) => void;
     deleteEntities: (ids: number[]) => void;
-    addCreation: () => void;
-    editCreation: (i: number, k: string, v: IcatEntityValue) => void;
-    cancelCreations: (idxs: number[]) => void;
     insertCreation: (i: number, id: number) => void;
     reloadEntity: (id: number) => Promise<void>;
-    editEntity: (id: number, k: string, v: string | number | {id: number}) => void;
-    cancelModifications: (id: number) => void;
+    dispatch: (action: EntityStateAction) => void;
+    idx: number;
 }
 
 const EntityTable = (
@@ -38,20 +30,12 @@ const EntityTable = (
         server,
         sessionId,
         state,
-        handleFilterChange,
         openRelated,
-        setSortingBy,
-        refreshData,
-        markToDelete,
-        cancelDeletions,
         deleteEntities,
-        addCreation,
-        editCreation,
-        cancelCreations,
         insertCreation,
         reloadEntity,
-        editEntity,
-        cancelModifications
+        dispatch,
+        idx
     }: Props) => {
     const icatClient = new IcatClient(server, sessionId);
     // TODO: these slightly weird coercions are maintaining compatibility from
@@ -62,6 +46,10 @@ const EntityTable = (
     const creations = state.creations ?? [];
     const errMsg = state.errMsg ?? null;
 
+    const handleFilterChange =
+            f => dispatch({type: "edit_filter", idx, filter: f});
+    const cancelCreations = idxs =>
+        dispatch({type: "cancel_creations", idxs, idx});
     const changeWhere = (w: string) => handleFilterChange({...filter, where: w});
     const changeLimit = (l: number) => handleFilterChange({...filter, limit: l});
     const changePage = (change: number) => {
@@ -76,8 +64,6 @@ const EntityTable = (
     };
     const pageNumber = Math.floor(filter.offset / filter.limit) + 1;
 
-    const clearDeletions = () => cancelDeletions([...deletions]);
-
     return (<>
         <span class={style.tableTitleBar}>
             <h2>{filter.table}</h2>
@@ -87,7 +73,11 @@ const EntityTable = (
                 value={filter.where || ""}
                 placeholder="Filter by (ie. id = 1234)"
                 onChange={ev => changeWhere((ev.target as HTMLInputElement).value)}/>
-            <button title="Refresh data" onClick={refreshData}>↻</button>
+            <button
+                title="Refresh data"
+                onClick={() => dispatch({type: "refresh", idx})}>
+                ↻
+            </button>
             <PaginationControl
                 pageNumber={pageNumber}
                 handleSetPage={handleSetPage}
@@ -99,11 +89,13 @@ const EntityTable = (
         <span class={style.tableActionsBar}>
             <CreateActions
                 creations={creations}
-                addCreation={addCreation}
+                addCreation={() => dispatch({type: "add_creation", idx})}
                 clearCreations={() => cancelCreations(range(creations.length))}/>
             <DeleteActions
                 deletions={deletions}
-                clearDeletions={clearDeletions}
+                clearDeletions={() => dispatch({
+                    type: "cancel_deletes", ids: [...deletions], idx
+                })}
                 deleteAll={() => deleteEntities([...deletions])}/>
         </span>
 
@@ -117,18 +109,14 @@ const EntityTable = (
                 openRelated={openRelated}
                 entityType={filter.table}
                 sortingBy={{field: filter.sortField, asc: filter.sortAsc}}
-                setSortingBy={setSortingBy}
                 saveEntity={e =>
                     icatClient.writeEntity(filter.table, e)}
                 reloadEntity={reloadEntity}
-                markToDelete={markToDelete}
-                cancelDeletion={id => cancelDeletions([id])}
                 deleteEntities={deleteEntities}
-                editCreation={editCreation}
                 cancelCreation={idx => cancelCreations([idx])}
                 insertCreation={insertCreation}
-                editEntity={editEntity}
-                cancelModifications={cancelModifications}
+                dispatch={dispatch}
+                idx={idx}
             />}
     </>);
 }

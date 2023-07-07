@@ -6,8 +6,9 @@ import style from './style.css';
 import EntityRow, {EntityModification} from '../row';
 import ContextMenu, {CtxMenuProps, OpenRelatedHandler} from '../../context-menu';
 import {defaultHeaderSort, xToOneAttributeToEntityName} from '../../../utils';
-import {ExistingIcatEntity, IcatEntityValue, NewIcatEntity} from "../../../icat";
+import {ExistingIcatEntity, NewIcatEntity} from "../../../icat";
 import JSX = h.JSX;
+import {EntityStateAction} from "../../../entityState";
 
 type Props = {
     openRelated: OpenRelatedHandler;
@@ -16,12 +17,11 @@ type Props = {
     creations: NewIcatEntity[];
     modifications: {[id: number]: EntityModification},
     deleteEntities: (ids: number[]) => void;
-    editCreation: (i: number, k: string, v: IcatEntityValue) => void;
     saveEntity: (e: NewIcatEntity | ExistingIcatEntity) => Promise<number[]>;
     cancelCreation: (number) => void;
     reloadEntity: (id: number) => Promise<void>;
-    editEntity: (id: number, field: string, value: string | number | { id: number }) => void;
-    cancelModifications: (id: number) => void;
+    dispatch: (action: EntityStateAction) => void;
+    idx: number;
     [k: string]: any;
 }
 
@@ -39,10 +39,10 @@ type FieldEdit = {
 const EntityTableView = ({
                              data, deletions, creations, modifications,
                              entityType, openRelated,
-                             sortingBy, setSortingBy, saveEntity, reloadEntity,
-                             markToDelete, cancelDeletion, deleteEntities,
-                             editCreation, cancelCreation, insertCreation,
-                             editEntity, cancelModifications
+                             sortingBy, saveEntity, reloadEntity,
+                             deleteEntities,
+                             cancelCreation, insertCreation,
+                             dispatch, idx
                          }: Props) => {
     const [contextMenuProps, setContextMenuProps] =
         useState<CtxMenuProps | null>(null);
@@ -112,8 +112,12 @@ const EntityTableView = ({
                 ? {id: Number.parseInt(v as string)}
                 : v;
             isNewRow
-                ? editCreation(i, k, newValue)
-                : editEntity(e.id, k, newValue);
+                ? dispatch({
+                    type: "edit_creation", i, k, v: newValue, idx
+                })
+                : dispatch({
+                    type: "edit_entity", id: e.id, k, v, idx
+                });
             stopEditing();
         }
         const syncModifications = isNewRow
@@ -121,7 +125,7 @@ const EntityTableView = ({
             : async () => await reloadEntity(e.id);
         const revertChanges = isNewRow
             ? () => cancelCreation(i)
-            : () => cancelModifications(e.id);
+            : () => dispatch({type: "cancel_modifications", id: e.id, idx});
         const isRowBeingEdited =
             fieldBeingEdited != null
             && (editingNewRow
@@ -153,11 +157,16 @@ const EntityTableView = ({
             saveEntity={saveEntity}
             revertChanges={revertChanges}
             syncModifications={syncModifications}
-            markToDelete={() => markToDelete(e.id)}
-            cancelDeletion={() => cancelDeletion(e.id)}
+            markToDelete={() => dispatch({type: "mark_delete", id: e.id!, idx})}
+            cancelDeletion={() => dispatch({
+                type: "cancel_deletes", ids: [e.id!], idx
+            })}
             doDelete={() => deleteEntities([(e as ExistingIcatEntity).id])}
             markedForDeletion={deletions.has((e as ExistingIcatEntity).id)}/>;
     };
+
+    const setSortingBy = (field: string, asc: boolean) =>
+        dispatch({type: "sort", field, asc, idx});
 
     // Slightly awkward array combination to make tsc happy
     const empty: (ExistingIcatEntity | NewIcatEntity)[] = [];

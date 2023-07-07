@@ -121,21 +121,27 @@ const EntityViewer = ({server, sessionId, visible}: Props) => {
         if ((tab.deletions ?? new Set()).size === 0) return;
 
         icatClient.deleteEntities(tab.filter.table, ids)
-            .then(() => dispatchEdit("sync_delete", {ids}));
+            .then(() => dispatch({
+                type: "sync_deletes", ids, idx: activeTabIdx
+            }));
     }
     const insertCreation = async (i: number, id: number) => {
         if (activeTabIdx === null) return;
 
         const activeTab = entityTabs[activeTabIdx];
         const entity = await icatClient.getById(activeTab.filter.table, id);
-        dispatchEdit("sync_creation", {i, entity});
+        dispatch({
+            type: "sync_creation", i, entity, idx: activeTabIdx
+        });
     }
 
     const reloadEntity = async (id: number) => {
         if (activeTabIdx === null) return;
         const entity = await icatClient.getById(
             entityTabs[activeTabIdx].filter.table, id);
-        dispatchEdit("sync_modification", {entity});
+        dispatch({
+            type: "sync_modification", entity, idx: activeTabIdx
+        });
     };
 
     useEffect(() => {
@@ -157,15 +163,6 @@ const EntityViewer = ({server, sessionId, visible}: Props) => {
         document.addEventListener("keydown", readKey);
         return () => document.removeEventListener("keydown", readKey);
     }, [visible, isOpenTabModalOpen])
-
-    function dispatchEdit(type, args = {}) {
-        if (activeTabIdx === null) return;
-        dispatch({
-            type,
-            idx: activeTabIdx,
-            ...args
-        });
-    }
 
     return (
         <div class={visible ? "page" : "hidden"}>
@@ -208,23 +205,12 @@ const EntityViewer = ({server, sessionId, visible}: Props) => {
                             insertCreation={insertCreation}
                             reloadEntity={reloadEntity}
                             deleteEntities={deleteEntities}
-                            handleFilterChange={filter =>
-                                dispatchEdit("edit_filter", {filter})}
-                            setSortingBy={(field, asc) =>
-                                dispatchEdit("sort", {field, asc})}
-                            refreshData={() => dispatchEdit("refresh")}
-                            markToDelete={id => dispatchEdit("mark_delete", {id})}
-                            cancelDeletions={ids =>
-                                dispatchEdit("cancel_delete", {ids})}
-                            addCreation={() => dispatchEdit("add_creation")}
-                            editCreation={(i, k, v) =>
-                                dispatchEdit("edit_creation", {i, k, v})}
-                            cancelCreations={
-                                idxs => dispatchEdit("cancel_creations", {idxs})}
-                            editEntity={(id, k, v) =>
-                                dispatchEdit("edit_entity", {id, k, v})}
-                            cancelModifications={id =>
-                                dispatchEdit("cancel_modifications", {id})}
+                            dispatch={dispatch}
+                              /*
+                              TODO: find a way to type capturing idx in dispatch
+                                    closure so we don't have to pass it down.
+                              */
+                            idx={activeTabIdx}
                           />
                         }
                     </div>

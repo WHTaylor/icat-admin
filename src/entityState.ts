@@ -83,12 +83,12 @@ type EntityMarkDeleteAction = EditAction & {
 }
 
 type EntityCancelDeleteAction = EditAction & {
-    type: "cancel_delete"
+    type: "cancel_deletes"
     ids: number[]
 }
 
 type EntitySyncDeleteAction = EditAction & {
-    type: "sync_delete"
+    type: "sync_deletes"
     ids: number[]
 }
 
@@ -193,7 +193,7 @@ function makeEditFunction(
                 return {...ets, deletions};
             };
         }
-        case "cancel_delete": {
+        case "cancel_deletes": {
             return ets => {
                 const deletions = ets.deletions ?? new Set();
                 return {
@@ -201,7 +201,7 @@ function makeEditFunction(
                 };
             };
         }
-        case "sync_delete": {
+        case "sync_deletes": {
             return ets => {
                 return {
                     ...ets,

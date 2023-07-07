@@ -1,5 +1,4 @@
-import {useEffect, useState, useRef} from "preact/hooks";
-import {h, Fragment} from "preact";
+import {useEffect, useRef, useState} from "preact/hooks";
 
 import style from './style.css';
 

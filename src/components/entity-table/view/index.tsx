@@ -1,5 +1,5 @@
 import {useEffect, useState} from "preact/hooks";
-import {h, Fragment} from "preact";
+import {h} from "preact";
 
 import style from './style.css';
 
@@ -7,8 +7,8 @@ import EntityRow, {EntityModification} from '../row';
 import ContextMenu, {CtxMenuProps, OpenRelatedHandler} from '../../context-menu';
 import {defaultHeaderSort, xToOneAttributeToEntityName} from '../../../utils';
 import {ExistingIcatEntity, NewIcatEntity} from "../../../icat";
-import JSX = h.JSX;
 import {EntityStateAction} from "../../../entityState";
+import JSX = h.JSX;
 
 type Props = {
     openRelated: OpenRelatedHandler;

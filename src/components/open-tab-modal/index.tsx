@@ -2,7 +2,6 @@ import {entityNames} from '../../icat';
 
 import {useEffect, useRef, useState} from "preact/hooks";
 import style from './style.css';
-import {h} from "preact";
 
 const MAX_MATCHES = 20;
 

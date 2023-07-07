@@ -1,4 +1,4 @@
-import {h, JSX} from "preact";
+import {JSX} from "preact";
 import {useState} from "preact/hooks";
 
 import style from './style.css';

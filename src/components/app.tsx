@@ -1,6 +1,6 @@
-import {h, Fragment, FunctionComponent} from 'preact';
-import { useLayoutEffect, useState } from 'preact/hooks';
-import {Router, route, Route} from 'preact-router';
+import {FunctionComponent} from 'preact';
+import {useLayoutEffect, useState} from 'preact/hooks';
+import {route, Route, Router} from 'preact-router';
 
 import IcatClient, {isValidSession} from '../icat';
 import About from './about';
@@ -8,7 +8,12 @@ import Tips from './tips';
 import Header from './header';
 import EntityViewer from './entity-viewer';
 import ServerConnector from './server-connector';
-import {getLastLogin, saveLogin, invalidateLogin, Connection} from '../connectioncache';
+import {
+    Connection,
+    getLastLogin,
+    invalidateLogin,
+    saveLogin
+} from '../connectioncache';
 import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
 
 const queryClient = new QueryClient({

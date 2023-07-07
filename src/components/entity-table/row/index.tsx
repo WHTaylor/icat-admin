@@ -1,12 +1,11 @@
 import {useEffect, useRef, useState} from "preact/hooks";
-import {h, Fragment} from "preact";
 
 import style from './style.css';
 
 import {commonFields} from '../../../utils';
 import ReadMore from '../../generic/read-more';
 import SuccessIndicator from '../../success-indicator';
-import {ExistingIcatEntity, NewIcatEntity, IcatEntityValue} from "../../../icat";
+import {ExistingIcatEntity, IcatEntityValue, NewIcatEntity} from "../../../icat";
 import {parseISODate, withCorrectedDateFormats} from "../../../dateUtils";
 import OnChangeInput from "../../generic/on-change-input";
 

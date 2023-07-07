@@ -1,4 +1,4 @@
-import {h, JSX, Ref} from "preact";
+import {JSX, Ref} from "preact";
 import {forwardRef} from "react";
 
 type Omitted = 'onChange' | 'onInput' | 'ref';

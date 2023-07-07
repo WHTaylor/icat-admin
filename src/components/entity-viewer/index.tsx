@@ -1,12 +1,12 @@
 import {useEffect, useReducer, useState} from "preact/hooks";
-import {h, Fragment} from "preact";
 
 import IcatClient, {entityNames,} from '../../icat';
 import {
-    xToManyAttributeToEntityName, xToOneAttributeToEntityName,
     idReferenceFromRelatedEntity,
     TableFilter,
     tableFilter,
+    xToManyAttributeToEntityName,
+    xToOneAttributeToEntityName,
 } from '../../utils';
 import EntityTable from '../entity-table/container';
 import TabWindow from '../tab-window';

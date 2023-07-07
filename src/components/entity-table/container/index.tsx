@@ -1,18 +1,10 @@
 import {useEffect} from "preact/hooks";
-import {h, Fragment} from "preact";
 
 import style from './style.css';
 
-import IcatClient, {
-    NewIcatEntity,
-} from '../../../icat';
+import IcatClient, {NewIcatEntity,} from '../../../icat';
 import EntityTableView from '../view';
-import {
-    randomSuffix,
-    TableFilter,
-    EntityTabState,
-    range,
-} from '../../../utils';
+import {EntityTabState, randomSuffix, range, TableFilter,} from '../../../utils';
 import {OpenRelatedHandler} from "../../context-menu";
 import {useQuery, useQueryClient} from "@tanstack/react-query";
 import OnChangeInput from "../../generic/on-change-input";

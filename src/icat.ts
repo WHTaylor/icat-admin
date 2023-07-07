@@ -5,7 +5,7 @@
  * any data concerning ICAT (ie. the names of entities) should be kept in this
  * module.
  */
-import {except, queryWhereFromInput, TableFilter} from './utils';
+import {queryWhereFromInput, TableFilter} from './utils';
 import {Connection} from "./connectioncache";
 
 export type IcatEntityValue = string | number | ExistingIcatEntity | ExistingIcatEntity[];

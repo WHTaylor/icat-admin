@@ -1,7 +1,4 @@
-import {h} from "preact";
-
 import style from './style.css';
-import JSX = h.JSX;
 import {TableFilter} from "../../utils";
 
 type Props = {

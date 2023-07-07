@@ -119,12 +119,12 @@ class IcatClient {
         fetch(this.sessionUrl(this.sessionId).toString(), {method: "PUT"});
     }
 
-    async getEntries(filter: TableFilter, signal: AbortSignal): Promise<ExistingIcatEntity[]> {
+    async getEntries(filter: TableFilter): Promise<ExistingIcatEntity[]> {
         const query = buildQuery(filter);
         const params = {
             query,
         }
-        return fetch(this.entityUrl(params).toString(), {signal})
+        return fetch(this.entityUrl(params).toString())
             .then(res => res.ok
                 ? res
                 : formatError(res)

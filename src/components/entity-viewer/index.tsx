@@ -6,7 +6,7 @@ import {
     xToManyAttributeToEntityName, xToOneAttributeToEntityName,
     idReferenceFromRelatedEntity,
     TableFilter,
-    tableFilter,
+    tableFilter, except,
 } from '../../utils';
 import EntityTable from '../entity-table/container';
 import TabWindow from '../tab-window';
@@ -14,6 +14,7 @@ import style from './style.css';
 import OpenTabModal from "../open-tab-modal";
 import {simplifyIcatErrMessage} from "../../icatErrorHandling";
 import {entityTabReducer} from "../../entityState";
+import {useQueries} from "@tanstack/react-query";
 
 type Props = {
     server: string;
@@ -36,32 +37,32 @@ const EntityViewer = ({server, sessionId, visible}: Props) => {
 
     const icatClient = new IcatClient(server, sessionId);
 
-    // Fetch data for the first tab which hasn't loaded its data yet
-    // TODO: load everything in parallel without being interrupted by rendering
-    useEffect(() => {
-        const controller = new AbortController();
-        const signal = controller.signal;
-        for (let i = 0; i < entityTabs.length; i++) {
-            const tableData = entityTabs[i];
-            if (tableData.data === undefined && tableData.errMsg === undefined) {
-                icatClient.getEntries(tableData.filter, signal)
-                    .then(data => dispatch({type: "set_data", data, idx: i}))
-                    .catch(err => {
-                        // DOMException gets throws if promise is aborted, which it is
-                        // during cleanup `controller.abort()` when table/filter changes
-                        // before request finishes
-                        if (err instanceof DOMException) return;
+    const queries = entityTabs.map(et => ({
+        queryKey: [except(et.filter, 'key')],
+        queryFn: async () => await icatClient.getEntries(et.filter),
+    }));
+    const results = useQueries({
+        queries
+    });
 
-                        dispatch({
-                            type: "set_error",
-                            message: simplifyIcatErrMessage(err),
-                            idx: i
-                        })
-                    });
-                break;
-            }
+    results.map((res, i) => {
+        const {data, error} = res;
+        const tab = entityTabs[i]
+        if (tab.data !== undefined || tab.errMsg !== undefined) return;
+
+        if (data) {
+            dispatch({
+                type: "set_data",
+                data,
+                idx: i
+            });
+        } else if (error) {
+            dispatch({
+                type: "set_error",
+                message: simplifyIcatErrMessage(error as string),
+                idx: i
+            })
         }
-        return () => controller.abort();
     });
 
     const openTabForFilter = (f: TableFilter) => {

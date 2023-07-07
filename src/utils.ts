@@ -231,3 +231,9 @@ export function range(a: number, b: number | null = null): number[] {
         : b;
     return [...Array(top - bot).keys()].map(n => n + bot);
 }
+
+export function except<T extends {[key: string]: any}>(
+    o: T, key: string): Omit<T, typeof key> {
+    const {[key]: _, ...rest} = o;
+    return rest;
+}

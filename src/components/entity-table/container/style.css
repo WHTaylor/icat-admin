@@ -32,18 +32,3 @@
     font-size: small;
     cursor: default;
 }
-
-.paginationControl {
-}
-
-.paginationControl input {
-    max-width: 5em;
-}
-
-.paginationControl > * {
-    margin: 0 0.15em;
-}
-
-.paginationControl label {
-    margin-right: 0.1em;
-}

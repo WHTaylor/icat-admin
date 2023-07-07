@@ -1,4 +1,4 @@
-import {useEffect, useRef, useState} from "preact/hooks";
+import {useEffect, useRef} from "preact/hooks";
 
 import style from './style.css';
 
@@ -8,6 +8,7 @@ import SuccessIndicator from '../../success-indicator';
 import {ExistingIcatEntity, IcatEntityValue, NewIcatEntity} from "../../../types";
 import {parseISODate, withCorrectedDateFormats} from "../../../dateUtils";
 import OnChangeInput from "../../generic/on-change-input";
+import {useMutation} from "@tanstack/react-query";
 
 function formatCellContent(cellContent: IcatEntityValue | undefined | null)
     : string {
@@ -66,10 +67,6 @@ const EntityRow = ({
                        doDelete
                    }: Props) => {
     const inputEl = useRef<HTMLInputElement>(null);
-    const [saveState, setSaveState] = useState(null);
-    const createSaveState = fields => ({
-        ...fields, clear: () => setSaveState(null)
-    });
 
     const doOpenContextMenu = ev => {
         ev.preventDefault();
@@ -92,25 +89,21 @@ const EntityRow = ({
 
     const isNewRow = entity.id === undefined;
 
-    const saveChanges = () => {
-        setSaveState(createSaveState({isSaving: true}));
-        // If entity.id is undefined, this is a new entity to be created
-        // Otherwise we just want to send modifications with the current id
-        const e = withCorrectedDateFormats(isNewRow
-            ? entity
-            : {...modifications, id: entity.id});
-        const successHandle = isNewRow
-            ? res => syncModifications(res[0])
-            : syncModifications;
-        saveEntity(e)
-            .then(successHandle)
-            .then(() => setSaveState(createSaveState({
-                failed: false, isSaving: false
-            })))
-            .catch(err => setSaveState(createSaveState({
-                failed: true, message: err, isSaving: false
-            })));
-    };
+    const mutation = useMutation({
+        mutationFn: () => {
+            // If entity.id is undefined, this is a new entity to be created
+            // Otherwise we just want to send modifications with the current id
+            const e = withCorrectedDateFormats(isNewRow
+                ? entity
+                : {...modifications, id: entity.id});
+            return saveEntity(e);
+        },
+        onSuccess: (data) => {
+            isNewRow
+                ? syncModifications(data)
+                : syncModifications();
+        },
+    });
 
     const getCurrentValue = (field: string): IcatEntityValue => {
         const isModified = modifications !== undefined
@@ -169,10 +162,9 @@ const EntityRow = ({
             <td>
                 <RowActions
                     isNewRow={isNewRow}
-                    saveState={saveState}
                     isModified={modifications !== undefined}
                     markedForDeletion={markedForDeletion}
-                    saveChanges={saveChanges}
+                    mutation={mutation}
                     revertChanges={revertChanges}
                     markToDelete={markToDelete}
                     cancelDeletion={cancelDeletion}
@@ -205,24 +197,28 @@ type ActionButtonData = {
     icon: string;
 }
 const RowActions = ({
+                        mutation,
                         isNewRow,
-                        saveState,
                         isModified,
                         markedForDeletion,
                         revertChanges,
-                        saveChanges,
                         markToDelete,
                         cancelDeletion,
                         doDelete
                     }) => {
-    if (saveState != null) {
-        return <SuccessIndicator saveState={saveState}/>;
+    if (!mutation.isIdle) {
+        return <SuccessIndicator saveState={{
+            failed: mutation.isError,
+            isSaving: mutation.isLoading,
+            clear: mutation.reset,
+            message: mutation.error
+        }}/>;
     }
 
     let actions: ActionButtonData[] = [];
     if (isNewRow) {
         actions.push({title: "Cancel creation", ev: revertChanges, icon: "🚫"});
-        actions.push({title: "Create row", ev: saveChanges, icon: "💾"});
+        actions.push({title: "Create row", ev: mutation.mutate, icon: "💾"});
     } else if (markedForDeletion) {
         actions.push({title: "Cancel deletion", ev: cancelDeletion, icon: "↩️"});
         actions.push({title: "Confirm deletion", ev: doDelete, icon: "✔️"});
@@ -234,7 +230,7 @@ const RowActions = ({
         actions.push(
             {title: "Revert changes", ev: revertChanges, icon: "↩️"});
         actions.push(
-            {title: "Save changes", ev: saveChanges, icon: "💾"});
+            {title: "Save changes", ev: mutation.mutate, icon: "💾"});
     }
     return (<>
         {actions.map(a =>

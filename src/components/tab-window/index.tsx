@@ -1,12 +1,11 @@
 import style from './style.css';
-import {TableFilter} from "../../types";
 
 type Props = {
     activeTabIdx: number | null;
     closeTab: (i: number) => void;
     handleChangeTabIdx: (i: number) => void;
     swapTabs: (a: number, b: number) => void;
-    tabFilters: TableFilter[];
+    tabs: [table: string, key: number][];
 }
 
 /**
@@ -43,15 +42,15 @@ const TabWindow = (props: Props) => {
             class={style.tabSwitcher}
             onDragOver={ev => ev.preventDefault()}
             onDrop={endDrag}>
-            {props.tabFilters.map((filter, i) =>
+            {props.tabs.map(([table, key], i) =>
                 <button
-                    key={filter.key}
+                    key={key}
                     onClick={() => props.handleChangeTabIdx(i)}
                     onMouseDown={ev => handleMouseDown(ev, i)}
                     class={`entityButton ${i === props.activeTabIdx ? style.selectedTab : ""}`}
                     draggable={true}
                     onDragStart={ev => startDrag(ev, i)}>
-                    {filter.table}
+                    {table}
                 </button>)}
         </div>)
 }

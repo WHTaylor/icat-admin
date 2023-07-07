@@ -39,7 +39,7 @@ type EntityTabEditAction =
     EntitySyncModificationAction
 
 type EntityTabCreateAction = {
-    type: "create"
+    type: "create_tab"
     filter: TableFilter
 }
 
@@ -142,8 +142,8 @@ export function entityTabReducer(
     action: EntityStateAction
 ): EntityTabState[] {
     switch (action.type) {
-        case "create":
-            return state.concat({filter: action.filter});
+        case "create_tab":
+            return state.concat({filter: action.filter, key: Math.random()});
 
         case "close_tab":
             return state.slice(0, action.idx).concat(state.slice(action.idx + 1));

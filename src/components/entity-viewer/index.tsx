@@ -68,7 +68,7 @@ const EntityViewer = ({server, sessionId, visible}: Props) => {
 
     const openTabForFilter = (f: TableFilter) => {
         const numTabs = entityTabs.length;
-        dispatch({type: "create", filter: f})
+        dispatch({type: "create_tab", filter: f})
         setActiveTabIdx(numTabs)
         // Timeout is used as a small hack to make sure scroll happens after component
         // rerenders (or at least, that's what it appears to do).
@@ -191,7 +191,8 @@ const EntityViewer = ({server, sessionId, visible}: Props) => {
                         closeTab={closeTab}
                         handleChangeTabIdx={i => setActiveTabIdx(i)}
                         swapTabs={swapTabs}
-                        tabFilters={entityTabs.map(tab => tab.filter)}/>
+                        tabs={entityTabs.map(tab =>
+                            [tab.filter.table, tab.key])}/>
 
                         {activeTabIdx !== null &&
                           <EntityTable

@@ -4,6 +4,7 @@ import {EntityModification} from "./components/entity-table/row";
  * All the state for a single tab within an EntityViewer
  */
 export type EntityTabState = {
+    key: number
     filter: TableFilter,
     data?: ExistingIcatEntity[],
     errMsg?: string,
@@ -16,7 +17,6 @@ export type EntityTabState = {
  * The filter which defines the data that should be fetched for an entity tab
  */
 export type TableFilter = {
-    key: number;
     table: string;
     offset: number;
     limit: number;

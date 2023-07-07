@@ -109,7 +109,6 @@ export function tableFilter(
     sortAsc = true): TableFilter {
     if (table === undefined) console.error("tableFilter called without args");
     return {
-        key: Math.random(),
         table,
         offset,
         limit,

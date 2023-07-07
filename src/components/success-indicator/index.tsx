@@ -18,6 +18,17 @@ type Props = {
     clearTimeoutMs?: number;
 };
 
+/**
+ * An icon for representing the outcome of an async operation.
+ *
+ * Ellipses if still loading, a tick if successful, or a cross if failed.
+ *
+ * Displays an error message in a tooltip when hovering over a failed icon
+ *
+ * @param saveState an object representing the operation
+ * @param clearTimeoutMs how long to display the success or failure icon for
+ * after loading has completed
+ */
 const SuccessIndicator = ({saveState, clearTimeoutMs = 2000}: Props) => {
     const [mousePos, setMousePos] = useState<MousePos | null>(null);
     const timer = useRef(0);

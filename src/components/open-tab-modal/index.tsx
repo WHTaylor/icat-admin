@@ -10,6 +10,12 @@ type Props = {
     close: () => void;
 }
 
+/**
+ * A modal window that allows opening entity tabs by typing (a substring of) the name
+ * @param openTab a function that opens a tab for entities of the given type
+ * @param close a function that closes the modal
+ * @constructor
+ */
 const OpenTabModal = ({openTab, close}: Props) => {
     const [matches, setMatches] = useState<string[]>([]);
     const [selectedIdx, setSelectedIdx] = useState<number | null>(null);
@@ -105,13 +111,13 @@ const OpenTabModal = ({openTab, close}: Props) => {
             ref={inputEl}/>
         <div>
             {matches &&
-                <ul>
-                    {
-                        matches.map((m, i) =>
-                            <li className={selectedIdx !== null && selectedIdx == i && style.active}>{m}</li>
-                        )
-                    }
-                </ul>
+              <ul>
+                  {matches.map((m, i) =>
+                      <li className={(selectedIdx ?? -1) == i && style.active}>
+                          {m}
+                      </li>
+                  )}
+              </ul>
             }
         </div>
     </div>

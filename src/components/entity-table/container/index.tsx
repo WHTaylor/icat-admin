@@ -68,7 +68,7 @@ const EntityTable = (
             <button
                 title="Refresh data"
                 onClick={() => {
-                    qc.removeQueries([icatClient.cacheKey(filter)])
+                    qc.removeQueries([icatClient.buildUrl(filter)])
                     dispatch({type: "refresh", idx});
                 }}>
                 ↻
@@ -156,12 +156,8 @@ type CounterProps = {
     icatClient: IcatClient
 }
 const EntityCounter = ({filter, icatClient}: CounterProps) => {
-    const key = {
-        table: filter.table,
-        where: filter.where
-    }
     const {isSuccess, data} = useQuery({
-        queryKey: ['count', key],
+        queryKey: [icatClient.buildCountUrl(filter)],
         queryFn: async () => await icatClient.getCount(filter)
     });
 

@@ -101,11 +101,7 @@ class IcatClient {
     }
 
     async getEntries(filter: TableFilter): Promise<ExistingIcatEntity[]> {
-        const query = buildQuery(filter);
-        const params = {
-            query,
-        }
-        return fetch(this.entityUrl(params).toString())
+        return fetch(this.buildUrl(filter))
             .then(res => res.ok
                 ? res
                 : formatError(res)
@@ -116,13 +112,7 @@ class IcatClient {
 
     async getCount(filter: TableFilter, signal: AbortSignal | null = null)
         : Promise<number> {
-
-        const where = queryWhereFromInput(filter.where);
-        const query = `select count(e) from ${filter.table} e ${where}`;
-        const params = {
-            query,
-        };
-        return fetch(this.entityUrl(params).toString(), {signal: signal})
+        return fetch(this.buildCountUrl(filter), {signal: signal})
             .then(res => res.ok
                 ? res
                 : formatError(res)
@@ -185,8 +175,14 @@ class IcatClient {
                     .then(msg => Promise.reject(msg)));
     }
 
-    public cacheKey(filter: TableFilter): string {
+    public buildUrl(filter: TableFilter): string {
         const query = buildQuery(filter);
+        return this.entityUrl({query}).toString();
+    }
+
+    public buildCountUrl(filter: TableFilter): string {
+        const where = queryWhereFromInput(filter.where);
+        const query = `select count(e) from ${filter.table} e ${where}`;
         return this.entityUrl({query}).toString();
     }
 }

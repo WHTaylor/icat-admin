@@ -1,22 +1,30 @@
 import dayjs from "dayjs";
 import {ExistingIcatEntity, NewIcatEntity} from "./types";
 
+// Date formats that can be used for creating/editing date fields
+// Dates received from ICAT will always be in the first format
 const dateFormats = [
     "YYYY-MM-DDTHH:mm:ss.SSSZ",
     "YYYY-MM-DDTHH:mm:ss.SSS[Z]",
     "YYYY-MM-DDTHH:mm:ssZ",
+    "YYYY-MM-DDTHH:mm:ss",
+    "YYYY-MM-DD",
     "YYYY-MM-DDTHH:mm:ss[Z]",
 ];
 
-export function parseISODate(s: string) {
+export function parseDate(s: string) {
     return dayjs(s, dateFormats, true);
 }
 
+export function inIcatFormat(dt: dayjs.Dayjs) {
+    return dt.format("YYYY-MM-DDTHH:mm:ss.000Z");
+}
+
 /**
- * Convert date formats to the single format that ICAT allows.
+ * Formats all date strings on an object into the datetime format ICAT enforces
  *
  * This allows users to change dates without specifying milliseconds, which are
- * truncated anyway
+ * truncated anyway, or any time at all if midnight is reasonable (ie. cycles)
  */
 export function withCorrectedDateFormats(entity: ExistingIcatEntity | NewIcatEntity) {
     return Object.fromEntries(
@@ -26,10 +34,9 @@ export function withCorrectedDateFormats(entity: ExistingIcatEntity | NewIcatEnt
                     return [k, v];
                 }
 
-                const asDate = parseISODate(v);
+                const asDate = parseDate(v);
                 if (asDate.isValid()) {
-                    const formatted = asDate.format("YYYY-MM-DDTHH:mm:ss.000Z");
-                    return [k, formatted];
+                    return [k, inIcatFormat(asDate)];
                 } else {
                     return [k, v];
                 }

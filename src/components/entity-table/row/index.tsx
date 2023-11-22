@@ -6,7 +6,11 @@ import {commonFields} from '../../../utils';
 import ReadMore from '../../generic/read-more';
 import SuccessIndicator from '../../success-indicator';
 import {ExistingIcatEntity, IcatEntityValue, NewIcatEntity} from "../../../types";
-import {parseISODate, withCorrectedDateFormats} from "../../../dateUtils";
+import {
+    inIcatFormat,
+    parseDate,
+    withCorrectedDateFormats
+} from "../../../dateUtils";
 import OnChangeInput from "../../generic/on-change-input";
 import {useMutation} from "@tanstack/react-query";
 
@@ -14,9 +18,9 @@ function formatCellContent(cellContent: IcatEntityValue | undefined | null)
     : string {
     if (cellContent === undefined || cellContent === null) return "";
     if (typeof cellContent === "string") {
-        const asDate = parseISODate(cellContent);
+        const asDate = parseDate(cellContent);
         return asDate.isValid()
-            ? asDate.format("YYYY-MM-DDTHH:mm:ssZ")
+            ? inIcatFormat(asDate)
             : cellContent;
     }
     return typeof cellContent === "object"

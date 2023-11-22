@@ -62,8 +62,14 @@ const EntityTableView = ({
         stopEditing();
     };
 
+    // Set up event listener to close the context menu and stop editing when
+    // clicking away
     useEffect(() => {
-        const cancelInteractions = () => {
+        const cancelInteractions = ev => {
+            // Allow clicks on fields being edited to work normally
+            if (ev.target.tagName == "INPUT") return;
+
+            ev.stopPropagation();
             clearContextMenu();
             stopEditing();
         };

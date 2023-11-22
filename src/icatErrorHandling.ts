@@ -21,7 +21,8 @@ export function simplifyIcatErrMessage(err: string): string {
             let m = message.match(patterns[k]);
             if (m != null) {
                 match = true;
-                message = handlers[k](m);
+                const handler = handlers[k] || (m => m[0])
+                message = handler(m);
             }
         }
     } while (match);

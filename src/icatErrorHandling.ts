@@ -9,6 +9,7 @@ const handlers = {
         "Entity type '" + m[1] + "' does not exist " +
         "(likely an ICAT 5 entity on a server running ICAT 4)",
     badRequest: m => m[1],
+    entityManagerException: m => m[1]
 };
 
 export function simplifyIcatErrMessage(err: string): string {

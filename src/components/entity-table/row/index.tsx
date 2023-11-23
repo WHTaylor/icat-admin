@@ -52,24 +52,25 @@ type Props = {
  * Renders a single entity as a table row, and provides controls for editing
  * the entity
  */
-const EntityRow = ({
-                       entity,
-                       modifications,
-                       headers,
-                       editingField,
-                       relatedEntityDisplayFields,
-                       markedForDeletion,
-                       openContextMenu,
-                       startEditing,
-                       stopEditing,
-                       makeEdit,
-                       saveEntity,
-                       revertChanges,
-                       syncModifications,
-                       markToDelete,
-                       cancelDeletion,
-                       doDelete
-                   }: Props) => {
+const EntityRow = (
+    {
+        entity,
+        modifications,
+        headers,
+        editingField,
+        relatedEntityDisplayFields,
+        markedForDeletion,
+        openContextMenu,
+        startEditing,
+        stopEditing,
+        makeEdit,
+        saveEntity,
+        revertChanges,
+        syncModifications,
+        markToDelete,
+        cancelDeletion,
+        doDelete
+    }: Props) => {
     const inputEl = useRef<HTMLInputElement>(null);
 
     const doOpenContextMenu = ev => {

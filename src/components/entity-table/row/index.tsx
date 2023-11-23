@@ -127,8 +127,9 @@ const EntityRow = (
         const isModified = modifications !== undefined
             && modifications[field] !== undefined;
 
-        // Always show id for modified related entities
-        if (isModified && typeof (value) === "object") {
+        // Always show id for new and modified related entities, because
+        // we won't have any other fields for them until changes are saved
+        if (typeof (value) === "object" && (isNewRow || isModified)) {
             return (value as ExistingIcatEntity).id.toString();
         }
 

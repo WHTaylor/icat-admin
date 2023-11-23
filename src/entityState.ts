@@ -168,9 +168,8 @@ export function entityTabReducer(
         : edit(ets));
 }
 
-function makeEditFunction(
-    action: EntityTabEditAction)
-    : (EntityTabState) => EntityTabState {
+function makeEditFunction(action: EntityTabEditAction)
+    : (entityTabState: EntityTabState) => EntityTabState {
     switch (action.type) {
         case "set_data":
             return ets => ({...ets, data: action.data, errMsg: undefined});

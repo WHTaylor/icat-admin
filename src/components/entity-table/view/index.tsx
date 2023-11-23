@@ -8,6 +8,7 @@ import ContextMenu, {CtxMenuProps, OpenRelatedHandler} from '../../context-menu'
 import {defaultHeaderSort, xToOneAttributeToEntityName} from '../../../utils';
 import {ExistingIcatEntity, NewIcatEntity} from "../../../types";
 import {EntityStateAction} from "../../../entityState";
+import {TargetedEvent} from "react";
 import JSX = h.JSX;
 
 type Props = {
@@ -18,7 +19,7 @@ type Props = {
     modifications: {[id: number]: EntityModification},
     deleteEntities: (ids: number[]) => void;
     saveEntity: (e: NewIcatEntity | ExistingIcatEntity) => Promise<number[]>;
-    cancelCreation: (number) => void;
+    cancelCreation: (i: number) => void;
     reloadEntity: (id: number) => Promise<void>;
     dispatch: (action: EntityStateAction) => void;
     idx: number;
@@ -65,9 +66,12 @@ const EntityTableView = ({
     // Set up event listener to close the context menu and stop editing when
     // clicking away
     useEffect(() => {
-        const cancelInteractions = ev => {
+        const cancelInteractions = (ev: TargetedEvent<HTMLElement>) => {
+            const target = ev.target as HTMLElement;
+            if (!target) return;
+
             // Allow clicks on fields being edited to work normally
-            if (ev.target.tagName == "INPUT") return;
+            if (target.tagName == "INPUT") return;
 
             ev.stopPropagation();
             clearContextMenu();
@@ -86,6 +90,9 @@ const EntityTableView = ({
             .filter(k => !Array.isArray(d[k])));
     const keys = defaultHeaderSort([...new Set(dataAttributes)]);
 
+    // For fields which are objects (AKA it's a related ICAT entity), display
+    // a dropdown that allows the user to select which field from those entities
+    // to display
     const relatedFieldDisplaySelect = (k: string): JSX.Element => {
         const firstEntityWithValue = data.find(e => e[k] !== undefined);
         if (firstEntityWithValue === undefined) return <></>;
@@ -95,7 +102,7 @@ const EntityTableView = ({
             typeof fieldValue === "object" && !Array.isArray(fieldValue);
         if (!fieldValueIsRelatedEntity) return <></>;
 
-        const setDisplayField = v =>
+        const setDisplayField = (v: string) =>
             setRelatedDisplayFields({...relatedDisplayFields, [k]: v});
         return (<select onChange={ev => setDisplayField((ev.target as HTMLSelectElement).value)}>
             {Object.keys(fieldValue)
@@ -127,7 +134,7 @@ const EntityTableView = ({
             stopEditing();
         }
         const syncModifications = isNewRow
-            ? async id => await insertCreation(i, id)
+            ? async (id: number) => await insertCreation(i, id)
             : async () => await reloadEntity(e.id);
         const revertChanges = isNewRow
             ? () => cancelCreation(i)
@@ -153,7 +160,7 @@ const EntityTableView = ({
                     : null}
             relatedEntityDisplayFields={relatedDisplayFields}
             openContextMenu={openContextMenuAt}
-            startEditing={field => {
+            startEditing={(field: string) => {
                 clearContextMenu();
                 setFieldBeingEdited({idx: isNewRow ? i : e.id, field});
                 setEditingNewRow(isNewRow);

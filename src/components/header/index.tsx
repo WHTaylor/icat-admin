@@ -4,7 +4,7 @@ import style from './style.css';
 
 import {Connection} from "../../connectioncache";
 
-function stripProtocol(server) {
+function stripProtocol(server: string) {
     return server.split("://").slice(-1);
 }
 

@@ -38,8 +38,8 @@ const EntityTable = (
     const {filter, data, deletions, creations, errMsg} = state;
 
     const handleFilterChange =
-        f => dispatch({type: "edit_filter", idx, filter: f});
-    const cancelCreations = idxs =>
+        (f: TableFilter) => dispatch({type: "edit_filter", idx, filter: f});
+    const cancelCreations = (idxs: number[]) =>
         dispatch({type: "cancel_creations", idxs, idx});
     const changeWhere = (w: string) => handleFilterChange({...filter, where: w});
     const changeLimit = (l: number) => handleFilterChange({...filter, limit: l});

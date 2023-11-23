@@ -117,7 +117,7 @@ const EntityViewer = ({server, sessionId, visible}: Props) => {
         dispatch({type: "close_tab", idx: idx})
     };
 
-    const deleteEntities = ids => {
+    const deleteEntities = (ids: number[]) => {
         if (activeTabIdx === null) return;
         const tab = entityTabs[activeTabIdx];
         if ((tab.deletions ?? new Set()).size === 0) return;

@@ -43,7 +43,7 @@ type Props = {
     modifications?: EntityModification;
     headers: string[];
     editingField: string | null;
-
+    relatedEntityDisplayFields: { [k: string]: string };
     saveEntity: (e: NewIcatEntity | ExistingIcatEntity) => Promise<number[]>;
     [k: string]: any;
 }
@@ -71,9 +71,10 @@ const EntityRow = (
         cancelDeletion,
         doDelete
     }: Props) => {
+
     const inputEl = useRef<HTMLInputElement>(null);
 
-    const doOpenContextMenu = ev => {
+    const doOpenContextMenu = (ev: MouseEvent) => {
         ev.preventDefault();
         openContextMenu(ev.pageX, ev.pageY);
     };
@@ -84,7 +85,7 @@ const EntityRow = (
         const el = inputEl.current;
         el.focus();
 
-        const cancelOnEsc = ev => {
+        const cancelOnEsc = (ev: KeyboardEvent) => {
             if (ev.key === "Escape") stopEditing();
         };
 
@@ -121,6 +122,8 @@ const EntityRow = (
 
     const getFieldValue = (field: string): string => {
         const value = getCurrentValue(field);
+        if (value === null || value === undefined) return "";
+
         const isModified = modifications !== undefined
             && modifications[field] !== undefined;
 
@@ -129,15 +132,16 @@ const EntityRow = (
             return (value as ExistingIcatEntity).id.toString();
         }
 
-        return relatedEntityDisplayFields[field] === undefined
-            ? formatCellContent(value)
-            // If the display field has been defined for the given field, it's a
-            // related entity.
-            // If the entity doesn't have a related entity, stay blank
-            // Otherwise, reach through to the entity and get _that_ value to display
-            : value === null || value === undefined
-                ? ""
-                : value[relatedEntityDisplayFields[field]];
+        if (relatedEntityDisplayFields[field] === undefined) {
+            return formatCellContent(value);
+        }
+
+        // By this point, the value cannot be a string or number, because
+        // relatedEntityDisplayFields will never be set for those fields,
+        // and array fields are never displayed in the table
+        const relatedEntity = value as ExistingIcatEntity;
+        const fieldToDisplay = relatedEntityDisplayFields[field];
+        return relatedEntity[fieldToDisplay] as string;
     };
 
     // Start from the id when editing a related entity, otherwise the current value
@@ -149,7 +153,7 @@ const EntityRow = (
             : getFieldValue(field);
     };
 
-    const handleFieldClick = (ev, k) => {
+    const handleFieldClick = (ev: MouseEvent, k: string) => {
         // All entities have some common fields which can't be edited
         if (commonFields.includes(k)) return;
         ev.stopPropagation();
@@ -198,19 +202,32 @@ const EntityRow = (
 
 type ActionButtonData = {
     title: string;
-    ev: (Event) => void;
+    clickEventHandler: (ev: MouseEvent) => void;
     icon: string;
 }
-const RowActions = ({
-                        mutation,
-                        isNewRow,
-                        isModified,
-                        markedForDeletion,
-                        revertChanges,
-                        markToDelete,
-                        cancelDeletion,
-                        doDelete
-                    }) => {
+
+type RowActionsProps = {
+    mutation: any,
+    isNewRow: boolean,
+    isModified: boolean,
+    markedForDeletion: boolean,
+    revertChanges: () => void,
+    markToDelete: () => void,
+    cancelDeletion: () => void,
+    doDelete: () => void
+}
+
+const RowActions = (
+    {
+        mutation,
+        isNewRow,
+        isModified,
+        markedForDeletion,
+        revertChanges,
+        markToDelete,
+        cancelDeletion,
+        doDelete
+    }: RowActionsProps) => {
     if (!mutation.isIdle) {
         return <SuccessIndicator saveState={{
             failed: mutation.isError,
@@ -222,20 +239,20 @@ const RowActions = ({
 
     let actions: ActionButtonData[] = [];
     if (isNewRow) {
-        actions.push({title: "Cancel creation", ev: revertChanges, icon: "🚫"});
-        actions.push({title: "Create row", ev: mutation.mutate, icon: "💾"});
+        actions.push({title: "Cancel creation", clickEventHandler: revertChanges, icon: "🚫"});
+        actions.push({title: "Create row", clickEventHandler: mutation.mutate, icon: "💾"});
     } else if (markedForDeletion) {
-        actions.push({title: "Cancel deletion", ev: cancelDeletion, icon: "↩️"});
-        actions.push({title: "Confirm deletion", ev: doDelete, icon: "✔️"});
+        actions.push({title: "Cancel deletion", clickEventHandler: cancelDeletion, icon: "↩️"});
+        actions.push({title: "Confirm deletion", clickEventHandler: doDelete, icon: "✔️"});
     } else {
-        actions.push({title: "Mark for deletion", ev: markToDelete, icon: "🗑"});
+        actions.push({title: "Mark for deletion", clickEventHandler: markToDelete, icon: "🗑"});
     }
 
     if (isModified) {
         actions.push(
-            {title: "Revert changes", ev: revertChanges, icon: "↩️"});
+            {title: "Revert changes", clickEventHandler: revertChanges, icon: "↩️"});
         actions.push(
-            {title: "Save changes", ev: mutation.mutate, icon: "💾"});
+            {title: "Save changes", clickEventHandler: mutation.mutate, icon: "💾"});
     }
     return (<>
         {actions.map(a =>
@@ -243,7 +260,7 @@ const RowActions = ({
                 class={style.actionButton}
                 key={a.title}
                 title={a.title}
-                onClick={a.ev}>
+                onClick={a.clickEventHandler}>
                 {a.icon}
             </button>)}
     </>);

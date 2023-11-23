@@ -13,19 +13,21 @@ type Props = {
  * closing them
  */
 const TabWindow = (props: Props) => {
-    const handleMouseDown = (ev, i) => {
+    const handleMouseDown = (ev: MouseEvent, i: number) => {
         // Only want middle mouse clicks
         if (ev.buttons != 4) return;
         ev.preventDefault();
         props.closeTab(i);
     }
 
-    const startDrag = (ev, i) => {
-        ev.dataTransfer.setData("index", i);
+    const startDrag = (ev: DragEvent, i: number) => {
+        if (!ev.dataTransfer) return;
+        ev.dataTransfer.setData("index", i.toString());
         ev.dataTransfer.dropEffect = "move";
     };
 
-    const endDrag = ev => {
+    const endDrag = (ev: DragEvent) => {
+        if (!ev.dataTransfer) return;
         const numTabsToLeft = getTabXs()
             .filter(x => x < ev.clientX)
             .length;

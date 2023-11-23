@@ -2,6 +2,7 @@ import {entityNames} from '../../icat';
 
 import {useEffect, useRef, useState} from "preact/hooks";
 import style from './style.css';
+import {TargetedEvent} from "react";
 
 const MAX_MATCHES = 20;
 
@@ -24,7 +25,7 @@ const OpenTabModal = ({openTab, close}: Props) => {
 
     // Close modal on Esc
     useEffect(() => {
-        const readKey = ev => {
+        const readKey = (ev: KeyboardEvent) => {
             if (ev.key === "Escape") {
                 ev.preventDefault();
                 close();
@@ -41,7 +42,7 @@ const OpenTabModal = ({openTab, close}: Props) => {
             return;
         }
 
-        const readKey = ev => {
+        const readKey = (ev: KeyboardEvent) => {
             if (!selectionControlKeys.includes(ev.key)) {
                 return;
             }
@@ -75,7 +76,7 @@ const OpenTabModal = ({openTab, close}: Props) => {
     });
 
     // When enter is pressed, open the currently selected match in a new tab
-    const handleInputKeyDown = ev => {
+    const handleInputKeyDown = (ev: KeyboardEvent) => {
         if (ev.key !== "Enter") return;
         if (selectedIdx === null) return;
         openTab(matches[selectedIdx]);
@@ -83,8 +84,10 @@ const OpenTabModal = ({openTab, close}: Props) => {
     }
 
     // Update the matching entities and selection when the input is changed
-    const handleOnInput = ev => {
-        const newMatches = getMatches(ev.target.value)
+    const handleOnInput = (ev: TargetedEvent<HTMLInputElement, Event>) => {
+        const input = ev.target as HTMLInputElement;
+        if (!input || ! input.value) return;
+        const newMatches = getMatches(input.value)
             .sort((a, b) => b.length - a.length)
             .reverse()
             .slice(0, MAX_MATCHES);

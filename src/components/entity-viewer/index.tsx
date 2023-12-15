@@ -176,8 +176,7 @@ const EntityViewer = ({server, sessionId, visible}: Props) => {
 
                         {activeTabIdx !== null &&
                           <EntityTable
-                            server={server}
-                            sessionId={sessionId}
+                            icatClient={icatClient}
                             state={entityTabs[activeTabIdx]}
                             openTab={openTab}
                             insertCreation={insertCreation}

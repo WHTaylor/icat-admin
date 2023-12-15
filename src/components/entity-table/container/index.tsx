@@ -15,8 +15,7 @@ import {
 import PaginationControl from "../../controls/pagination-control";
 
 type Props = {
-    server: string;
-    sessionId: string;
+    icatClient: IcatClient,
     state: EntityTabState;
     openTab: OpenTabHandler,
     deleteEntities: (ids: number[]) => void;
@@ -28,8 +27,7 @@ type Props = {
 
 const EntityTable = (
     {
-        server,
-        sessionId,
+        icatClient,
         state,
         openTab,
         deleteEntities,
@@ -38,7 +36,6 @@ const EntityTable = (
         dispatch,
         idx
     }: Props) => {
-    const icatClient = new IcatClient(server, sessionId);
     const {filter, data, deletions, creations, errMsg} = state;
 
     const handleFilterChange =

@@ -85,7 +85,8 @@ export function idReferenceFromRelatedEntity(
     origin: string,
     related: string,
     isOneToMany: boolean): string {
-    if (origin.endsWith("Type")) return "type.id";
+
+    if (isOneToMany && origin.endsWith("Type")) return "type.id";
 
     if (origin == "DataPublication"
         && dataPublicationIsPublication.includes(related)) {

@@ -6,10 +6,13 @@ import {
     xToOneAttributeToEntityName
 } from "../../utils";
 
-export type CtxMenuProps = {
+export type CtxMenuDynamicProps = {
     x: number;
     y: number;
     entity: ExistingIcatEntity;
+}
+
+export type CtxMenuProps = CtxMenuDynamicProps & {
     entityType: string,
     openTab: OpenTabHandler,
 }

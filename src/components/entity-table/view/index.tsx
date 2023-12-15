@@ -4,7 +4,7 @@ import {h} from "preact";
 import style from './style.css';
 
 import EntityRow, {EntityModification} from '../row';
-import ContextMenu, {CtxMenuProps} from '../../context-menu';
+import ContextMenu, {CtxMenuDynamicProps, CtxMenuProps} from '../../context-menu';
 import {defaultHeaderSort, xToOneAttributeToEntityName} from '../../../utils';
 import {ExistingIcatEntity, NewIcatEntity, OpenTabHandler} from "../../../types";
 import {EntityStateAction} from "../../../entityState";
@@ -46,7 +46,7 @@ const EntityTableView = ({
                              dispatch, idx
                          }: Props) => {
     const [contextMenuProps, setContextMenuProps] =
-        useState<CtxMenuProps | null>(null);
+        useState<CtxMenuDynamicProps | null>(null);
     // Locally saved changes to entities
     const [editingNewRow, setEditingNewRow] = useState(false);
     const [fieldBeingEdited, setFieldBeingEdited] =
@@ -59,7 +59,7 @@ const EntityTableView = ({
     const clearContextMenu = () => setContextMenuProps(null);
 
     const openContextMenu = (x: number, y: number, entity: ExistingIcatEntity) => {
-        setContextMenuProps({x, y, entity, entityType, openTab});
+        setContextMenuProps({x, y, entity});
         stopEditing();
     };
 
@@ -225,7 +225,10 @@ const EntityTableView = ({
                     toDisplay.map((e, i) => buildEntityRow(e, i))
                 }
             </table>
-            {contextMenuProps != null && <ContextMenu {...contextMenuProps} />}
+            {contextMenuProps != null &&
+              <ContextMenu {...contextMenuProps}
+                           entityType={entityType}
+                           openTab={openTab}/>}
         </>
     );
 }

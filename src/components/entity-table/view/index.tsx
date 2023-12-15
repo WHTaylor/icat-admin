@@ -10,9 +10,9 @@ import {ExistingIcatEntity, NewIcatEntity, OpenTabHandler} from "../../../types"
 import {EntityStateAction} from "../../../entityState";
 import {TargetedEvent} from "react";
 import JSX = h.JSX;
+import IcatClient from "../../../icat";
 
 type Props = {
-    openTab: OpenTabHandler,
     data?: ExistingIcatEntity[];
     deletions: Set<number>,
     creations: NewIcatEntity[];
@@ -23,6 +23,8 @@ type Props = {
     reloadEntity: (id: number) => Promise<void>;
     dispatch: (action: EntityStateAction) => void;
     idx: number;
+    openTab: OpenTabHandler,
+    icatClient: IcatClient,
     [k: string]: any;
 }
 
@@ -39,11 +41,12 @@ type FieldEdit = {
  */
 const EntityTableView = ({
                              data, deletions, creations, modifications,
-                             entityType, openTab,
+                             entityType,
                              sortingBy, saveEntity, reloadEntity,
                              deleteEntities,
                              cancelCreation, insertCreation,
-                             dispatch, idx
+                             dispatch, idx,
+                             openTab, icatClient
                          }: Props) => {
     const [contextMenuProps, setContextMenuProps] =
         useState<CtxMenuDynamicProps | null>(null);
@@ -228,7 +231,9 @@ const EntityTableView = ({
             {contextMenuProps != null &&
               <ContextMenu {...contextMenuProps}
                            entityType={entityType}
-                           openTab={openTab}/>}
+                           openTab={openTab}
+                           icatClient={icatClient}
+              />}
         </>
     );
 }

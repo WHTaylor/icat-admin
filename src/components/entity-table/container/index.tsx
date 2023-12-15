@@ -102,7 +102,6 @@ const EntityTable = (
                 deletions={deletions}
                 creations={creations}
                 modifications={state.modifications ?? {}}
-                openTab={openTab}
                 entityType={filter.table}
                 sortingBy={{field: filter.sortField, asc: filter.sortAsc}}
                 saveEntity={e =>
@@ -113,6 +112,8 @@ const EntityTable = (
                 insertCreation={insertCreation}
                 dispatch={dispatch}
                 idx={idx}
+                openTab={openTab}
+                icatClient={icatClient}
             />}
     </>);
 }

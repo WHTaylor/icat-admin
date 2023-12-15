@@ -12,6 +12,8 @@
 }
 
 .contextMenuRow {
+    display: flex;
+    align-items: center;
     background-color: white;
     margin-top: 0.06em;
     padding: 0 0.1em;
@@ -20,6 +22,11 @@
 .contextMenuRow:hover {
     background-color: var(--color-grey);
     user-select: none;
+}
+
+.relatedEntityCount {
+    font-size: xx-small;
+    padding-left: 0.25em;
 }
 
 .contextMenuList {

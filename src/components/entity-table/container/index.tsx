@@ -3,7 +3,6 @@ import style from './style.css';
 import IcatClient from '../../../icat';
 import EntityTableView from '../view';
 import {range} from '../../../utils';
-import {OpenRelatedHandler} from "../../context-menu";
 import {useQuery, useQueryClient} from "@tanstack/react-query";
 import OnChangeInput from "../../generic/on-change-input";
 import {EntityStateAction} from "../../../entityState";
@@ -14,7 +13,7 @@ type Props = {
     server: string;
     sessionId: string;
     state: EntityTabState;
-    openRelated: OpenRelatedHandler;
+    openTab: (entityName: string, where: string | null) => void
     deleteEntities: (ids: number[]) => void;
     insertCreation: (i: number, id: number) => void;
     reloadEntity: (id: number) => Promise<void>;
@@ -27,7 +26,7 @@ const EntityTable = (
         server,
         sessionId,
         state,
-        openRelated,
+        openTab,
         deleteEntities,
         insertCreation,
         reloadEntity,
@@ -101,7 +100,7 @@ const EntityTable = (
                 deletions={deletions}
                 creations={creations}
                 modifications={state.modifications ?? {}}
-                openRelated={openRelated}
+                openTab={openTab}
                 entityType={filter.table}
                 sortingBy={{field: filter.sortField, asc: filter.sortAsc}}
                 saveEntity={e =>

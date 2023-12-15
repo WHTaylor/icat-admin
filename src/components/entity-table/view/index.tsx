@@ -4,7 +4,7 @@ import {h} from "preact";
 import style from './style.css';
 
 import EntityRow, {EntityModification} from '../row';
-import ContextMenu, {CtxMenuProps, OpenRelatedHandler} from '../../context-menu';
+import ContextMenu, {CtxMenuProps} from '../../context-menu';
 import {defaultHeaderSort, xToOneAttributeToEntityName} from '../../../utils';
 import {ExistingIcatEntity, NewIcatEntity} from "../../../types";
 import {EntityStateAction} from "../../../entityState";
@@ -12,7 +12,7 @@ import {TargetedEvent} from "react";
 import JSX = h.JSX;
 
 type Props = {
-    openRelated: OpenRelatedHandler;
+    openTab: (entityName: string, where: string | null) => void;
     data?: ExistingIcatEntity[];
     deletions: Set<number>,
     creations: NewIcatEntity[];
@@ -39,7 +39,7 @@ type FieldEdit = {
  */
 const EntityTableView = ({
                              data, deletions, creations, modifications,
-                             entityType, openRelated,
+                             entityType, openTab,
                              sortingBy, saveEntity, reloadEntity,
                              deleteEntities,
                              cancelCreation, insertCreation,
@@ -59,7 +59,7 @@ const EntityTableView = ({
     const clearContextMenu = () => setContextMenuProps(null);
 
     const openContextMenu = (x: number, y: number, entity: ExistingIcatEntity) => {
-        setContextMenuProps({x, y, entity, openRelated});
+        setContextMenuProps({x, y, entity, entityType, openTab});
         stopEditing();
     };
 

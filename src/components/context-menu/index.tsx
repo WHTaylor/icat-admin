@@ -1,21 +1,39 @@
 import style from './style.css';
 import {ExistingIcatEntity} from "../../types";
-
-export type OpenRelatedHandler =
-    (attribute: string, originId: number, isOneToMany: boolean) => void;
+import {
+    idReferenceFromRelatedEntity,
+    xToManyAttributeToEntityName,
+    xToOneAttributeToEntityName
+} from "../../utils";
 
 export type CtxMenuProps = {
     x: number;
     y: number;
     entity: ExistingIcatEntity;
-    openRelated: OpenRelatedHandler;
+    entityType: string,
+    openTab: (entityName: string, where: string | null) => void;
 }
 
 /**
  * ContextMenu is displayed when right clicking an {@link EntityRow}, and
  * gives options for displaying any entities linked to the selected one
  */
-const ContextMenu = ({entity, openRelated, x, y}: CtxMenuProps) => {
+const ContextMenu = ({entity, entityType, openTab, x, y}: CtxMenuProps) => {
+    const openRelated = (attribute: string,
+                         originId: number,
+                         oneToMany: boolean) => {
+        const relatedEntity = oneToMany
+            ? xToManyAttributeToEntityName(entityType, attribute)
+            : xToOneAttributeToEntityName(entityType, attribute);
+
+        if (relatedEntity === null) return;
+
+        const originIdAttribute = idReferenceFromRelatedEntity(
+            entityType, relatedEntity, oneToMany);
+
+        openTab(relatedEntity, `${originIdAttribute} = ${originId}`);
+    };
+
     // Related entities which are many-one (ie. investigation.datasets)
     const relatedArrayCallbacks = Object.keys(entity)
         .filter(k => Array.isArray(entity[k]))

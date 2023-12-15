@@ -41,6 +41,7 @@ const EntityViewer = ({server, sessionId, visible}: Props) => {
         queryKey: [icatClient.buildUrl(et.filter)],
         queryFn: async () => await icatClient.getEntries(et.filter),
     }));
+
     const results = useQueries({
         queries
     });
@@ -88,22 +89,6 @@ const EntityViewer = ({server, sessionId, visible}: Props) => {
 
         if (activeTabIdx === a) setActiveTabIdx(b);
         else if (activeTabIdx === b) setActiveTabIdx(a);
-    };
-
-    const openRelated = (originEntity: string,
-                         attribute: string,
-                         originId: number,
-                         oneToMany: boolean) => {
-        const relatedEntity = oneToMany
-            ? xToManyAttributeToEntityName(originEntity, attribute)
-            : xToOneAttributeToEntityName(originEntity, attribute);
-
-        if (relatedEntity === null) return;
-
-        const originIdAttribute = idReferenceFromRelatedEntity(
-            originEntity, relatedEntity, oneToMany);
-
-        openTab(relatedEntity, `${originIdAttribute} = ${originId}`);
     };
 
     const closeTab = (idx: number) => {
@@ -199,12 +184,7 @@ const EntityViewer = ({server, sessionId, visible}: Props) => {
                             server={server}
                             sessionId={sessionId}
                             state={entityTabs[activeTabIdx]}
-                            openRelated={(attribute, id, isOneToMay) =>
-                                openRelated(
-                                    entityTabs[activeTabIdx].filter.table,
-                                    attribute,
-                                    id,
-                                    isOneToMay)}
+                            openTab={openTab}
                             insertCreation={insertCreation}
                             reloadEntity={reloadEntity}
                             deleteEntities={deleteEntities}

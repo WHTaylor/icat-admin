@@ -47,7 +47,8 @@ const ContextMenu = ({entity, entityType, openTab, x, y}: CtxMenuProps) => {
         .filter(k => !Array.isArray(entity[k]) && typeof entity[k] === "object")
         .map(k => ({
             relatedEntityType: k,
-            openRelated: () => openRelated(k, (entity[k] as ExistingIcatEntity).id, false)
+            openRelated: () => openRelated(
+                k, (entity[k] as ExistingIcatEntity).id, false)
         }));
 
     const items = relatedArrayCallbacks.concat(relatedSingleCallbacks);

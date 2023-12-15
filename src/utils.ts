@@ -24,6 +24,11 @@ export function xToManyAttributeToEntityName(
         if (attribute === "users") return "DataPublicationUser";
     }
 
+    if (originEntity == "Datafile"
+        && attribute == "sourceDatafiles" || attribute == "destDatafiles") {
+            return "RelatedDatafile"
+    }
+
     // Most attribute names for related entities are the table name lowercased
     // and pluralised. Reverse this to get the table name
     const singular = attribute.slice(0, -1);

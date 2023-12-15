@@ -104,7 +104,7 @@ export function tableFilter(
     table: string,
     offset: number,
     limit: number,
-    where: string | null = null,
+    where?: string,
     sortField: string | null = null,
     sortAsc = true): TableFilter {
     if (table === undefined) console.error("tableFilter called without args");
@@ -112,7 +112,7 @@ export function tableFilter(
         table,
         offset,
         limit,
-        where: where === undefined ? null : where,
+        where: where,
         sortField,
         sortAsc,
     };
@@ -152,9 +152,12 @@ export function randomSuffix() {
     return (a + b).slice(0, 8);
 }
 
-export function queryWhereFromInput(whereInput: string | null) {
-    if (whereInput === null || whereInput === undefined || whereInput.trim() === "")
+export function queryWhereFromInput(whereInput?: string) {
+    if (whereInput === null
+        || whereInput === undefined
+        || whereInput.trim() === "") {
         return " ";
+    }
 
     // Split into words on spaces and any suffixes consisting of (+
     // ie. ((id > 3) and name like '%S') or name like 'M%'

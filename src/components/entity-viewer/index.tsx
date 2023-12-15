@@ -1,12 +1,7 @@
 import {useEffect, useReducer, useState} from "preact/hooks";
 
 import IcatClient, {entityNames,} from '../../icat';
-import {
-    idReferenceFromRelatedEntity,
-    tableFilter,
-    xToManyAttributeToEntityName,
-    xToOneAttributeToEntityName,
-} from '../../utils';
+import {tableFilter,} from '../../utils';
 import EntityTable from '../entity-table/container';
 import TabWindow from '../tab-window';
 import style from './style.css';
@@ -14,7 +9,7 @@ import OpenTabModal from "../open-tab-modal";
 import {simplifyIcatErrMessage} from "../../icatErrorHandling";
 import {entityTabReducer} from "../../entityState";
 import {useQueries} from "@tanstack/react-query";
-import {TableFilter} from "../../types";
+import {OpenTabHandler, TableFilter} from "../../types";
 
 type Props = {
     server: string;
@@ -80,7 +75,7 @@ const EntityViewer = ({server, sessionId, visible}: Props) => {
         }), 1);
     };
 
-    const openTab = (entityName: string, where: string | null = null) =>
+    const openTab: OpenTabHandler = (entityName, where) =>
         openTabForFilter(tableFilter(entityName, 0, 50, where));
 
     const swapTabs = (a: number, b: number) => {

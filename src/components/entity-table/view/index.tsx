@@ -6,13 +6,13 @@ import style from './style.css';
 import EntityRow, {EntityModification} from '../row';
 import ContextMenu, {CtxMenuProps} from '../../context-menu';
 import {defaultHeaderSort, xToOneAttributeToEntityName} from '../../../utils';
-import {ExistingIcatEntity, NewIcatEntity} from "../../../types";
+import {ExistingIcatEntity, NewIcatEntity, OpenTabHandler} from "../../../types";
 import {EntityStateAction} from "../../../entityState";
 import {TargetedEvent} from "react";
 import JSX = h.JSX;
 
 type Props = {
-    openTab: (entityName: string, where: string | null) => void;
+    openTab: OpenTabHandler,
     data?: ExistingIcatEntity[];
     deletions: Set<number>,
     creations: NewIcatEntity[];

@@ -1,5 +1,5 @@
 import style from './style.css';
-import {ExistingIcatEntity} from "../../types";
+import {ExistingIcatEntity, OpenTabHandler} from "../../types";
 import {
     idReferenceFromRelatedEntity,
     xToManyAttributeToEntityName,
@@ -11,7 +11,7 @@ export type CtxMenuProps = {
     y: number;
     entity: ExistingIcatEntity;
     entityType: string,
-    openTab: (entityName: string, where: string | null) => void;
+    openTab: OpenTabHandler,
 }
 
 /**

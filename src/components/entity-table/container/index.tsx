@@ -6,14 +6,19 @@ import {range} from '../../../utils';
 import {useQuery, useQueryClient} from "@tanstack/react-query";
 import OnChangeInput from "../../generic/on-change-input";
 import {EntityStateAction} from "../../../entityState";
-import {EntityTabState, NewIcatEntity, TableFilter} from "../../../types";
+import {
+    EntityTabState,
+    NewIcatEntity,
+    OpenTabHandler,
+    TableFilter
+} from "../../../types";
 import PaginationControl from "../../controls/pagination-control";
 
 type Props = {
     server: string;
     sessionId: string;
     state: EntityTabState;
-    openTab: (entityName: string, where: string | null) => void
+    openTab: OpenTabHandler,
     deleteEntities: (ids: number[]) => void;
     insertCreation: (i: number, id: number) => void;
     reloadEntity: (id: number) => Promise<void>;

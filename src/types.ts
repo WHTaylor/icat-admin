@@ -20,7 +20,7 @@ export type TableFilter = {
     table: string;
     offset: number;
     limit: number;
-    where: string | null;
+    where?: string;
     sortField: string | null;
     sortAsc: boolean | null;
 }
@@ -48,3 +48,4 @@ export type NewIcatEntity = IcatEntity & {
     id?: never
 };
 
+export type OpenTabHandler = (entityName: string, where?: string) => void;

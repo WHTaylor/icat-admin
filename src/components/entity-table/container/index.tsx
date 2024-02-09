@@ -3,7 +3,7 @@ import style from './style.css';
 import IcatClient from '../../../icat';
 import EntityTableView from '../view';
 import {range} from '../../../utils';
-import {useQuery, useQueryClient} from "@tanstack/react-query";
+import {QueryFilters, useQuery, useQueryClient} from "@tanstack/react-query";
 import OnChangeInput from "../../generic/on-change-input";
 import {EntityStateAction} from "../../../entityState";
 import {
@@ -69,7 +69,7 @@ const EntityTable = (
             <button
                 title="Refresh data"
                 onClick={() => {
-                    qc.removeQueries([icatClient.buildUrl(filter)])
+                    qc.removeQueries({queryKey: [icatClient.buildUrl(filter)]})
                     dispatch({type: "refresh", idx});
                 }}>
                 ↻

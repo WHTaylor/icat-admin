@@ -56,7 +56,7 @@ const EntityViewer = ({server, sessionId, visible}: Props) => {
         } else if (error) {
             dispatch({
                 type: "set_error",
-                message: simplifyIcatErrMessage(error as string),
+                message: simplifyIcatErrMessage(error.message),
                 idx: i
             })
         }

@@ -6,7 +6,6 @@ import EntityTable from '../entity-table/container';
 import TabWindow from '../tab-window';
 import style from './style.css';
 import OpenTabModal from "../open-tab-modal";
-import {simplifyIcatErrMessage} from "../../icatErrorHandling";
 import {entityTabReducer} from "../../entityState";
 import {useQueries} from "@tanstack/react-query";
 import {OpenTabHandler, TableFilter} from "../../types";
@@ -56,7 +55,7 @@ const EntityViewer = ({server, sessionId, visible}: Props) => {
         } else if (error) {
             dispatch({
                 type: "set_error",
-                message: simplifyIcatErrMessage(error.message),
+                message: error.message,
                 idx: i
             })
         }

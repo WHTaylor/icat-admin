@@ -1,8 +1,7 @@
-type IcatError = "UnknownTable" | "BadRequest" | "EntityManagerException"
+type IcatError = "UnknownTable" | "EntityManagerException"
 
 const patterns: { [key in IcatError]: RegExp } = {
     "UnknownTable": /No information to determine type of (.+) in the FROM clause/,
-    "BadRequest": /400 Bad Request: (.+)/,
     "EntityManagerException":
         /An exception occurred while creating a query in EntityManager:\s+Exception Description: (.+)/
 }
@@ -12,7 +11,6 @@ const handlers: { [key in IcatError]: (match: RegExpMatchArray) => string } = {
     UnknownTable: m =>
         "Entity type '" + m[1] + "' does not exist " +
         "(likely an ICAT 5 entity on a server running ICAT 4)",
-    BadRequest: m => m[1],
     EntityManagerException: m => m[1]
 };
 

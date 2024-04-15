@@ -8,6 +8,7 @@
 import {queryWhereFromInput} from './utils';
 import {Connection} from "./connectioncache";
 import {ExistingIcatEntity, NewIcatEntity, TableFilter} from "./types";
+import {simplifyIcatErrMessage} from "./icatErrorHandling";
 
 type IcatResponse = { [k: string]: ExistingIcatEntity }[]
 
@@ -27,10 +28,12 @@ function queryUrlClause(args: { [k: string]: string | number }) {
         .join('&');
 }
 
-async function formatError(errResponse: Response): Promise<string> {
-    const header = `${errResponse.status} ${errResponse.statusText}`;
+async function formatError(errResponse: Response): Promise<{ message: string }> {
     return errResponse.json()
-        .then(r => `${header}: ${r["message"]}`);
+        .then(j => simplifyIcatErrMessage(j["message"]))
+        .then(msg => ({
+            message: `${errResponse.status}: ${msg}`
+        }));
 }
 
 function buildQuery(filter: TableFilter) {
@@ -88,8 +91,7 @@ class IcatClient {
             })
             .then(res => res.ok
                 ? res
-                : formatError(res)
-                    .then(msg => Promise.reject(msg)))
+                : formatError(res).then(j => Promise.reject(j)))
             .then(res => res.json())
             .then(j => j["sessionId"]);
     }
@@ -104,8 +106,7 @@ class IcatClient {
         return fetch(this.buildUrl(filter))
             .then(res => res.ok
                 ? res
-                : formatError(res)
-                    .then(msg => Promise.reject(msg)))
+                : formatError(res).then(j => Promise.reject(j)))
             .then(res => res.json())
             .then(unpack);
     }
@@ -115,8 +116,7 @@ class IcatClient {
         return fetch(this.buildCountUrl(filter), {signal: signal})
             .then(res => res.ok
                 ? res
-                : formatError(res)
-                    .then(msg => Promise.reject(msg)))
+                : formatError(res).then(j => Promise.reject(j)))
             .then(res => res.json())
             .then(json => json[0] as number);
     }
@@ -130,8 +130,7 @@ class IcatClient {
         return fetch(this.entityUrl(params).toString())
             .then(res => res.ok
                 ? res
-                : formatError(res)
-                    .then(msg => Promise.reject(msg)))
+                : formatError(res).then(j => Promise.reject(j)))
             .then(res => res.json())
             .then(j => j[entityType]);
     }
@@ -158,8 +157,7 @@ class IcatClient {
             })
             .then(res => res.ok
                 ? res
-                : formatError(res)
-                    .then(msg => Promise.reject(msg)))
+                : formatError(res).then(j => Promise.reject(j)))
             .then(res => res.json());
     }
 
@@ -171,8 +169,7 @@ class IcatClient {
         return fetch(this.entityUrl(params).toString(), {method: "DELETE"})
             .then(res => res.ok
                 ? res
-                : formatError(res)
-                    .then(msg => Promise.reject(msg)));
+                : formatError(res).then(j => Promise.reject(j)));
     }
 
     public buildUrl(filter: TableFilter): string {

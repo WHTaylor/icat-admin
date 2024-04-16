@@ -1,6 +1,6 @@
 import {randomSuffix} from "../../../utils";
 import {useEffect} from "preact/hooks";
-import style from "./style.css";
+import style from "./style.module.css";
 
 type Props = {
     pageNumber: number;

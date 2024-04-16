@@ -4,7 +4,7 @@ import IcatClient, {entityNames,} from '../../icat';
 import {tableFilter,} from '../../utils';
 import EntityTable from '../entity-table/container';
 import TabWindow from '../tab-window';
-import style from './style.css';
+import style from './style.module.css';
 import OpenTabModal from "../open-tab-modal";
 import {entityTabReducer} from "../../entityState";
 import {useQueries} from "@tanstack/react-query";

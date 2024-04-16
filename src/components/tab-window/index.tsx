@@ -1,4 +1,4 @@
-import style from './style.css';
+import style from './style.module.css';
 
 type Props = {
     activeTabIdx: number | null;

@@ -1,9 +1,9 @@
-import style from './style.css';
+import style from './style.module.css';
 
 import IcatClient from '../../../icat';
 import EntityTableView from '../view';
 import {range} from '../../../utils';
-import {QueryFilters, useQuery, useQueryClient} from "@tanstack/react-query";
+import {useQuery, useQueryClient} from "@tanstack/react-query";
 import OnChangeInput from "../../generic/on-change-input";
 import {EntityStateAction} from "../../../entityState";
 import {

@@ -1,10 +1,10 @@
 import {useEffect, useState} from "preact/hooks";
 import {h} from "preact";
 
-import style from './style.css';
+import style from './style.module.css';
 
 import EntityRow, {EntityModification} from '../row';
-import ContextMenu, {CtxMenuDynamicProps, CtxMenuProps} from '../../context-menu';
+import ContextMenu, {CtxMenuDynamicProps} from '../../context-menu';
 import {defaultHeaderSort, xToOneAttributeToEntityName} from '../../../utils';
 import {ExistingIcatEntity, NewIcatEntity, OpenTabHandler} from "../../../types";
 import {EntityStateAction} from "../../../entityState";

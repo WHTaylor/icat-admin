@@ -1,6 +1,6 @@
 import {useState} from "preact/hooks";
 
-import style from './style.css';
+import style from './style.module.css';
 
 const MAX_UNSUMMARISED_TEXT = 70;
 

@@ -1,7 +1,7 @@
 import {entityNames} from '../../icat';
 
 import {useEffect, useRef, useState} from "preact/hooks";
-import style from './style.css';
+import style from './style.module.css';
 import {TargetedEvent} from "react";
 
 const MAX_MATCHES = 20;

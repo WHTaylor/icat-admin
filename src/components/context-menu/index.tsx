@@ -1,4 +1,4 @@
-import style from './style.css';
+import style from './style.module.css';
 import {ExistingIcatEntity, OpenTabHandler} from "../../types";
 import {
     idReferenceFromRelatedEntity,

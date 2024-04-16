@@ -1,6 +1,6 @@
 import {useEffect, useRef} from "preact/hooks";
 
-import style from './style.css';
+import style from './style.module.css';
 
 import {commonFields} from '../../../utils';
 import ReadMore from '../../generic/read-more';

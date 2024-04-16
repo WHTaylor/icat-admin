@@ -1,7 +1,7 @@
 import {JSX} from "preact";
 import {useState} from "preact/hooks";
 
-import style from './style.css';
+import style from './style.module.css';
 
 import {getLastLogin, getServerNames} from '../../connectioncache'
 

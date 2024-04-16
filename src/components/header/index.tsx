@@ -1,6 +1,6 @@
 import {Link} from 'preact-router/match';
 
-import style from './style.css';
+import style from './style.module.css';
 
 import {Connection} from "../../connectioncache";
 
@@ -21,7 +21,7 @@ type Props = {
  */
 const Header = ({connections, activeConnection, setActiveConnection, closeConnection}: Props) => {
     const onClickConnectionLink =
-        (ev: MouseEvent, i: number, conn: Connection): void => {
+        (ev: MouseEvent, i: number): void => {
             // Middle click to close, left click to activate
             if (ev.buttons !== 4 && ev.buttons !== 1) return
             ev.preventDefault();
@@ -38,7 +38,7 @@ const Header = ({connections, activeConnection, setActiveConnection, closeConnec
                         // This will break if we allow connections to be reordered
                         key={i}
                         conn={conn}
-                        handleClick={ev => onClickConnectionLink(ev, i, conn)}
+                        handleClick={ev => onClickConnectionLink(ev, i)}
                         isActive={i === activeConnection}/>)}
                 <Link activeClassName={style.active} href="/">
                     +

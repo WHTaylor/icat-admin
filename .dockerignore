@@ -2,3 +2,5 @@
 !package.json
 !yarn.lock
 !src
+!tsconfig.json
+!vite.config.mts

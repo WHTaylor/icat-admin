@@ -208,7 +208,7 @@ type ActionButtonData = {
 }
 
 type RowActionsProps = {
-    mutation: UseMutationResult,
+    mutation: UseMutationResult<number[], Error, void, unknown>,
     isNewRow: boolean,
     isModified: boolean,
     markedForDeletion: boolean,
@@ -241,7 +241,7 @@ const RowActions = (
     let actions: ActionButtonData[] = [];
     if (isNewRow) {
         actions.push({title: "Cancel creation", clickEventHandler: revertChanges, icon: "🚫"});
-        actions.push({title: "Create row", clickEventHandler: mutation.mutate, icon: "💾"});
+        actions.push({title: "Create row", clickEventHandler: _ => mutation.mutate(), icon: "💾"});
     } else if (markedForDeletion) {
         actions.push({title: "Cancel deletion", clickEventHandler: cancelDeletion, icon: "↩️"});
         actions.push({title: "Confirm deletion", clickEventHandler: doDelete, icon: "✔️"});
@@ -253,7 +253,7 @@ const RowActions = (
         actions.push(
             {title: "Revert changes", clickEventHandler: revertChanges, icon: "↩️"});
         actions.push(
-            {title: "Save changes", clickEventHandler: mutation.mutate, icon: "💾"});
+            {title: "Save changes", clickEventHandler: _ => mutation.mutate(), icon: "💾"});
     }
     return (<>
         {actions.map(a =>

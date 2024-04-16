@@ -8,7 +8,6 @@ import ContextMenu, {CtxMenuDynamicProps} from '../../context-menu';
 import {defaultHeaderSort, xToOneAttributeToEntityName} from '../../../utils';
 import {ExistingIcatEntity, NewIcatEntity, OpenTabHandler} from "../../../types";
 import {EntityStateAction} from "../../../entityState";
-import {TargetedEvent} from "react";
 import JSX = h.JSX;
 import IcatClient from "../../../icat";
 
@@ -69,7 +68,7 @@ const EntityTableView = ({
     // Set up event listener to close the context menu and stop editing when
     // clicking away
     useEffect(() => {
-        const cancelInteractions = (ev: TargetedEvent<HTMLElement>) => {
+        const cancelInteractions = (ev: MouseEvent) => {
             const target = ev.target as HTMLElement;
             if (!target) return;
 

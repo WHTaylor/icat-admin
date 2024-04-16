@@ -15,7 +15,7 @@ const Tips = () => (
                 <SuccessIndicator
                     saveState={{
                         failed: true, clear: () => ({}),
-                        message: "Error reason will be displayed here"
+                        error: new Error("Error reason will be displayed here")
                     }}
                 />. Hover over it to see the error message.
             </li>

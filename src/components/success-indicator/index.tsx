@@ -10,7 +10,7 @@ type SaveState = {
     failed: boolean;
     isSaving?: boolean;
     clear: () => void;
-    message: string;
+    error: Error | null;
 };
 
 type Props = {
@@ -67,10 +67,10 @@ const SuccessIndicator = ({saveState, clearTimeoutMs = 2000}: Props) => {
               <div
                 class={style.messageContainer}
                 style={{
-                    top: (mousePos as MousePos).y,
-                    left: (mousePos as MousePos).x
+                    top: mousePos.y,
+                    left: mousePos.x
                 }}>
-                  {saveState.message}
+                  {saveState.error?.message}
               </div>}
         </>
     );

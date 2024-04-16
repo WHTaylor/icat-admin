@@ -12,7 +12,7 @@ import {
     withCorrectedDateFormats
 } from "../../../dateUtils";
 import OnChangeInput from "../../generic/on-change-input";
-import {useMutation} from "@tanstack/react-query";
+import {useMutation, UseMutationResult} from "@tanstack/react-query";
 
 function formatCellContent(cellContent: IcatEntityValue | undefined | null)
     : string {
@@ -208,7 +208,7 @@ type ActionButtonData = {
 }
 
 type RowActionsProps = {
-    mutation: any,
+    mutation: UseMutationResult,
     isNewRow: boolean,
     isModified: boolean,
     markedForDeletion: boolean,
@@ -232,9 +232,9 @@ const RowActions = (
     if (!mutation.isIdle) {
         return <SuccessIndicator saveState={{
             failed: mutation.isError,
-            isSaving: mutation.isLoading,
+            isSaving: mutation.isPending,
             clear: mutation.reset,
-            message: mutation.error
+            error: mutation.error
         }}/>;
     }
 

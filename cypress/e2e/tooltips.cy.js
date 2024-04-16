@@ -10,6 +10,6 @@ describe('Error tooltip on unauthorized update', () => {
       .type('{selectall}changed{enter}');
     cy.get('button[title="Save changes"]').click();
     cy.contains("❌").trigger('mousemove');
-    cy.contains("Forbidden");
+    cy.contains("403");
   })
 })

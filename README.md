@@ -17,7 +17,7 @@ yarn dev
 yarn build
 
 # run the production build locally
-yarn serve
+yarn preview
 ```
 
 Alternatively, launch the app with docker:

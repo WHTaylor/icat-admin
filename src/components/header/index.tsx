@@ -1,6 +1,7 @@
 import {Link} from 'preact-router/match';
 
 import style from './style.module.css';
+import CloseButton from '../controls/close-button';
 
 import {Connection} from "../../connectioncache";
 
@@ -72,8 +73,13 @@ const ConnectionLink = (
         if (ev.buttons === 4) closeConnection()
         else setActiveConnection();
     }
-    return <a onMouseDown={handleClick} class={isActive && style.active}>
-        {`${conn.username}@${stripProtocol(conn.server)}`}
+    return <a
+        onMouseDown={handleClick}
+        class={isActive && style.active}>
+        <span class={style.headerButtonContainer}>
+            {`${conn.username}@${stripProtocol(conn.server)}`}
+            <CloseButton onClickHandler={closeConnection}/>
+        </span>
     </a>;
 }
 

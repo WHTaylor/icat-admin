@@ -1,0 +1,20 @@
+.closeButton {
+    height: 2em;
+    width: 2em;
+    border: none;
+    background-color: transparent;
+}
+
+.closeButton svg {
+    display: block;
+}
+
+.closeButton svg circle {
+    transform-origin: center center;
+    transition: 0.1s;
+}
+
+.closeButton svg:hover circle {
+    transform: scale(0.95, 0.95);
+    fill-opacity: 0.5;
+}

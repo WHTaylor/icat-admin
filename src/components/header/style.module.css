@@ -50,3 +50,8 @@
 #tipsLink {
     margin-left: auto;
 }
+
+.headerButtonContainer {
+    display: flex;
+    align-items: center;
+}

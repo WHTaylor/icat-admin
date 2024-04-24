@@ -19,7 +19,13 @@ type Props = {
  * The header nav bar for the site, with links to active connections, and the
  * static pages
  */
-const Header = ({connections, activeConnection, setActiveConnection, closeConnection}: Props) => {
+const Header = (
+    {
+        connections,
+        activeConnection,
+        setActiveConnection,
+        closeConnection
+    }: Props) => {
     const onClickConnectionLink =
         (ev: MouseEvent, i: number): void => {
             // Middle click to close, left click to activate

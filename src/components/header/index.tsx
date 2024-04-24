@@ -78,7 +78,10 @@ const ConnectionLink = (
         class={isActive && style.active}>
         <span class={style.headerButtonContainer}>
             {`${conn.username}@${stripProtocol(conn.server)}`}
-            <CloseButton onClickHandler={closeConnection}/>
+            <CloseButton
+                onClickHandler={closeConnection}
+                additionalClass={style.closeButton}
+            />
         </span>
     </a>;
 }

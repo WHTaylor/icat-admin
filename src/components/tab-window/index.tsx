@@ -1,4 +1,5 @@
 import style from './style.module.css';
+import CloseButton from "../controls/close-button";
 
 type Props = {
     activeTabIdx: number | null;
@@ -40,6 +41,11 @@ const TabWindow = (props: Props) => {
             .map(el => el.getBoundingClientRect())
             .map(r => r.x);
 
+    const getTabClasses = (i: number) =>
+        "entityButton "
+        + style.entityTabButton + " "
+        + (i === props.activeTabIdx ? style.selectedTab : "");
+
     return (
         <div
             class={style.tabSwitcher}
@@ -50,10 +56,18 @@ const TabWindow = (props: Props) => {
                     key={key}
                     onClick={() => props.handleChangeTabIdx(i)}
                     onMouseDown={ev => handleMouseDown(ev, i)}
-                    class={`entityButton ${i === props.activeTabIdx ? style.selectedTab : ""}`}
+                    class={getTabClasses(i)}
                     draggable={true}
                     onDragStart={ev => startDrag(ev, i)}>
                     {table}
+                    <CloseButton
+                        onClickHandler={() => {
+                            props.closeTab(i)
+                        }}
+                        lineColour="black"
+                        additionalClass={style.closeButton}
+                        fillColour={i === props.activeTabIdx ? undefined : "white"}
+                    />
                 </button>)}
         </div>)
 }

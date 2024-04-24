@@ -12,13 +12,19 @@ const CloseButton = (
     {
         onClickHandler,
         lineColour = "white",
-        fillColour = "lightgrey" // Colour to part fill with on hover
+        // Colour to fill the circle with (partially) on hover
+        fillColour = "lightgrey",
+        // An additional class to apply to the button, allowing it to be
+        // styled by the parent component. Not convinced this is a great
+        // approach, but it'll do for now
+        additionalClass
     }: {
         onClickHandler: () => void,
         lineColour?: string
         fillColour?: string
+        additionalClass: string
     }
-) => <button class={style.closeButton}>
+) => <button class={style.closeButton + " " + additionalClass}>
     <svg
         viewBox="0 0 24 24"
         fill="none"

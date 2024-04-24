@@ -6,14 +6,19 @@
     width: 100%;
 }
 
-.tabSwitcher button {
+.entityTabButton {
     margin: 0.2em 0.25em -1px 0.25em;
     border-radius: 5px 5px 0 0;
     border: 1px solid var(--color-grey-dark);
     font-size: large;
 }
 
-.tabSwitcher button.selectedTab {
+.entityTabButton.selectedTab {
     background-color: var(--color-grey-very-light);
     border-bottom: 1px solid transparent;
+}
+
+.closeButton {
+    width: 1.5em;
+    height: 1.5em;
 }

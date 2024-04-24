@@ -1,7 +1,7 @@
 import {EntityModification} from "./components/entity-table/row";
 
 /**
- * All the state for a single tab within an EntityViewer
+ * All the state for a single tab within an EntityBrowser
  */
 export type EntityTabState = {
     key: number

@@ -6,7 +6,7 @@ import IcatClient, {isValidSession} from '../icat';
 import About from './about';
 import Tips from './tips';
 import Header from './header';
-import EntityViewer from './entity-viewer';
+import EntityBrowser from './entity-browser';
 import ServerConnector from './server-connector';
 import {
     Connection,
@@ -91,7 +91,7 @@ const App = () => {
             </Router>
 
             {connections.map((c, i) =>
-                <EntityViewer
+                <EntityBrowser
                     key={c.sessionId}
                     server={c.server}
                     sessionId={c.sessionId}

@@ -2,7 +2,7 @@ import style from './style.module.css';
 import CloseButton from "../controls/close-button";
 
 type Props = {
-    activeTabIdx: number | null;
+    activeTabIdx?: number;
     closeTab: (i: number) => void;
     handleChangeTabIdx: (i: number) => void;
     swapTabs: (a: number, b: number) => void;

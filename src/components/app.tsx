@@ -1,6 +1,4 @@
-import {FunctionComponent} from 'preact';
-import {useLayoutEffect, useState} from 'preact/hooks';
-import {route, Route, Router} from 'preact-router';
+import {useLayoutEffect, useReducer} from 'preact/hooks';
 
 import IcatClient, {isValidSession} from '../icat';
 import About from './about';
@@ -15,6 +13,7 @@ import {
     saveLogin
 } from '../connectioncache';
 import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
+import {appStateReducer, Page} from "../entityState";
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -27,79 +26,77 @@ const queryClient = new QueryClient({
 });
 
 const App = () => {
-    const [connections, setConnections] = useState<Connection[]>([]);
-    const [activeConnection, setActiveConnection] =
-        useState<number | null>(null);
+    const [state, dispatch] = useReducer(
+        appStateReducer,
+        {
+            activePage: undefined, connections: []
+        });
 
     const createConnection = (login: Connection) => {
         saveLogin(login);
-        setActiveConnection(connections.length);
-        setConnections(connections.concat(login));
-        route("/icat");
+        dispatch({
+            type: "create_connection",
+            connectionInfo: login
+        })
     };
 
+    const setActivePage = (p: Page) =>
+        dispatch({
+            type: "change_page",
+            page: p
+        });
+
     const removeConnection = (i: number) => {
-        const numConnections = connections.length;
-        const c = connections[i];
+        const c = state.connections[i].connectionInfo;
 
         invalidateLogin(c.server, c.username);
         new IcatClient(c.server, c.sessionId).logout();
-        setConnections(connections.slice(0, i).concat(connections.slice(i + 1)));
-
-        // Don't change active tab if non-connection tab is selected
-        if (activeConnection === null) return;
-
-        // Go to login screen if last connection was closed
-        if (numConnections === 1) route("/");
-
-        // If we closed a connection to the left, or the last connection whilst
-        //it was active, decrement the active connection
-        if (i < activeConnection
-            || (activeConnection == numConnections - 1) && i === activeConnection) {
-            setActiveConnection(activeConnection - 1);
-        }
+        dispatch({
+            type: "close_connection",
+            idx: i
+        });
     }
 
-    // If on the home or icat page, and no servers are currently active, try to
+    // If not on the login page, and no servers are currently active, try to
     // login to the last active server.
     useLayoutEffect(() => {
-        if (location.pathname != "/" && location.pathname != "/icat") return;
-        if (connections.length > 0) return;
+        if (state.activePage !== undefined) return;
+        if (state.connections.length > 0) return;
         const login = getLastLogin();
         if (login === null) return;
         isValidSession(login)
             .then(res => {if (res) createConnection(login)});
     });
 
+    // es pattern matching when?
+    const activePage = state.activePage === undefined
+        ? <ServerConnector createConnection={createConnection}/>
+        : state.activePage == "tips"
+            ? <Tips/>
+            : state.activePage == "about"
+                ? <About/>
+                : <EntityBrowser
+                    server={state.connections[state.activePage].connectionInfo.server}
+                    sessionId={state.connections[state.activePage].connectionInfo.sessionId}
+                    visible={true}
+                    entityTabs={state.connections[state.activePage].entityTabs}
+                    activeTabIdx={state.connections[state.activePage].activeTab ?? undefined}
+                    dispatch={a => dispatch(
+                        {...a, connectionIdx: state.activePage as number}
+                    )}
+                    key={state.connections[state.activePage].connectionInfo.sessionId}
+                />
+
     return (
         <QueryClientProvider client={queryClient}>
             <Header
-                connections={connections}
+                connections={state.connections.map(c => c.connectionInfo)}
                 closeConnection={removeConnection}
-                setActiveConnection={i => { route("/icat"); setActiveConnection(i)}}
-                activeConnection={activeConnection} />
-
-            <Router onChange={
-                e => {
-                    if (e.path != "/icat") setActiveConnection(null);
-                }
-            }>
-                <Route path="/tips" component={Tips}/>
-                <Route path="/about" component={About}/>
-                <Route path="/icat" component={Nothing}/>
-                <Route path="/" component={ServerConnector} createConnection={createConnection} />
-            </Router>
-
-            {connections.map((c, i) =>
-                <EntityBrowser
-                    key={c.sessionId}
-                    server={c.server}
-                    sessionId={c.sessionId}
-                    visible={i === activeConnection} />) }
+                setActivePage={setActivePage}
+                activePage={state.activePage}/>
+            {activePage}
         </QueryClientProvider>
     );
 }
-
-const Nothing: FunctionComponent = () => null;
 
 export default App;

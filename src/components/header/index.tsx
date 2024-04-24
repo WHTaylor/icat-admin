@@ -1,9 +1,8 @@
-import {Link} from 'preact-router/match';
-
 import style from './style.module.css';
 import CloseButton from '../controls/close-button';
 
 import {Connection} from "../../connectioncache";
+import {Page} from "../../entityState";
 
 function stripProtocol(server: string) {
     return server.split("://").slice(-1);
@@ -12,8 +11,8 @@ function stripProtocol(server: string) {
 
 type Props = {
     connections: Connection[];
-    activeConnection: number | null
-    setActiveConnection: (i: number) => void;
+    activePage: Page;
+    setActivePage: (i: Page) => void;
     closeConnection: Function;
 }
 /**
@@ -23,8 +22,8 @@ type Props = {
 const Header = (
     {
         connections,
-        activeConnection,
-        setActiveConnection,
+        activePage,
+        setActivePage,
         closeConnection
     }: Props) => {
     return (
@@ -36,19 +35,29 @@ const Header = (
                         // This will break if we allow connections to be reordered
                         key={i}
                         conn={conn}
-                        isActive={i === activeConnection}
-                        setActiveConnection={() => setActiveConnection(i)}
+                        isActive={i === activePage}
+                        setActiveConnection={() => setActivePage(i)}
                         closeConnection={() => closeConnection(i)}
                     />)}
-                <Link activeClassName={style.active} href="/">
+                <a
+                    class={activePage === undefined && style.active}
+                    onClick={() => setActivePage(undefined)}
+                >
                     +
-                </Link>
-                <Link activeClassName={style.active} id={style.tipsLink} href="/tips">
+                </a>
+                <a
+                    id={style.tipsLink}
+                    class={activePage === "tips" && style.active}
+                    onClick={() => setActivePage("tips")}
+                >
                     Tips
-                </Link>
-                <Link activeClassName={style.active} href="/about">
+                </a>
+                <a
+                    class={activePage === "about" && style.active}
+                    onClick={() => setActivePage("about")}
+                >
                     About
-                </Link>
+                </a>
             </nav>
         </header>
     )

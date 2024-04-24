@@ -1,4 +1,4 @@
-import {useEffect, useReducer, useState} from "preact/hooks";
+import {Dispatch, useEffect, useState} from "preact/hooks";
 
 import IcatClient, {entityNames,} from '../../icat';
 import {tableFilter,} from '../../utils';
@@ -6,14 +6,17 @@ import EntityTable from '../entity-table/container';
 import TabWindow from '../tab-window';
 import style from './style.module.css';
 import OpenTabModal from "../open-tab-modal";
-import {entityTabReducer} from "../../entityState";
+import {EntityStateAction} from "../../entityState";
 import {useQueries} from "@tanstack/react-query";
-import {OpenTabHandler, TableFilter} from "../../types";
+import {EntityTabState, OpenTabHandler, TableFilter} from "../../types";
 
 type Props = {
     server: string;
     sessionId: string;
     visible: boolean;
+    entityTabs: EntityTabState[];
+    activeTabIdx?: number;
+    dispatch: Dispatch<EntityStateAction>
     key: string;
 }
 
@@ -24,9 +27,15 @@ type Props = {
  * Contains components for opening new tables and a tab selector used to switch
  * between the opened tables.
  */
-const EntityBrowser = ({server, sessionId, visible}: Props) => {
-    const [entityTabs, dispatch] = useReducer(entityTabReducer, [])
-    const [activeTabIdx, setActiveTabIdx] = useState<number | null>(null);
+const EntityBrowser = (
+    {
+        server,
+        sessionId,
+        visible,
+        entityTabs,
+        activeTabIdx,
+        dispatch
+    }: Props) => {
     const [isOpenTabModalOpen, setIsOpenTabModalOpen] = useState(false);
 
     const icatClient = new IcatClient(server, sessionId);
@@ -62,9 +71,7 @@ const EntityBrowser = ({server, sessionId, visible}: Props) => {
     });
 
     const openTabForFilter = (f: TableFilter) => {
-        const numTabs = entityTabs.length;
         dispatch({type: "create_tab", filter: f})
-        setActiveTabIdx(numTabs)
         // Timeout is used as a small hack to make sure scroll happens after component
         // rerenders (or at least, that's what it appears to do).
         setTimeout(() => window.scrollTo({
@@ -80,24 +87,12 @@ const EntityBrowser = ({server, sessionId, visible}: Props) => {
     const swapTabs = (a: number, b: number) => {
         if (a === b) return;
         dispatch({type: "swap", a, b});
-
-        if (activeTabIdx === a) setActiveTabIdx(b);
-        else if (activeTabIdx === b) setActiveTabIdx(a);
     };
 
-    const closeTab = (idx: number) => {
-        if (entityTabs.length === 1 || activeTabIdx === null) {
-            setActiveTabIdx(null);
-        } else if (idx < activeTabIdx) {
-            setActiveTabIdx(activeTabIdx - 1);
-        } else if (activeTabIdx === idx) {
-            setActiveTabIdx(Math.min(activeTabIdx, entityTabs.length - 2));
-        }
-        dispatch({type: "close_tab", idx: idx})
-    };
+    const closeTab = (idx: number) => dispatch({type: "close_tab", idx: idx});
 
     const deleteEntities = (ids: number[]) => {
-        if (activeTabIdx === null) return;
+        if (activeTabIdx === undefined) return;
         const tab = entityTabs[activeTabIdx];
         if ((tab.deletions ?? new Set()).size === 0) return;
 
@@ -107,7 +102,7 @@ const EntityBrowser = ({server, sessionId, visible}: Props) => {
             }));
     }
     const insertCreation = async (i: number, id: number) => {
-        if (activeTabIdx === null) return;
+        if (activeTabIdx === undefined) return;
 
         const activeTab = entityTabs[activeTabIdx];
         const entity = await icatClient.getById(activeTab.filter.table, id);
@@ -117,7 +112,7 @@ const EntityBrowser = ({server, sessionId, visible}: Props) => {
     }
 
     const reloadEntity = async (id: number) => {
-        if (activeTabIdx === null) return;
+        if (activeTabIdx === undefined) return;
         const entity = await icatClient.getById(
             entityTabs[activeTabIdx].filter.table, id);
         dispatch({
@@ -168,12 +163,15 @@ const EntityBrowser = ({server, sessionId, visible}: Props) => {
                       <TabWindow
                         activeTabIdx={activeTabIdx}
                         closeTab={closeTab}
-                        handleChangeTabIdx={i => setActiveTabIdx(i)}
+                        handleChangeTabIdx={i => dispatch({
+                            type: "change_tab",
+                            idx: i
+                        })}
                         swapTabs={swapTabs}
                         tabs={entityTabs.map(tab =>
                             [tab.filter.table, tab.key])}/>
 
-                        {activeTabIdx !== null &&
+                        {activeTabIdx !== undefined &&
                           <EntityTable
                             icatClient={icatClient}
                             state={entityTabs[activeTabIdx]}

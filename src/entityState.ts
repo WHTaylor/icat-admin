@@ -2,23 +2,19 @@
  * Types and functions for the reducer which manages the main app state
  */
 import {difference, withReplaced} from "./utils";
-import {
-    EntityTabState,
-    ExistingIcatEntity,
-    IcatEntity,
-    IcatEntityValue,
-    TableFilter
-} from "./types";
+import {EntityTabState, ExistingIcatEntity, IcatEntity, IcatEntityValue, TableFilter} from "./types";
+import {Connection} from "./connectioncache";
 
 export type EntityStateAction =
     EntityTabAction |
     EntityTabEditAction
 
-// Actions which change the number or position of entity tabs
+// Actions which change the number, position, or active entity tab
 type EntityTabAction =
     EntityTabCreateAction |
     EntityTabCloseAction |
-    EntityTabSwapAction
+    EntityTabSwapAction |
+    EntityTabChangeAction
 
 // Actions which change a property of a tab
 type EntityTabEditAction =
@@ -52,6 +48,11 @@ type EntityTabSwapAction = {
     type: "swap"
     a: number
     b: number
+}
+
+type EntityTabChangeAction = {
+    type: "change_tab"
+    idx: number
 }
 
 type EditAction = {
@@ -137,35 +138,147 @@ type EntitySyncModificationAction = EditAction & {
     entity: ExistingIcatEntity
 }
 
-export function entityTabReducer(
-    state: EntityTabState[],
-    action: EntityStateAction
-): EntityTabState[] {
+/** The page can be:
+ 1. The index for the open server connection
+ 2. The tips page
+ 3. The about page
+ 4. The login page (ServerConnector), if undefined */
+export type Page = number | "tips" | "about" | undefined
+type AppState = {
+    connections: ConnectionState[]
+    activePage: Page
+}
+
+type ConnectionState = {
+    entityTabs: EntityTabState[]
+    activeTab?: number
+    connectionInfo: Connection
+};
+
+type AppStateAction =
+    ConnectionCreateAction |
+    ConnectionCloseAction |
+    PageChangeAction;
+
+type ConnectionCreateAction = {
+    type: "create_connection",
+    connectionInfo: Connection
+};
+
+type ConnectionCloseAction = {
+    type: "close_connection",
+    idx: number
+};
+
+type PageChangeAction = {
+    type: "change_page",
+    page: Page
+};
+
+export function appStateReducer(
+    state: AppState,
+    action: (EntityStateAction & {
+        connectionIdx: number
+    }) | AppStateAction
+): AppState {
     switch (action.type) {
-        case "create_tab":
-            return state.concat({
-                filter: action.filter,
-                key: Math.random(),
-                creations: [],
-                deletions: new Set<number>()
-            });
+        case "create_connection":
+            return {
+                activePage: state.connections.length,
+                connections: state.connections.concat({
+                    entityTabs: [],
+                    connectionInfo: action.connectionInfo
+                })
+            };
+        case "close_connection":
+            const c = state.activePage;
+            let newActivePage = undefined;
+            if (typeof c !== "number") newActivePage = c;
+            else if (state.connections.length == 1) newActivePage = undefined;
+            else if (action.idx < c
+                || action.idx === state.connections.length - 1) newActivePage = c - 1;
 
-        case "close_tab":
-            return state.slice(0, action.idx).concat(state.slice(action.idx + 1));
+            const newConnections = state.connections
+                .slice(0, action.idx)
+                .concat(state.connections
+                    .slice(action.idx + 1));
 
-        case "swap":
-            const rearranged = [...state];
-            const temp = rearranged[action.a];
-            rearranged[action.a] = rearranged[action.b];
-            rearranged[action.b] = temp;
-            return rearranged;
+            return {
+                activePage: newActivePage, connections: newConnections
+            };
 
+        case "change_page":
+            return {...state, activePage: action.page};
+    }
+
+    const connectionState = state.connections[action.connectionIdx];
+    const newConnectionState = connectionTabReducer(connectionState, action);
+    const connections = withReplaced(
+        state.connections, newConnectionState, action.connectionIdx);
+    return {
+        ...state,
+        connections
+    };
+}
+
+function connectionTabReducer(
+    state: ConnectionState,
+    action: EntityStateAction
+): ConnectionState {
+    if (action.type == "change_tab") {
+        return {...state, activeTab: action.idx};
+    } else if (action.type == "create_tab") {
+        const entities = state.entityTabs.concat({
+            filter: action.filter,
+            key: Math.random(),
+            creations: [],
+            deletions: new Set<number>()
+        });
+        return {
+            ...state,
+            activeTab: entities.length - 1,
+            entityTabs: entities
+        };
+    } else if (action.type == "close_tab") {
+        const entities = state.entityTabs
+            .slice(0, action.idx)
+            .concat(state.entityTabs
+                .slice(action.idx + 1));
+        let activeTab = state.activeTab;
+        if (entities.length === 0 || state.activeTab === undefined) activeTab = undefined;
+        else if (state.activeTab < action.idx) activeTab = state.activeTab - 1;
+        else if (state.activeTab === action.idx) activeTab = Math.min(entities.length - 1, state.activeTab);
+
+        return {
+            ...state,
+            activeTab,
+            entityTabs: entities
+        };
+    } else if (action.type == "swap") {
+        const rearranged = [...state.entityTabs];
+        const temp = rearranged[action.a];
+        rearranged[action.a] = rearranged[action.b];
+        rearranged[action.b] = temp;
+        const activeTab = state.activeTab === action.a
+            ? action.b
+            : state.activeTab === action.b
+                ? action.a
+                : state.activeTab;
+        return {
+            ...state,
+            activeTab,
+            entityTabs: rearranged
+        };
     }
 
     const edit = makeEditFunction(action);
-    return state.map((ets, i) => i !== action.idx
+    const newEntities = state.entityTabs.map((ets, i) => i !== action.idx
         ? ets
         : edit(ets));
+    return {
+        ...state,
+        entityTabs: newEntities
+    };
 }
 
 function makeEditFunction(action: EntityTabEditAction)

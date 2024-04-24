@@ -26,15 +26,6 @@ const Header = (
         setActiveConnection,
         closeConnection
     }: Props) => {
-    const onClickConnectionLink =
-        (ev: MouseEvent, i: number): void => {
-            // Middle click to close, left click to activate
-            if (ev.buttons !== 4 && ev.buttons !== 1) return
-            ev.preventDefault();
-            if (ev.buttons === 4) closeConnection(i)
-            else setActiveConnection(i);
-        };
-
     return (
         <header class={style.header}>
             <h1>ICAT admin</h1>
@@ -44,8 +35,10 @@ const Header = (
                         // This will break if we allow connections to be reordered
                         key={i}
                         conn={conn}
-                        handleClick={ev => onClickConnectionLink(ev, i)}
-                        isActive={i === activeConnection}/>)}
+                        isActive={i === activeConnection}
+                        setActiveConnection={() => setActiveConnection(i)}
+                        closeConnection={() => closeConnection(i)}
+                    />)}
                 <Link activeClassName={style.active} href="/">
                     +
                 </Link>
@@ -60,12 +53,25 @@ const Header = (
     )
 };
 
-const ConnectionLink = ({conn, isActive, handleClick}:
-                            {
-                                conn: Connection,
-                                isActive: boolean,
-                                handleClick: (ev: MouseEvent) => void
-                            }) => {
+const ConnectionLink = (
+    {
+        conn,
+        isActive,
+        setActiveConnection,
+        closeConnection
+    }: {
+        conn: Connection,
+        isActive: boolean,
+        setActiveConnection: () => void,
+        closeConnection: () => void,
+    }) => {
+    // Close on middle click, set active on left click
+    const handleClick = (ev: MouseEvent) => {
+        if (ev.buttons !== 4 && ev.buttons !== 1) return;
+        ev.preventDefault();
+        if (ev.buttons === 4) closeConnection()
+        else setActiveConnection();
+    }
     return <a onMouseDown={handleClick} class={isActive && style.active}>
         {`${conn.username}@${stripProtocol(conn.server)}`}
     </a>;

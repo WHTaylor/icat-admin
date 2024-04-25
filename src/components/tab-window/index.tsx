@@ -37,7 +37,7 @@ const TabWindow = (props: Props) => {
     }
 
     const getTabXs = () =>
-        Array.from(document.querySelectorAll(`.${style.tabSwitcher} button`))
+        Array.from(document.querySelectorAll(`.${style.tabSwitcher} .${style.entityTabButton}`))
             .map(el => el.getBoundingClientRect())
             .map(r => r.x);
 

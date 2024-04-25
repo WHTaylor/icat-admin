@@ -5,20 +5,42 @@ import {difference, withReplaced} from "./utils";
 import {EntityTabState, ExistingIcatEntity, IcatEntity, IcatEntityValue, TableFilter} from "./types";
 import {Connection} from "./connectioncache";
 
-export type EntityStateAction =
+/** Actions which affect top level app state */
+type AppStateAction =
+    ConnectionCreateAction |
+    ConnectionCloseAction |
+    PageChangeAction;
+
+type ConnectionCreateAction = {
+    type: "create_connection",
+    connectionInfo: Connection
+};
+
+type ConnectionCloseAction = {
+    type: "close_connection",
+    idx: number
+};
+
+type PageChangeAction = {
+    type: "change_page",
+    page: Page
+};
+
+/** Actions which affect the state of a single connection */
+export type ConnectionStateAction =
     EntityTabAction |
     EntityTabEditAction
 
-// Actions which change the number, position, or active entity tab
+/** Actions which change the number, position, or active entity tab */
 type EntityTabAction =
     EntityTabCreateAction |
     EntityTabCloseAction |
     EntityTabSwapAction |
     EntityTabChangeAction
 
-// Actions which change a property of a tab
-type EntityTabEditAction =
-    EntityDataAction |
+/** Actions which change the state of a single entity tab */
+export type EntityDataAction =
+    EntitySetDataAction |
     EntityErrorAction |
     EntitySortAction |
     EntityEditFilterAction |
@@ -33,6 +55,8 @@ type EntityTabEditAction =
     EntityModifyAction |
     EntityCancelModificationsAction |
     EntitySyncModificationAction
+/** idx is the entity tab to make the change to */
+type EntityTabEditAction = { idx: number } & EntityDataAction;
 
 type EntityTabCreateAction = {
     type: "create_tab"
@@ -55,85 +79,81 @@ type EntityTabChangeAction = {
     idx: number
 }
 
-type EditAction = {
-    idx: number
-}
-
-type EntityDataAction = EditAction & {
+type EntitySetDataAction = {
     type: "set_data"
     data: ExistingIcatEntity[]
 }
 
-type EntityErrorAction = EditAction & {
+type EntityErrorAction = {
     type: "set_error"
     message: string
 }
 
-type EntitySortAction = EditAction & {
+type EntitySortAction = {
     type: "sort"
     field: string
     asc: boolean
 }
 
-type EntityEditFilterAction = EditAction & {
+type EntityEditFilterAction = {
     type: "edit_filter"
     filter: TableFilter
 }
 
-type EntityRefreshAction = EditAction & {
+type EntityRefreshAction = {
     type: "refresh"
 }
 
-type EntityMarkDeleteAction = EditAction & {
+type EntityMarkDeleteAction = {
     type: "mark_delete"
     id: number
 }
 
-type EntityCancelDeleteAction = EditAction & {
+type EntityCancelDeleteAction = {
     type: "cancel_deletes"
     ids: number[]
 }
 
-type EntitySyncDeleteAction = EditAction & {
+type EntitySyncDeleteAction = {
     type: "sync_deletes"
     ids: number[]
 }
 
-type EntityAddCreationAction = EditAction & {
+type EntityAddCreationAction = {
     type: "add_creation"
 }
 
-type EntityCancelCreationsAction = EditAction & {
+type EntityCancelCreationsAction = {
     type: "cancel_creations"
     idxs: number[]
 }
 
-type EntityEditCreationAction = EditAction & {
+type EntityEditCreationAction = {
     type: "edit_creation"
     i: number
     k: string
     v: IcatEntityValue
 }
 
-type EntitySyncCreationAction = EditAction & {
+type EntitySyncCreationAction = {
     type: "sync_creation"
     i: number
     entity: ExistingIcatEntity
 }
 
-type EntityModifyAction = EditAction & {
+type EntityModifyAction = {
     type: "edit_entity"
     id: number
     k: string
     v: string | number | { id: number }
 }
 
-type EntityCancelModificationsAction = EditAction & {
+type EntityCancelModificationsAction = {
     type: "cancel_modifications"
     id: number
 }
 
-type EntitySyncModificationAction = EditAction & {
+type EntitySyncModificationAction = {
     type: "sync_modification"
     entity: ExistingIcatEntity
 }
@@ -155,29 +175,9 @@ type ConnectionState = {
     connectionInfo: Connection
 };
 
-type AppStateAction =
-    ConnectionCreateAction |
-    ConnectionCloseAction |
-    PageChangeAction;
-
-type ConnectionCreateAction = {
-    type: "create_connection",
-    connectionInfo: Connection
-};
-
-type ConnectionCloseAction = {
-    type: "close_connection",
-    idx: number
-};
-
-type PageChangeAction = {
-    type: "change_page",
-    page: Page
-};
-
 export function appStateReducer(
     state: AppState,
-    action: (EntityStateAction & {
+    action: (ConnectionStateAction & {
         connectionIdx: number
     }) | AppStateAction
 ): AppState {
@@ -223,7 +223,7 @@ export function appStateReducer(
 
 function connectionTabReducer(
     state: ConnectionState,
-    action: EntityStateAction
+    action: ConnectionStateAction
 ): ConnectionState {
     if (action.type == "change_tab") {
         return {...state, activeTab: action.idx};
@@ -246,7 +246,7 @@ function connectionTabReducer(
                 .slice(action.idx + 1));
         let activeTab = state.activeTab;
         if (entities.length === 0 || state.activeTab === undefined) activeTab = undefined;
-        else if (state.activeTab < action.idx) activeTab = state.activeTab - 1;
+        else if (action.idx < state.activeTab) activeTab = state.activeTab - 1;
         else if (state.activeTab === action.idx) activeTab = Math.min(entities.length - 1, state.activeTab);
 
         return {

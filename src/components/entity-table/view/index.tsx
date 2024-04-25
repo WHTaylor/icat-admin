@@ -7,9 +7,9 @@ import EntityRow, {EntityModification} from '../row';
 import ContextMenu, {CtxMenuDynamicProps} from '../../context-menu';
 import {defaultHeaderSort, xToOneAttributeToEntityName} from '../../../utils';
 import {ExistingIcatEntity, NewIcatEntity, OpenTabHandler} from "../../../types";
-import {EntityStateAction} from "../../../entityState";
-import JSX = h.JSX;
+import {EntityDataAction} from "../../../entityState";
 import IcatClient from "../../../icat";
+import JSX = h.JSX;
 
 type Props = {
     data?: ExistingIcatEntity[];
@@ -20,8 +20,7 @@ type Props = {
     saveEntity: (e: NewIcatEntity | ExistingIcatEntity) => Promise<number[]>;
     cancelCreation: (i: number) => void;
     reloadEntity: (id: number) => Promise<void>;
-    dispatch: (action: EntityStateAction) => void;
-    idx: number;
+    dispatch: (action: EntityDataAction) => void;
     openTab: OpenTabHandler,
     icatClient: IcatClient,
     [k: string]: any;
@@ -44,7 +43,7 @@ const EntityTableView = ({
                              sortingBy, saveEntity, reloadEntity,
                              deleteEntities,
                              cancelCreation, insertCreation,
-                             dispatch, idx,
+                             dispatch,
                              openTab, icatClient
                          }: Props) => {
     const [contextMenuProps, setContextMenuProps] =
@@ -128,10 +127,10 @@ const EntityTableView = ({
                 : v;
             isNewRow
                 ? dispatch({
-                    type: "edit_creation", i, k, v: newValue, idx
+                    type: "edit_creation", i, k, v: newValue
                 })
                 : dispatch({
-                    type: "edit_entity", id: e.id, k, v: newValue, idx
+                    type: "edit_entity", id: e.id, k, v: newValue
                 });
             stopEditing();
         }
@@ -140,7 +139,7 @@ const EntityTableView = ({
             : async () => await reloadEntity(e.id);
         const revertChanges = isNewRow
             ? () => cancelCreation(i)
-            : () => dispatch({type: "cancel_modifications", id: e.id, idx});
+            : () => dispatch({type: "cancel_modifications", id: e.id});
         const isRowBeingEdited =
             fieldBeingEdited != null
             && (editingNewRow
@@ -172,16 +171,16 @@ const EntityTableView = ({
             saveEntity={saveEntity}
             revertChanges={revertChanges}
             syncModifications={syncModifications}
-            markToDelete={() => dispatch({type: "mark_delete", id: e.id!, idx})}
+            markToDelete={() => dispatch({type: "mark_delete", id: e.id!})}
             cancelDeletion={() => dispatch({
-                type: "cancel_deletes", ids: [e.id!], idx
+                type: "cancel_deletes", ids: [e.id!]
             })}
             doDelete={() => deleteEntities([(e as ExistingIcatEntity).id])}
             markedForDeletion={deletions.has((e as ExistingIcatEntity).id)}/>;
     };
 
     const setSortingBy = (field: string, asc: boolean) =>
-        dispatch({type: "sort", field, asc, idx});
+        dispatch({type: "sort", field, asc});
 
     // Slightly awkward array combination to make tsc happy
     const empty: (ExistingIcatEntity | NewIcatEntity)[] = [];

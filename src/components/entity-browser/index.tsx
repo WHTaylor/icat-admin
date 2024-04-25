@@ -6,7 +6,7 @@ import EntityTable from '../entity-table/container';
 import TabWindow from '../tab-window';
 import style from './style.module.css';
 import OpenTabModal from "../open-tab-modal";
-import {EntityStateAction} from "../../entityState";
+import {ConnectionStateAction} from "../../entityState";
 import {useQueries} from "@tanstack/react-query";
 import {EntityTabState, OpenTabHandler, TableFilter} from "../../types";
 
@@ -16,7 +16,7 @@ type Props = {
     visible: boolean;
     entityTabs: EntityTabState[];
     activeTabIdx?: number;
-    dispatch: Dispatch<EntityStateAction>
+    dispatch: Dispatch<ConnectionStateAction>
     key: string;
 }
 
@@ -179,12 +179,10 @@ const EntityBrowser = (
                             insertCreation={insertCreation}
                             reloadEntity={reloadEntity}
                             deleteEntities={deleteEntities}
-                            dispatch={dispatch}
-                              /*
-                              TODO: find a way to type capturing idx in dispatch
-                                    closure so we don't have to pass it down.
-                              */
-                            idx={activeTabIdx}
+                            dispatch={a => dispatch({
+                                ...a,
+                                idx: activeTabIdx
+                            })}
                           />
                         }
                     </div>

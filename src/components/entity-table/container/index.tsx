@@ -5,13 +5,8 @@ import EntityTableView from '../view';
 import {range} from '../../../utils';
 import {useQuery, useQueryClient} from "@tanstack/react-query";
 import OnChangeInput from "../../generic/on-change-input";
-import {EntityStateAction} from "../../../entityState";
-import {
-    EntityTabState,
-    NewIcatEntity,
-    OpenTabHandler,
-    TableFilter
-} from "../../../types";
+import {EntityDataAction} from "../../../entityState";
+import {EntityTabState, NewIcatEntity, OpenTabHandler, TableFilter} from "../../../types";
 import PaginationControl from "../../controls/pagination-control";
 
 type Props = {
@@ -21,8 +16,7 @@ type Props = {
     deleteEntities: (ids: number[]) => void;
     insertCreation: (i: number, id: number) => void;
     reloadEntity: (id: number) => Promise<void>;
-    dispatch: (action: EntityStateAction) => void;
-    idx: number;
+    dispatch: (action: EntityDataAction) => void;
 }
 
 const EntityTable = (
@@ -34,14 +28,13 @@ const EntityTable = (
         insertCreation,
         reloadEntity,
         dispatch,
-        idx
     }: Props) => {
     const {filter, data, deletions, creations, errMsg} = state;
 
     const handleFilterChange =
-        (f: TableFilter) => dispatch({type: "edit_filter", idx, filter: f});
+        (f: TableFilter) => dispatch({type: "edit_filter", filter: f});
     const cancelCreations = (idxs: number[]) =>
-        dispatch({type: "cancel_creations", idxs, idx});
+        dispatch({type: "cancel_creations", idxs: idxs});
     const changeWhere = (w: string) => handleFilterChange({...filter, where: w});
     const changeLimit = (l: number) => handleFilterChange({...filter, limit: l});
     const changePage = (change: number) => {
@@ -70,7 +63,7 @@ const EntityTable = (
                 title="Refresh data"
                 onClick={() => {
                     qc.removeQueries({queryKey: [icatClient.buildUrl(filter)]})
-                    dispatch({type: "refresh", idx});
+                    dispatch({type: "refresh"});
                 }}>
                 ↻
             </button>
@@ -85,12 +78,12 @@ const EntityTable = (
         <span class={style.tableActionsBar}>
             <CreateActions
                 creations={creations}
-                addCreation={() => dispatch({type: "add_creation", idx})}
+                addCreation={() => dispatch({type: "add_creation"})}
                 clearCreations={() => cancelCreations(range(creations.length))}/>
             <DeleteActions
                 deletions={deletions}
                 clearDeletions={() => dispatch({
-                    type: "cancel_deletes", ids: [...deletions], idx
+                    type: "cancel_deletes", ids: [...deletions]
                 })}
                 deleteAll={() => deleteEntities([...deletions])}/>
         </span>
@@ -111,7 +104,6 @@ const EntityTable = (
                 cancelCreation={idx => cancelCreations([idx])}
                 insertCreation={insertCreation}
                 dispatch={dispatch}
-                idx={idx}
                 openTab={openTab}
                 icatClient={icatClient}
             />}

@@ -62,7 +62,7 @@ const TabWindow = (props: Props) => {
                     {table}
                     <CloseButton
                         onClickHandler={() => {
-                            props.closeTab(i)
+                            props.closeTab(i);
                         }}
                         lineColour="black"
                         additionalClass={style.closeButton}

@@ -45,7 +45,6 @@
     "dayjs": "^1.11.3",
     "preact": "^10.3.2",
     "preact-render-to-string": "^6.0.2",
-    "preact-router": "^4.1.0",
     "typescript": "^5.0.4",
     "vite": "^5.2.8"
   }

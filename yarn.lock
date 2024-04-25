@@ -4151,11 +4151,6 @@ preact-render-to-string@^6.0.2:
   dependencies:
     pretty-format "^3.8.0"
 
-preact-router@^4.1.0:
-  version "4.1.2"
-  resolved "https://registry.yarnpkg.com/preact-router/-/preact-router-4.1.2.tgz#f44b03737b670eeaec958563582eb8c4efaa87a5"
-  integrity sha512-uICUaUFYh+XQ+6vZtQn1q+X6rSqwq+zorWOCLWPF5FAsQh3EJ+RsDQ9Ee+fjk545YWQHfUxhrBAaemfxEnMOUg==
-
 preact@^10.3.2:
   version "10.20.2"
   resolved "https://registry.yarnpkg.com/preact/-/preact-10.20.2.tgz#0b343299a8c020562311cc25db93b3d832ec5e71"

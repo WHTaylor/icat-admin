@@ -1,6 +1,7 @@
 .closeButton {
     border: none;
     background-color: transparent;
+    padding: 0;
 }
 
 .closeButton svg {
@@ -12,7 +13,7 @@
     transition: 0.1s;
 }
 
-.closeButton svg:hover circle {
+.closeButton:hover svg circle {
     transform: scale(0.95, 0.95);
     fill-opacity: 0.5;
 }

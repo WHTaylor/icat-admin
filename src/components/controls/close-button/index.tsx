@@ -24,21 +24,25 @@ const CloseButton = (
         fillColour?: string
         additionalClass: string
     }
-) => <button class={style.closeButton + " " + additionalClass}>
+) => <button
+    class={style.closeButton + " " + additionalClass}
+    type="button"
+    onClick={ev => {
+        ev.stopPropagation();
+        onClickHandler();
+    }}
+>
     <svg
         viewBox="0 0 24 24"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
-        onClick={ev => {
-            ev.stopPropagation();
-            onClickHandler();
-        }}>
+        >
         <circle
             cx="12"
             cy="12"
-            r="8"
+            r="10"
             stroke={lineColour}
-            stroke-width="1.2"
+            stroke-width="1.5"
             fill={fillColour}
             fill-opacity="0"
         />

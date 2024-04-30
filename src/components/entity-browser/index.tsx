@@ -143,52 +143,52 @@ const EntityBrowser = (
     return (
         <div>
             <div class="leftColumn">
-              <h2>ICAT tables</h2>
-              <ul className={style.tableList}>
-                  {entityNames.map(en =>
-                      <li key={en}>
-                          <button
-                              className="entityButton"
-                              onClick={() => openTab(en)}>
-                              {en}
-                          </button>
-                      </li>)}
-              </ul>
+                <h2>ICAT tables</h2>
+                <ul className={style.tableList}>
+                    {entityNames.map(en =>
+                        <li key={en}>
+                            <button
+                                className="entityButton"
+                                onClick={() => openTab(en)}>
+                                {en}
+                            </button>
+                        </li>)}
+                </ul>
             </div>
 
-              {entityTabs.length > 0 &&
-                <div className="mainContentAndRightColumn">
-                  <TabWindow
-                    activeTabIdx={activeTabIdx}
-                    closeTab={closeTab}
-                    handleChangeTabIdx={i => dispatch({
-                        type: "change_tab",
-                        idx: i
-                    })}
-                    swapTabs={swapTabs}
-                    tabs={entityTabs.map(tab =>
-                        [tab.filter.table, tab.key])}/>
+            {entityTabs.length > 0 &&
+              <div className="mainContentAndRightColumn">
+                <TabWindow
+                  activeTabIdx={activeTabIdx}
+                  closeTab={closeTab}
+                  handleChangeTabIdx={i => dispatch({
+                      type: "change_tab",
+                      idx: i
+                  })}
+                  swapTabs={swapTabs}
+                  tabs={entityTabs.map(tab =>
+                      [tab.filter.table, tab.key])}/>
 
-                    {activeTabIdx !== undefined &&
-                      <EntityTable
-                        icatClient={icatClient}
-                        state={entityTabs[activeTabIdx]}
-                        openTab={openTab}
-                        insertCreation={insertCreation}
-                        reloadEntity={reloadEntity}
-                        deleteEntities={deleteEntities}
-                        dispatch={a => dispatch({
-                            ...a,
-                            idx: activeTabIdx
-                        })}
-                      />
-                    }
-                </div>
-              }
+                  {activeTabIdx !== undefined &&
+                    <EntityTable
+                      icatClient={icatClient}
+                      state={entityTabs[activeTabIdx]}
+                      openTab={openTab}
+                      insertCreation={insertCreation}
+                      reloadEntity={reloadEntity}
+                      deleteEntities={deleteEntities}
+                      dispatch={a => dispatch({
+                          ...a,
+                          idx: activeTabIdx
+                      })}
+                    />
+                  }
+              </div>
+            }
 
             {isOpenTabModalOpen &&
-              // Even if tab is not visible, have to render this because it
-              // holds state we want to persist when on other top level tab
+                // Even if tab is not visible, have to render this because it
+                // holds state we want to persist when on other top level tab
               <OpenTabModal
                 openTab={openTab}
                 close={() => setIsOpenTabModalOpen(false)}

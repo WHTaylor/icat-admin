@@ -5,7 +5,7 @@ import About from './about';
 import Tips from './tips';
 import Header from './header';
 import EntityBrowser from './entity-browser';
-import ServerConnector from './server-connector';
+import LoginForm from './login-form';
 import {
     Connection,
     getLastLogin,
@@ -70,7 +70,7 @@ const App = () => {
 
     // es pattern matching when?
     const activePage = state.activePage === undefined
-        ? <ServerConnector createConnection={createConnection}/>
+        ? <LoginForm createConnection={createConnection}/>
         : state.activePage == "tips"
             ? <Tips/>
             : state.activePage == "about"

@@ -57,13 +57,13 @@ const App = () => {
         });
     }
 
-    // If not on the login page, and no servers are currently active, try to
+    // If on the login page, and no servers are currently active, try to
     // login to the last active server.
     useLayoutEffect(() => {
         if (state.activePage !== undefined) return;
         if (state.connections.length > 0) return;
         const login = getLastLogin();
-        if (login === null) return;
+        if (login === null || login.sessionId == undefined) return;
         isValidSession(login)
             .then(res => {if (res) createConnection(login)});
     });

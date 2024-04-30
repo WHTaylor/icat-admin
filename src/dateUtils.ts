@@ -37,8 +37,8 @@ export function withCorrectedDateFormats(entity: ExistingIcatEntity | NewIcatEnt
                 const asDate = parseDate(v);
                 if (asDate.isValid()) {
                     return [k, inIcatFormat(asDate)];
-                } else {
-                    return [k, v];
                 }
+
+                return [k, v];
             }));
 }

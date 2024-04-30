@@ -118,7 +118,7 @@ export function tableFilter(
         table,
         offset,
         limit,
-        where: where,
+        where,
         sortField,
         sortAsc,
     };
@@ -142,8 +142,8 @@ export function defaultHeaderSort(headers: string[]): string[] {
     // If the entity has start and end date fields, put the start date immediately
     // before the end date (they can be far apart when sorted alphabetically)
     if (middle.includes("startDate") && middle.includes("endDate")) {
-        let startIndex = middle.findIndex(e => e === "startDate");
-        let endIndex = middle.findIndex(e => e === "endDate");
+        const startIndex = middle.findIndex(e => e === "startDate");
+        const endIndex = middle.findIndex(e => e === "endDate");
         middle.splice(startIndex, 1);
         middle.splice(endIndex, 0, "startDate");
     }
@@ -192,8 +192,8 @@ export function queryWhereFromInput(whereInput?: string) {
 }
 
 export function difference<T>(set: Set<T>, other: Iterable<T>): Set<T> {
-    let diff = new Set(set);
-    for (let e of other) {
+    const diff = new Set(set);
+    for (const e of other) {
         diff.delete(e);
     }
     return diff;

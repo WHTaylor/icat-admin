@@ -13,7 +13,7 @@ type Props = {
     connections: Connection[];
     activePage: Page;
     setActivePage: (i: Page) => void;
-    closeConnection: Function;
+    closeConnection: (n: number) => void;
 }
 /**
  * The header nav bar for the site, with links to active connections, and the

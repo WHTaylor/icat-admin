@@ -14,8 +14,14 @@
   "rules": {
     "prefer-template": "off",
     "radix": "off",
-    "@typescript-eslint/no-unused-vars": ["error"],
-    "jest/no-deprecated-functions": "off",
-    "react/jsx-tag-spacing": "off"
+    "@typescript-eslint/no-unused-vars": [
+      "error",
+      {
+        "argsIgnorePattern": "^_"
+      }
+    ],
+    "react/jsx-tag-spacing": "off",
+    "@typescript-eslint/no-explicit-any": "off",
+    "jest/no-deprecated-functions": "off"
   }
 }

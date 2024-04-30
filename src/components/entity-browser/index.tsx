@@ -89,7 +89,7 @@ const EntityBrowser = (
         dispatch({type: "swap", a, b});
     };
 
-    const closeTab = (idx: number) => dispatch({type: "close_tab", idx: idx});
+    const closeTab = (idx: number) => dispatch({type: "close_tab", idx});
 
     const deleteEntities = (ids: number[]) => {
         if (activeTabIdx === undefined) return;

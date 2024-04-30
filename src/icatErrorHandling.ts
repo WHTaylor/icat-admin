@@ -1,8 +1,8 @@
 type IcatError = "UnknownTable" | "EntityManagerException"
 
 const patterns: { [key in IcatError]: RegExp } = {
-    "UnknownTable": /No information to determine type of (.+) in the FROM clause/,
-    "EntityManagerException":
+    UnknownTable: /No information to determine type of (.+) in the FROM clause/,
+    EntityManagerException:
         /An exception occurred while creating a query in EntityManager:\s+Exception Description: (.+)/
 }
 
@@ -22,8 +22,8 @@ export function simplifyIcatErrMessage(err: string): string {
     let match;
     do {
         match = false;
-        for (let k in patterns) {
-            let m = message.match(patterns[k as IcatError]);
+        for (const k in patterns) {
+            const m = message.match(patterns[k as IcatError]);
             if (m != null) {
                 match = true;
                 const handler = handlers[k as IcatError] || defaultHandler;

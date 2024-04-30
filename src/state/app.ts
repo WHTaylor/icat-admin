@@ -56,9 +56,9 @@ export function appStateReducer(
                     connectionInfo: action.connectionInfo
                 })
             };
-        case "close_connection":
+        case "close_connection": {
             const c = state.activePage;
-            let newActivePage = undefined;
+            let newActivePage;
             if (typeof c !== "number") newActivePage = c;
             else if (state.connections.length == 1) newActivePage = undefined;
             else if (action.idx < c
@@ -72,6 +72,7 @@ export function appStateReducer(
             return {
                 activePage: newActivePage, connections: newConnections
             };
+        }
 
         case "change_page":
             return {...state, activePage: action.page};

@@ -116,7 +116,8 @@ const OpenTabModal = ({openTab, close}: Props) => {
             {matches &&
               <ul>
                   {matches.map((m, i) =>
-                      <li className={(selectedIdx ?? -1) == i && style.active}>
+                      <li key={m}
+                          className={(selectedIdx ?? -1) == i && style.active}>
                           {m}
                       </li>
                   )}

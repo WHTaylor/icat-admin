@@ -1,4 +1,4 @@
-﻿/*
+/*
 The SVG icon for this button was originally sourced from
 https://www.svgrepo.com/svg/526920/close-circle, from the Solar Line Duotone
 Icons collections, under the CC BY license.

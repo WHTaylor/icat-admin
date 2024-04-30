@@ -183,7 +183,7 @@ const EntityRow = (
             </td>
             {headers.map(k =>
                 k === editingField
-                    ? <td>
+                    ? <td key={k}>
                         <OnChangeInput
                             type="text"
                             ref={inputEl}
@@ -192,6 +192,7 @@ const EntityRow = (
                             onChange={ev => makeEdit(editingField, (ev.target as HTMLInputElement).value)}/>
                     </td>
                     : <td
+                        key={k}
                         onClick={ev => handleFieldClick(ev, k)}
                         class={getStyleForField(k)}>
                         <ReadMore text={getFieldValue(k)}/>
@@ -238,7 +239,7 @@ const RowActions = (
         }}/>;
     }
 
-    let actions: ActionButtonData[] = [];
+    const actions: ActionButtonData[] = [];
     if (isNewRow) {
         actions.push({title: "Cancel creation", clickEventHandler: revertChanges, icon: "🚫"});
         actions.push({title: "Create row", clickEventHandler: _ => mutation.mutate(), icon: "💾"});

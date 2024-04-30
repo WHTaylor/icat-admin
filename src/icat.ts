@@ -113,7 +113,7 @@ class IcatClient {
 
     async getCount(filter: TableFilter, signal: AbortSignal | null = null)
         : Promise<number> {
-        return fetch(this.buildCountUrl(filter), {signal: signal})
+        return fetch(this.buildCountUrl(filter), {signal})
             .then(res => res.ok
                 ? res
                 : formatError(res).then(j => Promise.reject(j)))

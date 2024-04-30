@@ -15,7 +15,6 @@ const ServerConnection = (
     return <EntityBrowser
         server={connection.connectionInfo.server}
         sessionId={connection.connectionInfo.sessionId}
-        visible={true}
         entityTabs={connection.entityTabs}
         activeTabIdx={connection.activeTab}
         dispatch={dispatch}

@@ -13,7 +13,6 @@ import {EntityTabState, OpenTabHandler, TableFilter} from "../../types";
 type Props = {
     server: string;
     sessionId: string;
-    visible: boolean;
     entityTabs: EntityTabState[];
     activeTabIdx?: number;
     dispatch: Dispatch<ConnectionStateAction>
@@ -31,7 +30,6 @@ const EntityBrowser = (
     {
         server,
         sessionId,
-        visible,
         entityTabs,
         activeTabIdx,
         dispatch
@@ -127,10 +125,8 @@ const EntityBrowser = (
         return () => clearInterval(id);
     }, [server, sessionId]); // eslint-disable-line react-hooks/exhaustive-deps
 
-    // If this is visible, bind Alt-Shift-O to toggle an OpenTabModal
+    // Bind Alt-Shift-O to toggle an OpenTabModal
     useEffect(() => {
-        if (!visible) return;
-
         const readKey = (ev: KeyboardEvent) => {
             if (ev.altKey && ev.shiftKey && ev.key == "O") {
                 setIsOpenTabModalOpen(!isOpenTabModalOpen)
@@ -138,7 +134,7 @@ const EntityBrowser = (
         }
         document.addEventListener("keydown", readKey);
         return () => document.removeEventListener("keydown", readKey);
-    }, [visible, isOpenTabModalOpen])
+    }, [isOpenTabModalOpen])
 
     return (
         <div>
@@ -187,8 +183,6 @@ const EntityBrowser = (
             }
 
             {isOpenTabModalOpen &&
-                // Even if tab is not visible, have to render this because it
-                // holds state we want to persist when on other top level tab
               <OpenTabModal
                 openTab={openTab}
                 close={() => setIsOpenTabModalOpen(false)}

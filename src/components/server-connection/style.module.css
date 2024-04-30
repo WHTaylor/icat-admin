@@ -1,0 +1,27 @@
+.uiSwitcher {
+}
+
+.uiSwitcher button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    text-decoration: underline rgba(0, 0, 0, 0);
+    transition: text-decoration-color 200ms
+}
+
+.uiSwitcher button:first-child {
+    padding-right: 0.7em;
+}
+
+.uiSwitcher button:last-child {
+    padding-left: 0.7em;
+}
+
+.uiSwitcher button.active {
+    text-decoration-color: rgba(0, 0, 0, 1);
+}
+
+.spacer {
+    user-select: none;
+    font-size: small;
+}

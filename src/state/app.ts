@@ -6,7 +6,7 @@ import {Connection} from "../connectioncache";
 import {
     ConnectionState,
     ConnectionStateAction,
-    connectionTabReducer
+    connectionTabReducer, makeNewConnectionState
 } from "./connection";
 
 /** Actions which affect top level app state */
@@ -49,12 +49,10 @@ export function appStateReducer(
 ): AppState {
     switch (action.type) {
         case "create_connection":
+            const newConnection = makeNewConnectionState(action.connectionInfo);
             return {
                 activePage: state.connections.length,
-                connections: state.connections.concat({
-                    entityTabs: [],
-                    connectionInfo: action.connectionInfo
-                })
+                connections: state.connections.concat(newConnection)
             };
         case "close_connection": {
             const c = state.activePage;

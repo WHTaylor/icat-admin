@@ -9,17 +9,42 @@ import {
 } from "../types";
 import {difference, withReplaced} from "../utils";
 import {Connection} from "../connectioncache";
+import {
+    handleToolAction,
+    makeNewToolsState,
+    ToolsAction,
+    ToolsUIState
+} from "./tools";
+
+export type UI = "Browser" | "Tools";
 
 export type ConnectionState = {
+    connectionInfo: Connection
+    activeUI: UI
     entityTabs: EntityTabState[]
     activeTab?: number
-    connectionInfo: Connection
+    toolsState: ToolsUIState
 };
+
+export const makeNewConnectionState = (connectionInfo: Connection) => ({
+    connectionInfo,
+    activeUI: "Browser" as UI,
+    entityTabs: [],
+    activeTab: undefined,
+    toolsState: makeNewToolsState()
+});
 
 /** Actions which affect the state of a single connection */
 export type ConnectionStateAction =
+    SwitchUIAction |
     EntityTabAction |
-    EntityTabEditAction
+    EntityTabEditAction |
+    ToolsAction
+
+type SwitchUIAction = {
+    type: "switch_ui",
+    ui: UI
+}
 
 /** Actions which change the number, position, or active entity tab */
 type EntityTabAction =
@@ -148,12 +173,17 @@ type EntitySyncModificationAction = {
     entity: ExistingIcatEntity
 }
 
-
 export function connectionTabReducer(
     state: ConnectionState,
     action: ConnectionStateAction
 ): ConnectionState {
-    if (action.type == "change_tab") {
+    if (action.type == "switch_ui") {
+        if (action.ui == state.activeUI) return state;
+        return {
+            ...state,
+            activeUI: action.ui
+        };
+    } else if (action.type == "change_tab") {
         return {...state, activeTab: action.idx};
     } else if (action.type == "create_tab") {
         const entities = state.entityTabs.concat({
@@ -197,6 +227,17 @@ export function connectionTabReducer(
             activeTab,
             entityTabs: rearranged
         };
+    }
+
+    if (
+        action.type === "set_active_tool"
+        || action.type === "move_runs_add_range"
+        || action.type === "move_runs_remove_range"
+        || action.type === "move_runs_set_investigation") {
+        return {
+            ...state,
+            toolsState: handleToolAction(action, state.toolsState)
+        }
     }
 
     const edit = makeEditFunction(action);

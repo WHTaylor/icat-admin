@@ -1,0 +1,48 @@
+.runSelectContainer {
+}
+
+.investigationSelectContainer {
+}
+
+.moveRunsCard {
+    display: grid;
+    background-color: var(--color-blue-very-light);
+    grid-template-columns: 5fr 1fr;
+    max-width: 10em;
+    border: 1px solid black;
+    border-radius: 0.5em;
+    padding: 0.2em;
+    overflow: scroll;
+}
+
+.moveRunsCard div {
+    grid-column: 1;
+}
+
+.closeButton {
+    grid-column: 2;
+    grid-row: 1;
+    width: 1.4em;
+    height: 1.4em;
+    margin-left: 0.2em;
+}
+
+.selectedRunsContainer {
+    border-radius: 0.5em;
+    display: flex;
+    gap: 0.5em;
+    padding: 0.2em;
+}
+
+.runRangeContainer {
+    border: 1px solid black;
+    background-color: var(--color-grey-very-light);
+    user-select: none;
+    cursor: pointer;
+    padding: 0 0.1em;
+}
+
+.description {
+    font-size: large;
+    font-style: italic;
+}

@@ -11,8 +11,7 @@ import {useQueries} from "@tanstack/react-query";
 import {EntityTabState, OpenTabHandler, TableFilter} from "../../types";
 
 type Props = {
-    server: string;
-    sessionId: string;
+    icatClient: IcatClient
     entityTabs: EntityTabState[];
     activeTabIdx?: number;
     dispatch: Dispatch<ConnectionStateAction>
@@ -28,15 +27,12 @@ type Props = {
  */
 const EntityBrowser = (
     {
-        server,
-        sessionId,
+        icatClient,
         entityTabs,
         activeTabIdx,
         dispatch
     }: Props) => {
     const [isOpenTabModalOpen, setIsOpenTabModalOpen] = useState(false);
-
-    const icatClient = new IcatClient(server, sessionId);
 
     const queries = entityTabs.map(et => ({
         queryKey: [icatClient.buildUrl(et.filter)],
@@ -123,7 +119,7 @@ const EntityBrowser = (
         const twentyMinutes = 1000 * 60 * 20;
         const id = setInterval(() => icatClient.refresh(), twentyMinutes);
         return () => clearInterval(id);
-    }, [server, sessionId]); // eslint-disable-line react-hooks/exhaustive-deps
+    }, [icatClient]); // eslint-disable-line react-hooks/exhaustive-deps
 
     // Bind Alt-Shift-O to toggle an OpenTabModal
     useEffect(() => {
@@ -139,7 +135,7 @@ const EntityBrowser = (
     return (
         <>
             <div class="leftColumn">
-                <h2>ICAT tables</h2>
+                <h2 class={style.tableListHeader}>ICAT tables</h2>
                 <ul className={style.tableList}>
                     {entityNames.map(en =>
                         <li key={en}>

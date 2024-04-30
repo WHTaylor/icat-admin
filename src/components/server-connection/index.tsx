@@ -1,6 +1,9 @@
+import style from './style.module.css'
 import EntityBrowser from '../entity-browser';
 import {ConnectionState, ConnectionStateAction} from "../../state/connection";
-import {Dispatch} from "preact/hooks";
+import {Dispatch, useEffect} from "preact/hooks";
+import ToolsUI from "../tools-ui";
+import IcatClient from "../../icat";
 
 type Props = {
     connection: ConnectionState
@@ -10,16 +13,66 @@ type Props = {
 const ServerConnection = (
     {
         connection,
-        dispatch
+        dispatch,
     }: Props) => {
-    return <div class="page">
-        <EntityBrowser
-            server={connection.connectionInfo.server}
-            sessionId={connection.connectionInfo.sessionId}
+    const openBrowser = () => dispatch({type: "switch_ui", ui: "Browser"});
+    const openTools = () => dispatch({type: "switch_ui", ui: "Tools"});
+
+    useEffect(() => {
+        const readKey = (ev: KeyboardEvent) => {
+            if (ev.altKey && ev.shiftKey) {
+                if (ev.key === "T") {
+                    ev.stopPropagation();
+                    openTools();
+                } else if (ev.key === "B") {
+                    ev.stopPropagation();
+                    openBrowser();
+                }
+            }
+        }
+        document.addEventListener("keydown", readKey);
+        return () => document.removeEventListener("keydown", readKey);
+    }, [connection])
+
+    const icatClient = new IcatClient(
+        connection.connectionInfo.server,
+        connection.connectionInfo.sessionId);
+    const content = connection.activeUI == "Browser"
+        ? <EntityBrowser
+            icatClient={icatClient}
             entityTabs={connection.entityTabs}
             activeTabIdx={connection.activeTab}
             dispatch={dispatch}
             key={connection.connectionInfo.sessionId}/>
+        : <ToolsUI
+            dispatch={dispatch}
+            state={connection.toolsState}
+            icatClient={icatClient}
+        />
+
+    return <div class="page">
+        <span class={"leftColumn " + style.uiSwitcher}>
+            <button
+                title="Switch to browser (Alt-Shift-B)"
+                type="button"
+                onClick={openBrowser}
+                class={connection.activeUI === "Browser" ? style.active : ""}
+            >
+                Browse
+            </button>
+            <span class={style.spacer}>
+                /
+            </span>
+            <button
+                title="Switch to tools (Alt-Shift-T)"
+                type="button"
+                onClick={openTools}
+                class={connection.activeUI === "Tools" ? style.active : ""}
+            >
+                Tools
+            </button>
+        </span>
+        {content}
     </div>
 }
 

@@ -177,7 +177,7 @@ class IcatClient {
         return this.entityUrl({query}).toString();
     }
 
-    public buildCountUrl(filter: TableFilter): string {
+    buildCountUrl(filter: TableFilter): string {
         const where = queryWhereFromInput(filter.where);
         const query = `select count(e) from ${filter.table} e ${where}`;
         return this.entityUrl({query}).toString();

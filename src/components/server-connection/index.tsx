@@ -12,13 +12,15 @@ const ServerConnection = (
         connection,
         dispatch
     }: Props) => {
-    return <EntityBrowser
-        server={connection.connectionInfo.server}
-        sessionId={connection.connectionInfo.sessionId}
-        entityTabs={connection.entityTabs}
-        activeTabIdx={connection.activeTab}
-        dispatch={dispatch}
-        key={connection.connectionInfo.sessionId}/>;
+    return <div class="page">
+        <EntityBrowser
+            server={connection.connectionInfo.server}
+            sessionId={connection.connectionInfo.sessionId}
+            entityTabs={connection.entityTabs}
+            activeTabIdx={connection.activeTab}
+            dispatch={dispatch}
+            key={connection.connectionInfo.sessionId}/>
+    </div>
 }
 
 export default ServerConnection;

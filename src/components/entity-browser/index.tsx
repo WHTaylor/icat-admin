@@ -137,7 +137,7 @@ const EntityBrowser = (
     }, [isOpenTabModalOpen])
 
     return (
-        <div>
+        <>
             <div class="leftColumn">
                 <h2>ICAT tables</h2>
                 <ul className={style.tableList}>
@@ -188,7 +188,7 @@ const EntityBrowser = (
                 close={() => setIsOpenTabModalOpen(false)}
               />
             }
-        </div>
+        </>
     );
 }
 

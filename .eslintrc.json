@@ -1,0 +1,21 @@
+{
+  "parser": "@typescript-eslint/parser",
+  "plugins": [
+    "@typescript-eslint"
+  ],
+  "extends": [
+    "preact",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:@tanstack/eslint-plugin-query/recommended"
+  ],
+  "ignorePatterns": [
+    "build/"
+  ],
+  "rules": {
+    "prefer-template": "off",
+    "radix": "off",
+    "@typescript-eslint/no-unused-vars": ["error"],
+    "jest/no-deprecated-functions": "off",
+    "react/jsx-tag-spacing": "off"
+  }
+}

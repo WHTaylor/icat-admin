@@ -7,28 +7,8 @@
     "build": "tsc && vite build",
     "dev": "vite --port 8080",
     "preview": "vite preview --port 8080",
-    "lint": "eslint src",
+    "lint": "eslint \"src/**/*.ts*\"",
     "e2e": "cypress run"
-  },
-  "eslintConfig": {
-    "extends": [
-      "preact",
-      "plugin:@tanstack/eslint-plugin-query/recommended"
-    ],
-    "ignorePatterns": [
-      "build/"
-    ],
-    "rules": {
-      "prefer-template": "off",
-      "radix": "off",
-      "no-unused-vars": [
-        "error",
-        {
-          "argsIgnorePattern": "_+"
-        }
-      ],
-      "jest/no-deprecated-functions": "off"
-    }
   },
   "devDependencies": {
     "@tanstack/eslint-plugin-query": "^5.28.1",
@@ -37,7 +17,8 @@
     "enzyme-adapter-preact-pure": "^4.1.0",
     "eslint": "^8.39.0",
     "eslint-config-preact": "^1.1.0",
-    "netlify-plugin-cypress": "^2.2.0"
+    "netlify-plugin-cypress": "^2.2.0",
+    "typescript-eslint": "^7.8.0"
   },
   "dependencies": {
     "@preact/preset-vite": "^2.8.2",

@@ -7,7 +7,7 @@ import EntityRow, {EntityModification} from '../row';
 import ContextMenu, {CtxMenuDynamicProps} from '../../context-menu';
 import {defaultHeaderSort, xToOneAttributeToEntityName} from '../../../utils';
 import {ExistingIcatEntity, NewIcatEntity, OpenTabHandler} from "../../../types";
-import {EntityDataAction} from "../../../entityState";
+import {EntityDataAction} from "../../../state/connection";
 import IcatClient from "../../../icat";
 import JSX = h.JSX;
 

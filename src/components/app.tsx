@@ -13,7 +13,7 @@ import {
     saveLogin
 } from '../connectioncache';
 import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
-import {appStateReducer, Page} from "../entityState";
+import {appStateReducer, Page} from "../state/app";
 
 const queryClient = new QueryClient({
     defaultOptions: {

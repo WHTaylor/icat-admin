@@ -5,7 +5,7 @@ import EntityTableView from '../view';
 import {range} from '../../../utils';
 import {useQuery, useQueryClient} from "@tanstack/react-query";
 import OnChangeInput from "../../generic/on-change-input";
-import {EntityDataAction} from "../../../entityState";
+import {EntityDataAction} from "../../../state/connection";
 import {EntityTabState, NewIcatEntity, OpenTabHandler, TableFilter} from "../../../types";
 import PaginationControl from "../../controls/pagination-control";
 

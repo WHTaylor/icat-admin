@@ -6,7 +6,7 @@ import EntityTable from '../entity-table/container';
 import TabWindow from '../tab-window';
 import style from './style.module.css';
 import OpenTabModal from "../open-tab-modal";
-import {ConnectionStateAction} from "../../entityState";
+import {ConnectionStateAction} from "../../state/connection";
 import {useQueries} from "@tanstack/react-query";
 import {EntityTabState, OpenTabHandler, TableFilter} from "../../types";
 

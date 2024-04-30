@@ -4,7 +4,6 @@ import IcatClient, {isValidSession} from '../icat';
 import About from './about';
 import Tips from './tips';
 import Header from './header';
-import EntityBrowser from './entity-browser';
 import LoginForm from './login-form';
 import {
     Connection,
@@ -14,6 +13,7 @@ import {
 } from '../connectioncache';
 import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
 import {appStateReducer, Page} from "../state/app";
+import ServerConnection from "./server-connection";
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -75,16 +75,11 @@ const App = () => {
             ? <Tips/>
             : state.activePage == "about"
                 ? <About/>
-                : <EntityBrowser
-                    server={state.connections[state.activePage].connectionInfo.server}
-                    sessionId={state.connections[state.activePage].connectionInfo.sessionId}
-                    visible={true}
-                    entityTabs={state.connections[state.activePage].entityTabs}
-                    activeTabIdx={state.connections[state.activePage].activeTab ?? undefined}
-                    dispatch={a => dispatch(
-                        {...a, connectionIdx: state.activePage as number}
-                    )}
-                    key={state.connections[state.activePage].connectionInfo.sessionId}
+                : <ServerConnection
+                    connection={state.connections[state.activePage]}
+                    dispatch={a => dispatch({
+                        ...a, connectionIdx: state.activePage as number
+                    })}
                 />
 
     return (

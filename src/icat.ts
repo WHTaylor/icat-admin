@@ -45,7 +45,11 @@ function buildQuery(filter: TableFilter) {
     const order = filter.sortField == null
         ? ""
         : `order by e.${filter.sortField} ${filter.sortAsc ? "asc" : "desc"}`;
-    return `select e from ${filter.table} e ${where} ${order} ${limit} include 1`;
+    const includes = filter.includes === undefined
+        ? "1"
+        : filter.includes.map(i => "e." + i)
+            .join(", ");
+    return `select e from ${filter.table} e ${where} ${order} ${limit} include ${includes}`;
 }
 
 class IcatClient {

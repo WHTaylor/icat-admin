@@ -112,7 +112,8 @@ export function tableFilter(
     limit: number,
     where?: string,
     sortField: string | null = null,
-    sortAsc = true): TableFilter {
+    sortAsc = true,
+    includes: string[] | undefined = undefined): TableFilter {
     if (table === undefined) console.error("tableFilter called without args");
     return {
         table,
@@ -121,6 +122,7 @@ export function tableFilter(
         where,
         sortField,
         sortAsc,
+        includes
     };
 }
 

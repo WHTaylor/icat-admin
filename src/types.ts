@@ -23,6 +23,7 @@ export type TableFilter = {
     where?: string;
     sortField: string | null;
     sortAsc: boolean | null;
+    includes?: string[];
 }
 
 /**

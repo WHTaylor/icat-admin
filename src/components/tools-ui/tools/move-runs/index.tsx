@@ -83,10 +83,10 @@ const MoveRunsTool = (
         const instruments = instrumentResult.data as IcatInstrument[];
         instruments.sort((i1, i2) => i1.name.localeCompare(i2.name));
         instrumentOptions = instruments.map(i =>
-            <option>{i.name}</option>
+            <option key={i}>{i.name}</option>
         );
     } else {
-        instrumentOptions = [<option>Loading...</option>];
+        instrumentOptions = [<option key="loading">Loading...</option>];
     }
 
     const handleAddSingleClick = () => {
@@ -110,7 +110,7 @@ const MoveRunsTool = (
         })
     }
 
-    let cantExecuteReasons = [];
+    const cantExecuteReasons = [];
     if (state?.investigation?.datasets === undefined) {
         cantExecuteReasons.push("No investigation loaded");
     } else if ((state.investigation.datasets as ExistingIcatEntity[]).length === 0) {
@@ -203,14 +203,13 @@ const MoveRunsTool = (
         </div>
         {cantExecuteReasons.length === 0
             ? <MoveExecutor
-                state={state}
                 dataset={(state?.investigation?.datasets as ExistingIcatEntity[])[0]}
                 datafiles={dfQueryResults.map(q => q.data)
                     .flatMap(dfs => dfs === undefined ? [] : dfs)}
                 icatClient={icatClient}
             />
             : <div>
-                {cantExecuteReasons.map(r => <p>{r}</p>)}
+                {cantExecuteReasons.map(r => <p key={r}>{r}</p>)}
             </div>
         }
     </>
@@ -240,7 +239,7 @@ const SelectedRuns = (
             .filter(r => r !== undefined);
         if (results.length === 0) return undefined;
         const dfsFound = results.filter(r => r.isSuccess)
-            .map(r => r.data!!.length)
+            .map(r => r.data?.length ?? 0)
             .reduce((a, b) => a + b, 0)
         const countPending = results.filter(r => r.isPending)
             .length;
@@ -255,7 +254,7 @@ const SelectedRuns = (
             ? rr.start.toString()
             : rr.start + " - " + rr.end;
         const content = getContentForRange(rr);
-        let rows = [header];
+        const rows = [header];
         // If no instrument has been defined, there won't be any query results
         if (content !== undefined) {
             rows.push(content.dfsFound + " datafiles");
@@ -325,7 +324,7 @@ const InvestigationSelector = (
             />}
         <hr/>
         {isSuccess && data.length > 0 && <div>
-            {data.map(i => <div>
+            {data.map(i => <div key={i}>
                 <button type="button" onClick={_ => {
                     setInvestigationName("");
                     setInvestigation(i)
@@ -356,7 +355,7 @@ const Card = (
     return <div
         onMouseDown={closeOnMiddleClick}
         class={style.moveRunsCard}>
-        {rows.map(r => <div>{r}</div>)}
+        {rows.map((r, i) => <div key={i}>{r}</div>)}
         <CloseButton
             onClickHandler={close}
             additionalClass={style.closeButton}
@@ -368,7 +367,6 @@ const Card = (
 
 const MoveExecutor = (
     {
-        state,
         datafiles,
         dataset,
         icatClient

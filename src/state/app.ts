@@ -48,12 +48,14 @@ export function appStateReducer(
     }) | AppStateAction
 ): AppState {
     switch (action.type) {
-        case "create_connection":
+        case "create_connection": {
             const newConnection = makeNewConnectionState(action.connectionInfo);
             return {
                 activePage: state.connections.length,
                 connections: state.connections.concat(newConnection)
             };
+        }
+
         case "close_connection": {
             const c = state.activePage;
             let newActivePage;

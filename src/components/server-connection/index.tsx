@@ -1,7 +1,7 @@
 import style from './style.module.css'
 import EntityBrowser from '../entity-browser';
 import {ConnectionState, ConnectionStateAction} from "../../state/connection";
-import {Dispatch, useEffect} from "preact/hooks";
+import {Dispatch, useCallback, useEffect} from "preact/hooks";
 import ToolsUI from "../tools-ui";
 import IcatClient from "../../icat";
 
@@ -15,8 +15,12 @@ const ServerConnection = (
         connection,
         dispatch,
     }: Props) => {
-    const openBrowser = () => dispatch({type: "switch_ui", ui: "Browser"});
-    const openTools = () => dispatch({type: "switch_ui", ui: "Tools"});
+    const openBrowser = useCallback(() =>
+            dispatch({type: "switch_ui", ui: "Browser"}),
+        [dispatch]);
+    const openTools = useCallback(() =>
+            dispatch({type: "switch_ui", ui: "Tools"}),
+        [dispatch]);
 
     useEffect(() => {
         const readKey = (ev: KeyboardEvent) => {
@@ -32,7 +36,7 @@ const ServerConnection = (
         }
         document.addEventListener("keydown", readKey);
         return () => document.removeEventListener("keydown", readKey);
-    }, [connection])
+    }, [connection, openBrowser, openTools])
 
     const icatClient = new IcatClient(
         connection.connectionInfo.server,

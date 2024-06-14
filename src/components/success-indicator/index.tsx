@@ -1,6 +1,7 @@
 import {useEffect, useRef, useState} from "preact/hooks";
 
 import style from './style.module.css';
+import LoadingIndicator from "../generic/loading-indicator";
 
 const INTERVAL_MS = 10
 
@@ -34,7 +35,7 @@ const SuccessIndicator = ({saveState, clearTimeoutMs = 2000}: Props) => {
     const timer = useRef(0);
 
     const icon = saveState.isSaving
-        ? "..."
+        ? <LoadingIndicator/>
         : saveState.failed
             ? "❌" // This is a big red X
             : "✔️";

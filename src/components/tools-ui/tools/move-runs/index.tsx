@@ -13,6 +13,10 @@ import {ConnectionStateAction} from "../../../../state/connection";
 import {MoveRunsState, RunRange} from "../../../../state/tools";
 import OnChangeInput from "../../../generic/on-change-input";
 import CloseButton from "../../../controls/close-button";
+import LoadingIndicator, {
+    PrefixedLoadingIndicator
+} from "../../../generic/loading-indicator";
+import {JSX} from "preact";
 
 type Props = {
     icatClient: IcatClient
@@ -254,13 +258,15 @@ const SelectedRuns = (
             ? rr.start.toString()
             : rr.start + " - " + rr.end;
         const content = getContentForRange(rr);
-        const rows = [header];
+        const rows: (string | JSX.Element)[] = [header];
         // If no instrument has been defined, there won't be any query results
         if (content !== undefined) {
             rows.push(content.dfsFound + " datafiles");
             if (content.countPending > 0) {
                 const total = (rr.end - rr.start + 1);
-                rows.push("Searched " + (total - content.countPending) + "/" + total);
+                const s = "Searched " + (total - content.countPending) + "/" + total;
+                rows.push(
+                    <PrefixedLoadingIndicator>{s}</PrefixedLoadingIndicator>);
             }
         }
         return <Card
@@ -344,7 +350,7 @@ const Card = (
         rows
     }: {
         close: () => void,
-        rows: string[]
+        rows: (string | JSX.Element)[]
     }) => {
     const closeOnMiddleClick = (ev: MouseEvent) => {
         if (ev.buttons == 4) {
@@ -413,7 +419,10 @@ const MoveExecutor = (
             Move {datafiles.length} datafiles
         </button>
         {moveDfMutation.isPending
-            && <p>{successCount}/{datafiles.length} completed</p>}
+            && <span>
+            <LoadingIndicator/>
+            <p>{successCount}/{datafiles.length} completed</p>
+          </span>}
     </div>
 }
 

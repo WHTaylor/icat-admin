@@ -10,6 +10,7 @@ import {ExistingIcatEntity, NewIcatEntity, OpenTabHandler} from "../../../types"
 import {EntityDataAction} from "../../../state/connection";
 import IcatClient from "../../../icat";
 import JSX = h.JSX;
+import LoadingIndicator from "../../generic/loading-indicator";
 
 type Props = {
     data?: ExistingIcatEntity[];
@@ -83,7 +84,7 @@ const EntityTableView = ({
     });
 
     // Note: early returns need to be after all hooks
-    if (data === undefined) return <p>Loading...</p>;
+    if (data === undefined) return <LoadingIndicator/>;
     if (data.length === 0) return <p>No entries</p>;
 
     const dataAttributes = data

@@ -1,10 +1,7 @@
-import dayjs from 'dayjs';
-import customParseFormat from 'dayjs/plugin/customParseFormat';
-
 import {entityNames} from './icat';
-import {TableFilter} from "./types";
+import {ExistingIcatEntity, NewIcatEntity, TableFilter} from "./types";
+import {inIcatFormat, parseDate} from "./dateUtils";
 
-dayjs.extend(customParseFormat);
 
 /**
  * Return the name of the entity which a one-many attribute points at.
@@ -221,4 +218,32 @@ export function range(a: number, b: number | null = null): number[] {
         ? a
         : b;
     return [...Array(top - bot).keys()].map(n => n + bot);
+}
+
+/**
+ * Convert an entity into a format that can be sent to ICAT
+ */
+export function serialize(entity: ExistingIcatEntity | NewIcatEntity) {
+    return Object.fromEntries(
+        Object.entries(entity)
+            .map(([k, v]) => {
+                if (typeof v === "object" || typeof v === "number") {
+                    return [k, v];
+                }
+
+                // Accepts date formats the don't specify milliseconds, and
+                // converts to one that does because ICAT requires it.
+                const asDate = parseDate(v);
+                if (asDate.isValid()) {
+                    return [k, inIcatFormat(asDate)];
+                }
+
+                if (v === "true") {
+                    return [k, true];
+                } else if (v === "false") {
+                    return [k, false];
+                }
+
+                return [k, v];
+            }));
 }

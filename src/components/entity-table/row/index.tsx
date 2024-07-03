@@ -2,14 +2,13 @@ import {useEffect, useRef} from "preact/hooks";
 
 import style from './style.module.css';
 
-import {commonFields} from '../../../utils';
+import {commonFields, serialize} from '../../../utils';
 import ReadMore from '../../generic/read-more';
 import SuccessIndicator from '../../success-indicator';
 import {ExistingIcatEntity, IcatEntityValue, NewIcatEntity} from "../../../types";
 import {
     inIcatFormat,
     parseDate,
-    withCorrectedDateFormats
 } from "../../../dateUtils";
 import OnChangeInput from "../../generic/on-change-input";
 import {useMutation, UseMutationResult} from "@tanstack/react-query";
@@ -99,7 +98,7 @@ const EntityRow = (
         mutationFn: () => {
             // If entity.id is undefined, this is a new entity to be created
             // Otherwise we just want to send modifications with the current id
-            const e = withCorrectedDateFormats(isNewRow
+            const e = serialize(isNewRow
                 ? entity
                 : {...modifications, id: entity.id});
             return saveEntity(e);

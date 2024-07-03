@@ -1,4 +1,7 @@
 import dayjs from "dayjs";
+import customParseFormat from 'dayjs/plugin/customParseFormat';
+
+dayjs.extend(customParseFormat);
 
 // Date formats that can be used for creating/editing date fields
 // Dates received from ICAT will always be in the first format

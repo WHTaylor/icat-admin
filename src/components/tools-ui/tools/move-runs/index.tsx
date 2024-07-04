@@ -103,6 +103,10 @@ const MoveRunsTool = (
         })
     }
 
+    const handleAddSingleKey = (ev: KeyboardEvent) => {
+        if (ev.key === "Enter") handleAddSingleClick();
+    }
+
     const handleAddRangeClick = () => {
         const start = startRangeInputValue.trim();
         const end = endRangeInputValue.trim();
@@ -112,6 +116,10 @@ const MoveRunsTool = (
             runStart: Number(start),
             runEnd: Number(end)
         })
+    }
+
+    const handleAddRangeKey = (ev: KeyboardEvent) => {
+        if (ev.key === "Enter") handleAddRangeClick();
     }
 
     const cantExecuteReasons = [];
@@ -157,6 +165,7 @@ const MoveRunsTool = (
                         placeholder="Enter run number"
                         value={singleRunInputValue}
                         min="1"
+                        onKeyPress={handleAddSingleKey}
                         onChange={ev => setSingleRunInputValue(
                             (ev.target as HTMLInputElement).value)}
                     />
@@ -175,6 +184,7 @@ const MoveRunsTool = (
                         placeholder="First run number"
                         value={startRangeInputValue}
                         min="1"
+                        onKeyPress={handleAddRangeKey}
                         onChange={ev => setStartRangeInputValue(
                             (ev.target as HTMLInputElement).value)}
                     />
@@ -183,6 +193,7 @@ const MoveRunsTool = (
                         placeholder="Last run number"
                         value={endRangeInputValue}
                         min="1"
+                        onKeyPress={handleAddRangeKey}
                         onChange={ev => setEndRangeInputValue(
                             (ev.target as HTMLInputElement).value)}
                     />

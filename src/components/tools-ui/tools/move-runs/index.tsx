@@ -317,18 +317,22 @@ const InvestigationSelector = (
     }
 
     return <div className={style.investigationSelectContainer}>
-        {investigation !== undefined
-            ? <Card close={() => setInvestigation(undefined)}
-                    rows={[
-                        investigation.id.toString(),
-                        "RB" + investigation.name,
-                        "Visit: " + investigation.visitId]}/>
-            : <OnChangeInput
-                onChange={ev => setInvestigationName(
-                    (ev.target as HTMLInputElement).value)}
-                placeholder="Enter investigation name"
-            />}
+        <div class={style.selectedInvestigation}>
+            {investigation !== undefined
+                ? <Card close={() => setInvestigation(undefined)}
+                        rows={[
+                            investigation.id.toString(),
+                            "RB" + investigation.name,
+                            "Visit: " + investigation.visitId]}/>
+                : <OnChangeInput
+                    onChange={ev => setInvestigationName(
+                        (ev.target as HTMLInputElement).value)}
+                    placeholder="Enter investigation name"
+                />}
+        </div>
+
         <hr/>
+
         {isSuccess && data.length > 0 && <div>
             {data.map(i => <div key={i}>
                 <button type="button" onClick={_ => {
@@ -361,7 +365,9 @@ const Card = (
     return <div
         onMouseDown={closeOnMiddleClick}
         class={style.moveRunsCard}>
-        {rows.map((r, i) => <div key={i}>{r}</div>)}
+        <div class={style.moveRunsCardContent}>
+            {rows.map((r, i) => <div key={i}>{r}</div>)}
+        </div>
         <CloseButton
             onClickHandler={close}
             additionalClass={style.closeButton}

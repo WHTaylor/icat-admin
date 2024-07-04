@@ -5,7 +5,6 @@ import {
     useQuery,
     UseQueryResult
 } from "@tanstack/react-query";
-import IcatClient from "../../../../icat";
 import {range, tableFilter} from "../../../../utils";
 import {ExistingIcatEntity} from "../../../../types";
 import {Dispatch, useState} from "preact/hooks";
@@ -17,6 +16,7 @@ import LoadingIndicator, {
     PrefixedLoadingIndicator
 } from "../../../generic/loading-indicator";
 import {JSX} from "preact";
+import IcatClient from "../../../../icat";
 
 type Props = {
     icatClient: IcatClient
@@ -38,8 +38,6 @@ async function queryForRunDatafiles(
     // TODO: filter with regex to name = <instr>0*<run>\D+
     return icatClient.getEntries(f, signal);
 }
-
-const allInstrumentFilter = tableFilter("Instrument", 0, 0);
 
 const MoveRunsTool = (
     {
@@ -72,29 +70,10 @@ const MoveRunsTool = (
             queryFn: ({signal}: { signal: AbortSignal }) =>
                 queryForRunDatafiles(selectedInstrument, r, icatClient, signal)
         }))
-    const instrumentResult = useQuery(
-        {
-            queryKey: ["instruments"],
-            queryFn: ({signal}) =>
-                icatClient.getEntries(allInstrumentFilter, signal)
-        }
-    );
 
     const dfQueryResults = useQueries({queries: dfQueries});
     const dfQueryResultsByRunNumbers = Object.fromEntries(
         dfQueryResults.map((r, i) => [runNumbers[i], r]));
-
-    let instrumentOptions;
-    if (instrumentResult.isSuccess) {
-        const instruments = instrumentResult.data as IcatInstrument[];
-        instruments.sort((i1, i2) => i1.name.localeCompare(i2.name));
-        instrumentOptions = instruments.map(i =>
-            <option key={i}>{i.name}</option>
-        );
-    } else {
-        instrumentOptions = [<option key="loading">Loading...</option>];
-    }
-
     const handleAddSingleClick = () => {
         const val = singleRunInputValue.trim();
         if (val.length === 0) return;
@@ -145,11 +124,9 @@ const MoveRunsTool = (
         </p>
         <div>
             <h3>Select Instrument</h3>
-            <select
-                onChange={ev => setSelectedInstrument((ev.target as HTMLSelectElement).value)}
-                disabled={!instrumentResult.isSuccess}>
-                {instrumentOptions}
-            </select>
+            <InstrumentSelector
+                icatClient={icatClient}
+                setInstrument={setSelectedInstrument}/>
         </div>
         <div>
             <h3>Select run(s)</h3>
@@ -292,6 +269,40 @@ const SelectedRuns = (
     return <div class={style.selectedRunsContainer}>
         {sorted.map(makeCard)}
     </div>
+};
+
+const InstrumentSelector = (
+    {
+        icatClient,
+        setInstrument
+    }: {
+        icatClient: IcatClient,
+        setInstrument: (i: string) => void
+    }) => {
+    const instrumentResult = useQuery(
+        {
+            queryKey: ["instruments"],
+            queryFn: ({signal}) =>
+                icatClient.getEntries(tableFilter("Instrument", 0, 0), signal)
+        }
+    );
+
+    let instrumentOptions;
+    if (instrumentResult.isSuccess) {
+        const instruments = instrumentResult.data as IcatInstrument[];
+        instruments.sort((i1, i2) => i1.name.localeCompare(i2.name));
+        instrumentOptions = instruments.map(i =>
+            <option key={i}>{i.name}</option>
+        );
+    } else {
+        instrumentOptions = [<option key="loading">Loading...</option>];
+    }
+
+    return <select
+        onChange={ev => setInstrument((ev.target as HTMLSelectElement).value)}
+        disabled={!instrumentResult.isSuccess}>
+        {instrumentOptions}
+    </select>
 };
 
 const InvestigationSelector = (

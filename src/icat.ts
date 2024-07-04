@@ -106,8 +106,8 @@ class IcatClient {
         fetch(this.sessionUrl(this.sessionId).toString(), {method: "PUT"});
     }
 
-    async getEntries(filter: TableFilter): Promise<ExistingIcatEntity[]> {
-        return fetch(this.buildUrl(filter))
+    async getEntries(filter: TableFilter, signal: AbortSignal | null = null) {
+        return fetch(this.buildUrl(filter), {signal})
             .then(res => res.ok
                 ? res
                 : formatError(res).then(j => Promise.reject(j)))

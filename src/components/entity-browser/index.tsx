@@ -36,7 +36,8 @@ const EntityBrowser = (
 
     const queries = entityTabs.map(et => ({
         queryKey: [icatClient.buildUrl(et.filter)],
-        queryFn: async () => await icatClient.getEntries(et.filter),
+        queryFn: async ({signal}: {signal: AbortSignal}) =>
+            await icatClient.getEntries(et.filter, signal),
     }));
 
     const results = useQueries({

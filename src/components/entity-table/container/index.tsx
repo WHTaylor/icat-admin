@@ -152,7 +152,7 @@ type CounterProps = {
 const EntityCounter = ({filter, icatClient}: CounterProps) => {
     const {isSuccess, data} = useQuery({
         queryKey: [icatClient.buildUrl(filter), 'count'],
-        queryFn: async () => await icatClient.getCount(filter)
+        queryFn: async ({signal}) => await icatClient.getCount(filter, signal)
     });
 
     return isSuccess

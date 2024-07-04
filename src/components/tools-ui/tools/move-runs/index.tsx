@@ -28,19 +28,19 @@ type IcatInstrument = ExistingIcatEntity & {
     name: string
 }
 
-function makeRunQuery(
+async function queryForRunDatafiles(
     selectedInstrument: string,
     run: number,
-    icatClient: IcatClient) {
+    icatClient: IcatClient,
+    signal: AbortSignal) {
     const where = "name like '" + selectedInstrument + "%" + run + "%'";
     const f = tableFilter("Datafile", 0, 0, where);
     // TODO: filter with regex to name = <instr>0*<run>\D+
-    return () => icatClient.getEntries(f);
+    return icatClient.getEntries(f, signal);
 }
 
 const allInstrumentFilter = tableFilter("Instrument", 0, 0);
 
-//TODO: Display datafile information per run range, not as a whole
 const MoveRunsTool = (
     {
         icatClient,
@@ -69,12 +69,14 @@ const MoveRunsTool = (
         ? []
         : runNumbers.map(r => ({
             queryKey: ["dfs", selectedInstrument, r],
-            queryFn: makeRunQuery(selectedInstrument, r, icatClient)
+            queryFn: ({signal}: { signal: AbortSignal }) =>
+                queryForRunDatafiles(selectedInstrument, r, icatClient, signal)
         }))
     const instrumentResult = useQuery(
         {
             queryKey: ["instruments"],
-            queryFn: () => icatClient.getEntries(allInstrumentFilter)
+            queryFn: ({signal}) =>
+                icatClient.getEntries(allInstrumentFilter, signal)
         }
     );
 
@@ -304,15 +306,17 @@ const InvestigationSelector = (
     }) => {
     const [investigationName, setInvestigationName] = useState<string>("");
     const queryFn = investigationName.trim().length > 0
-        ? () => icatClient.getEntries(
-            tableFilter(
-                "Investigation",
-                0,
-                0,
-                "name = '" + investigationName + "'",
-                null,
-                true,
-                ["datasets"]))
+        ? ({signal}: { signal: AbortSignal }) =>
+            icatClient.getEntries(
+                tableFilter(
+                    "Investigation",
+                    0,
+                    0,
+                    "name = '" + investigationName + "'",
+                    null,
+                    true,
+                    ["datasets"]),
+                signal)
         : () => [];
     const query = {
         queryKey: ["inv", investigationName],

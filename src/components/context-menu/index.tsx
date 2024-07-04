@@ -86,7 +86,8 @@ const ContextMenu = ({
 
         return {
             queryKey: [icatClient.buildUrl(f)],
-            queryFn: async () => await icatClient.getCount(f),
+            queryFn: async ({signal}: { signal: AbortSignal }) =>
+                await icatClient.getCount(f, signal),
         }
     });
 

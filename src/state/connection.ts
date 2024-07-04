@@ -233,6 +233,7 @@ export function connectionTabReducer(
         action.type === "set_active_tool"
         || action.type === "move_runs_add_range"
         || action.type === "move_runs_remove_range"
+        || action.type === "move_runs_set_instrument"
         || action.type === "move_runs_set_investigation") {
         return {
             ...state,

@@ -14,6 +14,7 @@ export type RunRange = {
 export type MoveRunsState = {
     instrumentId?: number
     runRanges: RunRange[]
+    instrument?: string
     investigation?: ExistingIcatEntity
 }
 
@@ -34,6 +35,7 @@ export type ToolsAction =
     SetActiveToolAction |
     MoveRunsAddRangeAction |
     MoveRunsRemoveRangeAction |
+    MoveRunsSetInstrumentAction |
     MoveRunsSetInvestigationAction
 
 type SetActiveToolAction = {
@@ -51,6 +53,11 @@ type MoveRunsRemoveRangeAction = {
     type: "move_runs_remove_range"
     runStart: number
     runEnd: number
+}
+
+type MoveRunsSetInstrumentAction = {
+    type: "move_runs_set_instrument"
+    instrument: string
 }
 
 type MoveRunsSetInvestigationAction = {
@@ -151,6 +158,14 @@ export function handleToolAction(
                     rr => rr.start !== action.runStart || rr.end !== action.runEnd)
             }
         };
+    } else if (action.type === "move_runs_set_instrument") {
+        return {
+            ...state,
+            moveRuns: {
+                ...state.moveRuns,
+                instrument: action.instrument
+            }
+        }
     } else if (action.type === "move_runs_set_investigation") {
         return {
             ...state,

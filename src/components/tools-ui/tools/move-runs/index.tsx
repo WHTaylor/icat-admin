@@ -49,7 +49,6 @@ const MoveRunsTool = (
     const [singleRunInputValue, setSingleRunInputValue] = useState<string>("");
     const [startRangeInputValue, setStartRangeInputValue] = useState<string>("");
     const [endRangeInputValue, setEndRangeInputValue] = useState<string>("");
-    const [selectedInstrument, setSelectedInstrument] = useState<string | undefined>(undefined);
 
     const singleRunInputIsValid = singleRunInputValue.trim().length > 0
         && Number.isInteger(Number(singleRunInputValue.trim()));
@@ -63,12 +62,12 @@ const MoveRunsTool = (
     // Make a query for each run in the selected run ranges.
     // Individual queries are much faster than doing several runs at once joined
     // with ORs.
-    const dfQueries = selectedInstrument === undefined
+    const dfQueries = state.instrument === undefined
         ? []
         : runNumbers.map(r => ({
-            queryKey: ["dfs", selectedInstrument, r],
+            queryKey: ["dfs", state.instrument, r],
             queryFn: ({signal}: { signal: AbortSignal }) =>
-                queryForRunDatafiles(selectedInstrument, r, icatClient, signal)
+                queryForRunDatafiles(state.instrument!!, r, icatClient, signal)
         }))
 
     const dfQueryResults = useQueries({queries: dfQueries});
@@ -126,7 +125,9 @@ const MoveRunsTool = (
             <h3>Select Instrument</h3>
             <InstrumentSelector
                 icatClient={icatClient}
-                setInstrument={setSelectedInstrument}/>
+                instrument={state.instrument}
+                setInstrument={i => dispatch(
+                    {type: "move_runs_set_instrument", instrument: i})}/>
         </div>
         <div>
             <h3>Select run(s)</h3>
@@ -274,9 +275,11 @@ const SelectedRuns = (
 const InstrumentSelector = (
     {
         icatClient,
+        instrument,
         setInstrument
     }: {
         icatClient: IcatClient,
+        instrument: string,
         setInstrument: (i: string) => void
     }) => {
     const instrumentResult = useQuery(
@@ -292,7 +295,7 @@ const InstrumentSelector = (
         const instruments = instrumentResult.data as IcatInstrument[];
         instruments.sort((i1, i2) => i1.name.localeCompare(i2.name));
         instrumentOptions = instruments.map(i =>
-            <option key={i}>{i.name}</option>
+            <option selected={i.name === instrument} key={i}>{i.name}</option>
         );
     } else {
         instrumentOptions = [<option key="loading">Loading...</option>];

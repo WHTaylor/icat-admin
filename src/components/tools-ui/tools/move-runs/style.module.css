@@ -11,6 +11,15 @@
     margin-bottom: 1em;
 }
 
+.investigationInputContainer {
+    display: flex;
+    align-items: center;
+}
+
+.investigationInputContainer > input {
+    margin-right: 0.5em;
+}
+
 .moveRunsCard {
     display: flex;
     background-color: var(--color-blue-very-light);

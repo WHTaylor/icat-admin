@@ -313,6 +313,7 @@ const InvestigationSelector = (
         setInvestigation: (i?: ExistingIcatEntity) => void
     }) => {
     const [investigationName, setInvestigationName] = useState<string>("");
+    const isValidInvestigationName = investigationName.trim().length > 0;
     const f = tableFilter(
         "Investigation",
         0,
@@ -321,7 +322,7 @@ const InvestigationSelector = (
         null,
         true,
         ["datasets"]);
-    const queryFn = investigationName.trim().length > 0
+    const queryFn = isValidInvestigationName
         ? ({signal}: { signal: AbortSignal }) =>
             icatClient.getEntries(f, signal)
         : () => [];
@@ -329,11 +330,11 @@ const InvestigationSelector = (
         queryKey: [icatClient.buildUrl(f)],
         queryFn
     };
-    const {isSuccess, data} = useQuery(query);
+    const {isPending, isSuccess, data} = useQuery(query);
+    const queryDone = isSuccess && isValidInvestigationName && data !== undefined;
 
     // If there was only one match, select it automatically
-    if (isSuccess
-        && data !== undefined
+    if (queryDone
         && data.length === 1
         && investigation === undefined) {
         setInvestigation(data[0]);
@@ -341,7 +342,7 @@ const InvestigationSelector = (
         return <></>;
     }
 
-    return <div className={style.investigationSelectContainer}>
+    return <div>
         <div class={style.selectedInvestigation}>
             {investigation !== undefined
                 ? <Card close={() => setInvestigation(undefined)}
@@ -349,16 +350,21 @@ const InvestigationSelector = (
                             investigation.id.toString(),
                             "RB" + investigation.name,
                             "Visit: " + investigation.visitId]}/>
-                : <OnChangeInput
-                    onChange={ev => setInvestigationName(
-                        (ev.target as HTMLInputElement).value)}
-                    placeholder="Enter investigation name"
-                />}
+                : <div className={style.investigationInputContainer}>
+                    <OnChangeInput
+                        onChange={ev => setInvestigationName(
+                            (ev.target as HTMLInputElement).value)}
+                        placeholder="Enter investigation name"/>
+                    {isPending && <LoadingIndicator/>}
+                    {queryDone && data.length === 0
+                        && "No matching investigation found"}
+                </div>
+            }
         </div>
 
         <hr/>
 
-        {isSuccess && data !== undefined && data.length > 0 && <div>
+        {queryDone && data.length > 1 && <div>
             {data.map(i => <div key={i}>
                 <button type="button" onClick={_ => {
                     setInvestigationName("");

@@ -42,8 +42,7 @@ const TabWindow = (props: Props) => {
             .map(r => r.x);
 
     const getTabClasses = (i: number) =>
-        "entityButton "
-        + style.entityTabButton + " "
+        style.entityTabButton + " "
         + (i === props.activeTabIdx ? style.selectedTab : "");
 
     return (

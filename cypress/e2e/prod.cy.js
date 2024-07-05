@@ -38,7 +38,7 @@ describe('Read more works', () => {
 
 describe('Can open many tables at once', () => {
   it('passes', () => {
-    const buttons = cy.get('.leftColumn ul li button');
+    const buttons = cy.get('[class*="tableList"] li button');
     buttons.should('have.length.greaterThan', 0);
     const numButtons = buttons.click({multiple: true})
       .then($b => {

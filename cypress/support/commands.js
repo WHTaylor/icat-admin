@@ -6,7 +6,7 @@ const urls = {
 const login = env => {
   cy.get('#serverInput').click().type(urls[env]);
   cy.contains('Login').click();
-  cy.contains('ICAT tables');
+  cy.contains('ICAT Tables');
 };
 
 Cypress.Commands.add('login', env => {

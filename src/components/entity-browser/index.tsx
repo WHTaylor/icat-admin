@@ -4,11 +4,11 @@ import IcatClient, {entityNames,} from '../../icat';
 import {tableFilter,} from '../../utils';
 import EntityTable from '../entity-table/container';
 import TabWindow from '../tab-window';
-import style from './style.module.css';
 import OpenTabModal from "../open-tab-modal";
 import {ConnectionStateAction} from "../../state/connection";
 import {useQueries} from "@tanstack/react-query";
 import {EntityTabState, OpenTabHandler, TableFilter} from "../../types";
+import LeftColumnList from "../left-column-list";
 
 type Props = {
     icatClient: IcatClient
@@ -36,7 +36,7 @@ const EntityBrowser = (
 
     const queries = entityTabs.map(et => ({
         queryKey: [icatClient.buildUrl(et.filter)],
-        queryFn: async ({signal}: {signal: AbortSignal}) =>
+        queryFn: async ({signal}: { signal: AbortSignal }) =>
             await icatClient.getEntries(et.filter, signal),
     }));
 
@@ -135,19 +135,16 @@ const EntityBrowser = (
 
     return (
         <>
-            <div class="leftColumn">
-                <h2 class={style.tableListHeader}>ICAT tables</h2>
-                <ul className={style.tableList}>
-                    {entityNames.map(en =>
-                        <li key={en}>
-                            <button
-                                className="entityButton"
-                                onClick={() => openTab(en)}>
-                                {en}
-                            </button>
-                        </li>)}
-                </ul>
-            </div>
+            <LeftColumnList
+                title={"ICAT Tables"}
+                makeChildren={c => entityNames.map(en =>
+                    <li key={en}>
+                        <button
+                            className={c}
+                            onClick={() => openTab(en)}>
+                            {en}
+                        </button>
+                    </li>)}/>
 
             {entityTabs.length > 0 &&
               <div className="mainContentAndRightColumn">

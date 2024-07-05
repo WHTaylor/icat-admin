@@ -46,16 +46,6 @@ html, body {
     width: 100%;
 }
 
-.leftColumn {
-    grid-column-start: 1;
-    grid-column-end: 2;
-}
-
-.leftColumn h2 {
-    margin: 0.45em 0.1em 0.1em 0.1em;
-    user-select: none;
-}
-
 .mainContentAndRightColumn {
     grid-column-start: 2;
     grid-column-end: 4;
@@ -64,12 +54,6 @@ html, body {
 .mainContent {
     grid-column-start: 2;
     grid-column-end: 3;
-}
-
-.entityButton {
-    border: 0;
-    border-radius: 2px;
-    padding: 0.08em 0.3em;
 }
 
 .hidden {

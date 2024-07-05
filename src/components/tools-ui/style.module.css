@@ -1,0 +1,9 @@
+.tableList {
+    list-style: none;
+    margin-left: -2.3em;
+    margin-right: 0.4em;
+}
+
+.tableList li {
+    margin: 0.1em 0;
+}

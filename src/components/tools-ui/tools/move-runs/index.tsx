@@ -364,18 +364,21 @@ const InvestigationSelector = (
 
         <hr/>
 
-        {queryDone && data.length > 1 && <div>
-            {data.map(i => <div key={i}>
-                <button type="button" onClick={_ => {
-                    setInvestigationName("");
-                    setInvestigation(i)
-                }
-                }>
-                    Select
-                </button>
-                Visit id: {i.visitId}
-            </div>)}
-        </div>}
+        {queryDone && data.length > 1
+            &&
+          <div>
+              {data.map(i =>
+                  <WithSuffix
+                      key={i}
+                      suffix={"Visit id: " + i.visitId}>
+                      <button type="button" onClick={_ => {
+                          setInvestigationName("");
+                          setInvestigation(i)
+                      }}>
+                          Select
+                      </button>
+                  </WithSuffix>)}
+          </div>}
     </div>
 };
 

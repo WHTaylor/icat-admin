@@ -28,17 +28,6 @@ type IcatInstrument = ExistingIcatEntity & {
     name: string
 }
 
-async function queryForRunDatafiles(
-    selectedInstrument: string,
-    run: number,
-    icatClient: IcatClient,
-    signal: AbortSignal) {
-    const where = "name like '" + selectedInstrument + "%" + run + "%'";
-    const f = tableFilter("Datafile", 0, 0, where);
-    // TODO: filter with regex to name = <instr>0*<run>\D+
-    return icatClient.getEntries(f, signal);
-}
-
 const MoveRunsTool = (
     {
         icatClient,
@@ -64,11 +53,16 @@ const MoveRunsTool = (
     // with ORs.
     const dfQueries = state.instrument === undefined
         ? []
-        : runNumbers.map(r => ({
-            queryKey: ["dfs", state.instrument, r],
-            queryFn: ({signal}: { signal: AbortSignal }) =>
-                queryForRunDatafiles(state.instrument!!, r, icatClient, signal)
-        }))
+        : runNumbers.map(r => {
+            const where = "name like '" + state.instrument + "%" + r + "%'";
+            const f = tableFilter("Datafile", 0, 0, where);
+            return {
+                queryKey: [icatClient.buildUrl(f)],
+                // TODO: filter with regex to name = <instr>0*<run>\D+
+                queryFn: async ({signal}: { signal: AbortSignal }) =>
+                    await icatClient.getEntries(f, signal)
+            }
+        })
 
     const dfQueryResults = useQueries({queries: dfQueries});
     const dfQueryResultsByRunNumbers = Object.fromEntries(
@@ -279,7 +273,7 @@ const InstrumentSelector = (
         setInstrument
     }: {
         icatClient: IcatClient,
-        instrument: string,
+        instrument: string | undefined,
         setInstrument: (i: string) => void
     }) => {
     const instrumentResult = useQuery(
@@ -319,27 +313,29 @@ const InvestigationSelector = (
         setInvestigation: (i?: ExistingIcatEntity) => void
     }) => {
     const [investigationName, setInvestigationName] = useState<string>("");
+    const f = tableFilter(
+        "Investigation",
+        0,
+        0,
+        "name = '" + investigationName + "'",
+        null,
+        true,
+        ["datasets"]);
     const queryFn = investigationName.trim().length > 0
         ? ({signal}: { signal: AbortSignal }) =>
-            icatClient.getEntries(
-                tableFilter(
-                    "Investigation",
-                    0,
-                    0,
-                    "name = '" + investigationName + "'",
-                    null,
-                    true,
-                    ["datasets"]),
-                signal)
+            icatClient.getEntries(f, signal)
         : () => [];
     const query = {
-        queryKey: ["inv", investigationName],
+        queryKey: [icatClient.buildUrl(f)],
         queryFn
     };
     const {isSuccess, data} = useQuery(query);
 
     // If there was only one match, select it automatically
-    if (isSuccess && data.length === 1 && investigation === undefined) {
+    if (isSuccess
+        && data !== undefined
+        && data.length === 1
+        && investigation === undefined) {
         setInvestigation(data[0]);
         setInvestigationName("");
         return <></>;
@@ -362,7 +358,7 @@ const InvestigationSelector = (
 
         <hr/>
 
-        {isSuccess && data.length > 0 && <div>
+        {isSuccess && data !== undefined && data.length > 0 && <div>
             {data.map(i => <div key={i}>
                 <button type="button" onClick={_ => {
                     setInvestigationName("");

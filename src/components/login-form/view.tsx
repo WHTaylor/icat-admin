@@ -4,9 +4,7 @@ import {useState} from "preact/hooks";
 import style from './style.module.css';
 
 import {getLastLogin, getServerNames} from '../../connectioncache'
-import LoadingIndicator, {
-    PrefixedLoadingIndicator
-} from "../generic/loading-indicator";
+import {PrefixedLoadingIndicator} from "../generic/loading-indicator";
 
 function processServerName(name: string): string {
     if (name.trim().length === 0) return "";

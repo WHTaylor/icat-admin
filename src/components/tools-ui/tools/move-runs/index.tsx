@@ -350,10 +350,10 @@ const InvestigationSelector = (
                             "RB" + investigation.name,
                             "Visit: " + investigation.visitId]}/>
                 : <WithSuffix suffix={
-                    isPending ? <LoadingIndicator/>
-                        : queryDone && data.length === 0
-                            ? <>"No matching investigation found"</>
-                            : <></>}>
+                    isPending
+                        ? <LoadingIndicator/>
+                        : <>{queryDone && data.length === 0
+                            && "No matching investigation found"}</>}>
                     <OnChangeInput
                         onChange={ev => setInvestigationName(
                             (ev.target as HTMLInputElement).value)}

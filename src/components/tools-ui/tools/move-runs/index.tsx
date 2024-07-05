@@ -12,11 +12,10 @@ import {ConnectionStateAction} from "../../../../state/connection";
 import {MoveRunsState, RunRange} from "../../../../state/tools";
 import OnChangeInput from "../../../generic/on-change-input";
 import CloseButton from "../../../controls/close-button";
-import LoadingIndicator, {
-    PrefixedLoadingIndicator
-} from "../../../generic/loading-indicator";
+import LoadingIndicator from "../../../generic/loading-indicator";
 import {JSX} from "preact";
 import IcatClient from "../../../../icat";
+import {WithSuffix} from "../../../generic/with-indicator";
 
 type Props = {
     icatClient: IcatClient
@@ -251,7 +250,7 @@ const SelectedRuns = (
                 const total = (rr.end - rr.start + 1);
                 const s = "Searched " + (total - content.countPending) + "/" + total;
                 rows.push(
-                    <PrefixedLoadingIndicator>{s}</PrefixedLoadingIndicator>);
+                    <WithSuffix suffix={<LoadingIndicator/>}>{s}</WithSuffix>);
             }
         }
         return <Card
@@ -350,15 +349,16 @@ const InvestigationSelector = (
                             investigation.id.toString(),
                             "RB" + investigation.name,
                             "Visit: " + investigation.visitId]}/>
-                : <div className={style.investigationInputContainer}>
+                : <WithSuffix suffix={
+                    isPending ? <LoadingIndicator/>
+                        : queryDone && data.length === 0
+                            ? <>"No matching investigation found"</>
+                            : <></>}>
                     <OnChangeInput
                         onChange={ev => setInvestigationName(
                             (ev.target as HTMLInputElement).value)}
                         placeholder="Enter investigation name"/>
-                    {isPending && <LoadingIndicator/>}
-                    {queryDone && data.length === 0
-                        && "No matching investigation found"}
-                </div>
+                </WithSuffix>
             }
         </div>
 
@@ -447,19 +447,20 @@ const MoveExecutor = (
         }
     }
 
+    const suffix = moveDfMutation.isPending
+        ? <LoadingIndicator/>
+        : <></>
     return <div>
-        <button
-            type="button"
-            disabled={isExecuting}
-            onClick={executeMove}
-        >
-            Move {datafiles.length} datafiles
-        </button>
-        {moveDfMutation.isPending
-            && <span>
-            <LoadingIndicator/>
-            <p>{successCount}/{datafiles.length} completed</p>
-          </span>}
+        <WithSuffix suffix={suffix}>
+            <button
+                type="button"
+                disabled={isExecuting}
+                onClick={executeMove}>
+                Move {datafiles.length} datafiles
+            </button>
+        </WithSuffix>
+        {moveDfMutation.isPending &&
+          <p>{successCount}/{datafiles.length} completed</p>}
     </div>
 }
 

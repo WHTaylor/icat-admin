@@ -4,7 +4,8 @@ import {useState} from "preact/hooks";
 import style from './style.module.css';
 
 import {getLastLogin, getServerNames} from '../../connectioncache'
-import {PrefixedLoadingIndicator} from "../generic/loading-indicator";
+import LoadingIndicator from "../generic/loading-indicator";
+import {WithSuffix} from "../generic/with-indicator";
 
 function processServerName(name: string): string {
     if (name.trim().length === 0) return "";
@@ -57,7 +58,7 @@ const LoginFormView = ({doLogin, errMsg, isLoggingIn}: Props) => {
 
             {errMsg != null && <p>Error logging in: {errMsg}</p>}
             {isLoggingIn &&
-              <PrefixedLoadingIndicator>Logging in...</PrefixedLoadingIndicator>}
+              <WithSuffix suffix={<LoadingIndicator/>}>Logging in...</WithSuffix>}
         </form>);
 }
 

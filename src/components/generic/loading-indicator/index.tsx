@@ -23,8 +23,6 @@ COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
 IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-import {ComponentChildren} from "preact";
-import style from './style.module.css';
 
 const LoadingIndicator = () =>
     <svg width="24" height="24" viewBox="0 0 24 24">
@@ -46,10 +44,5 @@ const LoadingIndicator = () =>
                 repeatCount="indefinite"/>
         </path>
     </svg>;
-
-export const PrefixedLoadingIndicator = (props: { children: ComponentChildren }) =>
-    <span class={style.withLoadingIndicatorPrefix}>
-        <LoadingIndicator/>{props.children}
-    </span>;
 
 export default LoadingIndicator;

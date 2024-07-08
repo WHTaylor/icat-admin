@@ -423,6 +423,7 @@ const MoveExecutor = (
     }
 ) => {
     const [successCount, setSuccessCount] = useState(0);
+    const [errorCount, setErrorCount] = useState(0);
 
     const moveDfMutation = useMutation({
         mutationFn: (datafile: ExistingIcatEntity) => {
@@ -438,16 +439,23 @@ const MoveExecutor = (
             id: "move-run-datafile"
         },
         onSuccess: () => setSuccessCount(c => c + 1),
-        retry: 3
+        onError: () => setErrorCount(c => c + 1),
+        retry: 1,
+        retryDelay: attempt => attempt * 50
     });
 
     const isExecuting = moveDfMutation.isPending;
 
-    const executeMove = () => {
+    const executeMove = async () => {
         for (const df of datafiles) {
-            moveDfMutation.mutate(
+            await moveDfMutation.mutate(
                 df, {
-                    onSettled: () => setSuccessCount(0)
+                    onSettled: () => {
+                        setTimeout(() => {
+                            setSuccessCount(0)
+                            setErrorCount(0);
+                        }, 2000)
+                    },
                 });
         }
     }
@@ -464,8 +472,10 @@ const MoveExecutor = (
                 Move {datafiles.length} datafiles
             </button>
         </WithSuffix>
-        {moveDfMutation.isPending &&
+        {(moveDfMutation.isPending || successCount > 0) &&
           <p>{successCount}/{datafiles.length} completed</p>}
+        {errorCount > 0 &&
+          <p>{errorCount}/{datafiles.length} failed</p>}
     </div>
 }
 

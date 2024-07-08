@@ -432,8 +432,10 @@ const MoveExecutor = (
             };
             return icatClient.writeEntity("Datafile", toUpdate);
         },
+        // Assigning a fixed id means mutations will run serially
+        // TODO: Run in 'partial' parallel, e.g a few at once
         scope: {
-            id: "asdf"
+            id: "move-run-datafile"
         },
         onSuccess: () => setSuccessCount(c => c + 1),
         retry: 3

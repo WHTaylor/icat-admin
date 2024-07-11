@@ -21,6 +21,11 @@ export function xToManyAttributeToEntityName(
         if (attribute === "users") return "DataPublicationUser";
     }
 
+    // Covers job fields on DataCollection
+    if (attribute.startsWith("jobsAs")) {
+        return "Job";
+    }
+
     if (originEntity == "Datafile"
         && attribute == "sourceDatafiles" || attribute == "destDatafiles") {
             return "RelatedDatafile"
@@ -88,6 +93,9 @@ export function idReferenceFromRelatedEntity(
     if (origin == "DataPublication"
         && dataPublicationIsPublication.includes(related)) {
         return "publication.id";
+    } else if (origin === "DataCollection"
+        && related === "DataPublication") {
+        return "content.id";
     }
 
     return isOneToMany

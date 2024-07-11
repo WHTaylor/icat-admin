@@ -56,7 +56,7 @@ const LoginFormView = ({doLogin, errMsg, isLoggingIn}: Props) => {
 
             <button class={style.block}>Login</button>
 
-            {errMsg != null && <p>Error logging in: {errMsg}</p>}
+            {errMsg != null && <p>{errMsg}</p>}
             {isLoggingIn &&
               <WithSuffix suffix={<LoadingIndicator/>}>Logging in...</WithSuffix>}
         </form>);

@@ -41,7 +41,7 @@ const LoginForm = ({createConnection}: Props) => {
                 }
             })
             .catch(err => {
-                setErrMsg(err.toString());
+                setErrMsg(err.message);
                 setIsLoggingIn(false)
             });
     };

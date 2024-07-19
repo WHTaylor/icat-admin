@@ -79,7 +79,11 @@ const OpenTabModal = ({openTab, close}: Props) => {
     const handleInputKeyDown = (ev: KeyboardEvent) => {
         if (ev.key !== "Enter") return;
         if (selectedIdx === null) return;
-        openTab(matches[selectedIdx]);
+        confirmSelection(matches[selectedIdx])
+    }
+
+    const confirmSelection = (selection: string) => {
+        openTab(selection);
         close();
     }
 
@@ -117,6 +121,7 @@ const OpenTabModal = ({openTab, close}: Props) => {
               <ul>
                   {matches.map((m, i) =>
                       <li key={m}
+                          onClick={() => confirmSelection(m)}
                           className={(selectedIdx ?? -1) == i && style.active}>
                           {m}
                       </li>

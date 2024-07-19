@@ -23,6 +23,11 @@
 
 .openTabModal ul li {
     padding: 0.05em;
+    cursor: pointer;
+}
+
+.openTabModal ul li:hover {
+    background-color: var(--color-blue-light);
 }
 
 .active {

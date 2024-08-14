@@ -1,6 +1,6 @@
 # icat-admin
 
-A web application for convenient browsing and editing of ICAT data. See it in action [here](https://vigorous-lamarr-7b3487.netlify.app). Designed as an alternative to [ICAT Manager](https://github.com/icatproject/manager.icat-manager).
+A web application for convenient browsing and editing of ICAT data. See it in action [here](https://icatadmin.netlify.app). Designed as an alternative to [ICAT Manager](https://github.com/icatproject/manager.icat-manager).
 
 ## Development
 
@@ -29,4 +29,5 @@ docker run --init -p 8080:8080
 
  - There is a small suite of end to end tests which can be run using `yarn e2e`. Use `yarn cypress open` for interactive test running during development.
  - I'd like to keep the main code free of eslint errors and warnings. Run eslint using `yarn eslint src`.
- - Pushes to the `master` branch of https://github.com/wonkySpecs/icat-admin will trigger a netlify deployment to https://vigorous-lamarr-7b3487.netlify.app.
+ - Pushes to the `master` branch of https://github.com/wonkySpecs/icat-admin will trigger a netlify deployment to https://icatadmin.netlify.app.
+ 

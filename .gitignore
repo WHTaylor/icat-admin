@@ -5,3 +5,4 @@ size-plugin.json
 cypress/videos
 cypress/screenshots
 .idea
+**/venv

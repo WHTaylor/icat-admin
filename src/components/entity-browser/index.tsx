@@ -1,6 +1,7 @@
 import {Dispatch, useEffect, useState} from "preact/hooks";
 
-import IcatClient, {entityNames,} from '../../icat';
+import IcatClient  from '../../icat';
+import {entityNames}  from '../../icatEntityStructure';
 import {tableFilter,} from '../../utils';
 import EntityTable from '../entity-table/container';
 import TabWindow from '../tab-window';

@@ -1,4 +1,4 @@
-import {entityNames} from './icat';
+import {entityNames} from './icatEntityStructure';
 import {ExistingIcatEntity, NewIcatEntity, TableFilter} from "./types";
 import {inIcatFormat, parseDate} from "./dateUtils";
 

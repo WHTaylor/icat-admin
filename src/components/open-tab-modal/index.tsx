@@ -1,4 +1,4 @@
-import {entityNames} from '../../icat';
+import {entityNames} from '../../icatEntityStructure';
 
 import {useEffect, useRef, useState} from "preact/hooks";
 import style from './style.module.css';

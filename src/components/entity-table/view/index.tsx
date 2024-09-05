@@ -5,10 +5,10 @@ import style from './style.module.css';
 
 import EntityRow, {EntityModification} from '../row';
 import ContextMenu, {CtxMenuDynamicProps} from '../../context-menu';
-import {defaultHeaderSort, xToOneAttributeToEntityName} from '../../../utils';
+import {defaultHeaderSort} from '../../../utils';
 import {ExistingIcatEntity, NewIcatEntity, OpenTabHandler} from "../../../types";
 import {EntityDataAction} from "../../../state/connection";
-import IcatClient from "../../../icat";
+import IcatClient, {getEntityAttributes} from "../../../icat";
 import JSX = h.JSX;
 import LoadingIndicator from "../../generic/loading-indicator";
 
@@ -121,7 +121,7 @@ const EntityTableView = ({
         const isNewRow = e?.id === undefined;
 
         const makeEdit = (k: string, v: string | number) => {
-            const fieldIsEntity = xToOneAttributeToEntityName(entityType, k) !== null;
+            const fieldIsEntity = !getEntityAttributes(entityType).includes(k)
             const newValue = fieldIsEntity
                 // TODO: Validate whether the selected entity exists
                 ? {id: Number.parseInt(v as string)}

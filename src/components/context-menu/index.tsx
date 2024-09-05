@@ -1,12 +1,10 @@
 import style from './style.module.css';
 import {ExistingIcatEntity, OpenTabHandler} from "../../types";
-import {
-    idReferenceFromRelatedEntity,
-    tableFilter,
-    xToManyAttributeToEntityName,
-    xToOneAttributeToEntityName
-} from "../../utils";
-import IcatClient from "../../icat";
+import {tableFilter} from "../../utils";
+import IcatClient, {
+    getRelatedEntityAttribute,
+    idReferenceFromRelatedEntity, isOneToManyRelationship, isXToOneRelationship
+} from "../../icat";
 import {useQueries} from "@tanstack/react-query";
 
 export type CtxMenuDynamicProps = {
@@ -45,28 +43,23 @@ const ContextMenu = ({
      * of entity
      */
     const relatedEntityFilterComponents = (field: string) => {
-        // This is currently a correct way of working out whether the related
-        // entity is an 1-many or many-1 relationship for all fields on all
-        // entities, as of ICAT 6.
-        const oneToMany = field.endsWith("s")
-            || field.includes("jobs");
-        const referenceId = oneToMany
+        const isXToOne = isXToOneRelationship(entityType, field);
+        const isOneToMany = isOneToManyRelationship(entityType, field);
+        if (!isXToOne && !isOneToMany) {
+            return null;
+        }
+
+        const relatedEntityAttribute = getRelatedEntityAttribute(
+            entityType, field)!;
+
+        const idFilterField = idReferenceFromRelatedEntity(
+            entityType, relatedEntityAttribute.name);
+
+        const referenceId = isOneToMany
             ? entity.id
             : (entity[field] as ExistingIcatEntity).id;
-        const relatedEntityType = oneToMany
-            ? xToManyAttributeToEntityName(entityType, field)
-            : xToOneAttributeToEntityName(entityType, field);
 
-        if (relatedEntityType === null) return;
-
-        // The id field on the related entity that is used to filter to _only_ the
-        // related entity/entities.
-        // For one to many, this is ie. 'investigation.id'
-        // ie. For many to one
-        const idFilterField = idReferenceFromRelatedEntity(
-            entityType, relatedEntityType, oneToMany);
-
-        return [relatedEntityType, `${idFilterField} = ${referenceId}`];
+        return [relatedEntityAttribute.type, `${idFilterField} = ${referenceId}`];
     }
 
     // For each one-many relationship, fetch how many related entities there are

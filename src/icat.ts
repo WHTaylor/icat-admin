@@ -9,6 +9,7 @@ import {queryWhereFromInput} from './utils';
 import {Connection} from "./connectioncache";
 import {ExistingIcatEntity, NewIcatEntity, TableFilter} from "./types";
 import {simplifyIcatErrMessage} from "./icatErrorHandling";
+import {entityStructures} from "./icatEntityStructure";
 
 type IcatResponse = { [k: string]: ExistingIcatEntity }[]
 
@@ -202,3 +203,57 @@ function buildSessionUrl(sessionId: string, server: string | URL) {
 }
 
 export default IcatClient;
+
+export function getEntityAttributes(entityType: string) {
+    return entityStructures[entityType].fields;
+}
+
+export function isXToOneRelationship(
+    entityType: string, field: string) {
+    return entityStructures[entityType].ones
+        .filter(m => m.name === field)
+        .length > 0;
+}
+
+export function isOneToManyRelationship(
+    entityType: string, field: string) {
+    return entityStructures[entityType].manys
+        .filter(m => m.name === field)
+        .length > 0;
+}
+
+export function getRelatedEntityAttribute(
+    entityType: string, relatedEntityField: string) {
+    const match = entityStructures[entityType].manys
+        .concat(entityStructures[entityType].ones)
+        .filter(f => f.name === relatedEntityField);
+    return match.length === 0
+        ? undefined
+        : match[0];
+}
+
+/**
+ * Calculate the name of the id field to filter on when traversing to a related
+ * entity
+ *
+ * Examples:
+ * entityType: "Investigation", relatedEntityField: "type"
+ * result = "id"
+ * An investigation has exactly one type, so we filter on the type's id
+ *
+ * entityType: "Investigation", relatedEntityField: "datasets"
+ * result = "investigation.id"
+ * An investigation has many datasets, so we filter on the investigation's id
+ * @param entityType the entity type the relationship starts from
+ * @param relatedEntityField the field being traversed to
+ */
+export function idReferenceFromRelatedEntity(
+    entityType: string, relatedEntityField: string) {
+    if (isXToOneRelationship(entityType, relatedEntityField)) return "id";
+
+    const relatedEntityType = getRelatedEntityAttribute(
+        entityType, relatedEntityField)!.type
+    const relatedEntityStructure = entityStructures[relatedEntityType].ones
+        .filter(m => m.type === entityType)[0];
+    return relatedEntityStructure.name + ".id";
+}

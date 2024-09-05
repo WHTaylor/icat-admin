@@ -49,7 +49,10 @@ function buildQuery(filter: TableFilter) {
         ? "1"
         : filter.includes.map(i => "e." + i)
             .join(", ");
-    return `select e from ${filter.table} e ${where} ${order} ${limit} include ${includes}`;
+    return "select e "
+        + `from ${filter.table} `
+        + `e ${where} ${order} ${limit} `
+        + `include ${includes}`;
 }
 
 class IcatClient {
@@ -78,7 +81,7 @@ class IcatClient {
     async login(
         plugin: string,
         username: string,
-        password: string):Promise<string | PromiseRejectionEvent> {
+        password: string): Promise<string | PromiseRejectionEvent> {
         const creds = {
             plugin,
             credentials: [
@@ -149,7 +152,7 @@ class IcatClient {
 
     async writeEntity(
         entityType: string, entity: ExistingIcatEntity | NewIcatEntity)
-    : Promise<number[]> {
+        : Promise<number[]> {
         const form = new FormData();
         form.append('entities', JSON.stringify({[entityType]: entity}));
         form.append('sessionId', this.sessionId || "");
@@ -183,7 +186,8 @@ class IcatClient {
 
     buildCountUrl(filter: TableFilter): string {
         const where = queryWhereFromInput(filter.where);
-        const query = `select count(e) from ${filter.table} e ${where}`;
+        const query = "select count(e) "
+            + `from ${filter.table} e ${where}`;
         return this.entityUrl({query}).toString();
     }
 }

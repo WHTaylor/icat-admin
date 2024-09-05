@@ -1,5 +1,5 @@
 const urls = {
-  prod: 'icatisis.esc.rl.ac.uk',
+  prod: 'icat.isis.stfc.ac.uk',
   dev: 'icat-dev.isis.stfc.ac.uk'
 };
 

@@ -1,5 +1,7 @@
+// Currently skipping these tests because the new ISIS ICAT dev server isn't connected to the internet
+
 describe('Can login to both envs, and urls are saved', () => {
-  it('passes', () => {
+  it.skip('passes', () => {
     cy.login('prod')
     cy.contains('+').click();
     cy.loginNewServer('dev');
@@ -22,7 +24,7 @@ describe('Can login to both envs, and urls are saved', () => {
 
 // Test for regression of issue fixed by 9b75e77
 describe('Opening an entity on one server should not open it on another', () => {
-  it('passes', () => {
+  it.skip('passes', () => {
     cy.login('prod')
     cy.contains('+').click();
     cy.loginNewServer('dev');

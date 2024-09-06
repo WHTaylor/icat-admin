@@ -11,6 +11,7 @@ import {EntityDataAction} from "../../../state/connection";
 import IcatClient, {getEntityAttributes} from "../../../icat";
 import JSX = h.JSX;
 import LoadingIndicator from "../../generic/loading-indicator";
+import {entityStructures} from "../../../icatEntityStructure";
 
 type Props = {
     data?: ExistingIcatEntity[];
@@ -24,6 +25,7 @@ type Props = {
     dispatch: (action: EntityDataAction) => void;
     openTab: OpenTabHandler,
     icatClient: IcatClient,
+    showAllColumns: boolean,
     [k: string]: any;
 }
 
@@ -45,7 +47,8 @@ const EntityTableView = ({
                              deleteEntities,
                              cancelCreation, insertCreation,
                              dispatch,
-                             openTab, icatClient
+                             openTab, icatClient,
+                             showAllColumns
                          }: Props) => {
     const [contextMenuProps, setContextMenuProps] =
         useState<CtxMenuDynamicProps | null>(null);
@@ -87,10 +90,12 @@ const EntityTableView = ({
     if (data === undefined) return <LoadingIndicator/>;
     if (data.length === 0) return <p>No entries</p>;
 
-    const dataAttributes = data
-        .flatMap(d => Object.keys(d)
+    const fields = showAllColumns
+        ? entityStructures[entityType].fields
+            .concat(entityStructures[entityType].ones.map(o => o.name))
+        : data.flatMap(d => Object.keys(d)
             .filter(k => !Array.isArray(d[k])));
-    const keys = defaultHeaderSort([...new Set(dataAttributes)]);
+    const keys = defaultHeaderSort([...new Set(fields)]);
 
     // For fields which are objects (AKA it's a related ICAT entity), display
     // a dropdown that allows the user to select which field from those entities

@@ -10,7 +10,8 @@ export type EntityTabState = {
     errMsg?: string,
     creations: NewIcatEntity[],
     deletions: Set<number>,
-    modifications?: {[id: number]: EntityModification}
+    modifications?: {[id: number]: EntityModification},
+    showAllColumns: boolean
 }
 
 /**

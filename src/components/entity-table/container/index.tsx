@@ -29,7 +29,7 @@ const EntityTable = (
         reloadEntity,
         dispatch,
     }: Props) => {
-    const {filter, data, deletions, creations, errMsg} = state;
+    const {filter, data, deletions, creations, errMsg, showAllColumns} = state;
 
     const handleFilterChange =
         (f: TableFilter) => dispatch({type: "edit_filter", filter: f});
@@ -72,6 +72,21 @@ const EntityTable = (
                 handleSetPage={handleSetPage}
                 handleLimitChange={changeLimit}
                 handlePageChange={changePage}/>
+            <label>
+                {/*
+                   The label not matching the action/state here name is
+                   intentional; from a users point of view, the action is to
+                   see all of the columns, but internally the difference is
+                   whether we show the empty columns or not
+                */}
+                Show empty columns
+                <input
+                    type="checkbox"
+                    checked={showAllColumns}
+                    defaultChecked={showAllColumns}
+                    onChange={() => dispatch({type: "toggle_show_empty_columns"})}
+                />
+            </label>
             <EntityCounter filter={filter} icatClient={icatClient}/>
         </span>
 
@@ -106,6 +121,7 @@ const EntityTable = (
                 dispatch={dispatch}
                 openTab={openTab}
                 icatClient={icatClient}
+                showAllColumns={showAllColumns}
             />}
     </>);
 }

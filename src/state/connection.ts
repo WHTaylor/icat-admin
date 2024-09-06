@@ -32,7 +32,7 @@ export const makeNewConnectionState = (connectionInfo: Connection) => ({
     entityTabs: [],
     activeTab: undefined,
     toolsState: makeNewToolsState()
-});
+})
 
 /** Actions which affect the state of a single connection */
 export type ConnectionStateAction =
@@ -69,7 +69,9 @@ export type EntityDataAction =
     EntitySyncCreationAction |
     EntityModifyAction |
     EntityCancelModificationsAction |
-    EntitySyncModificationAction
+    EntitySyncModificationAction |
+    EntityToggleShowEmptyColumns
+
 /** idx is the entity tab to make the change to */
 type EntityTabEditAction = { idx: number } & EntityDataAction;
 
@@ -173,6 +175,10 @@ type EntitySyncModificationAction = {
     entity: ExistingIcatEntity
 }
 
+type EntityToggleShowEmptyColumns = {
+    type: "toggle_show_empty_columns"
+}
+
 export function connectionTabReducer(
     state: ConnectionState,
     action: ConnectionStateAction
@@ -190,7 +196,8 @@ export function connectionTabReducer(
             filter: action.filter,
             key: Math.random(),
             creations: [],
-            deletions: new Set<number>()
+            deletions: new Set<number>(),
+            showAllColumns: false
         });
         return {
             ...state,
@@ -374,6 +381,9 @@ function makeEditFunction(action: EntityTabEditAction)
                     ? action.entity
                     : e)
             }, action.entity.id);
+
+        case "toggle_show_empty_columns":
+            return ets => ({...ets, showAllColumns: !ets.showAllColumns});
     }
 }
 

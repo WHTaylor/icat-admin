@@ -2,7 +2,7 @@ import style from './style.module.css';
 import {ExistingIcatEntity, OpenTabHandler} from "../../types";
 import {tableFilter} from "../../utils";
 import IcatClient, {
-    getRelatedEntityAttribute,
+    getRelatedEntityField,
     idReferenceFromRelatedEntity, isOneToManyRelationship, isXToOneRelationship
 } from "../../icat";
 import {useQueries} from "@tanstack/react-query";
@@ -49,17 +49,17 @@ const ContextMenu = ({
             return null;
         }
 
-        const relatedEntityAttribute = getRelatedEntityAttribute(
+        const relatedEntityField = getRelatedEntityField(
             entityType, field)!;
 
         const idFilterField = idReferenceFromRelatedEntity(
-            entityType, relatedEntityAttribute.name);
+            entityType, relatedEntityField.name);
 
         const referenceId = isOneToMany
             ? entity.id
             : (entity[field] as ExistingIcatEntity).id;
 
-        return [relatedEntityAttribute.type, `${idFilterField} = ${referenceId}`];
+        return [relatedEntityField.type, `${idFilterField} = ${referenceId}`];
     }
 
     // For each one-many relationship, fetch how many related entities there are

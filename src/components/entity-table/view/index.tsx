@@ -121,7 +121,7 @@ const EntityTableView = ({
     // Otherwise, only show columns where at least one of the values for it in
     // data is populated
     const fields = showAllColumns
-        ? entityStructures[entityType].fields
+        ? entityStructures[entityType].attributes
             .concat(entityStructures[entityType].ones.map(o => o.name))
         : data.flatMap(d => Object.keys(d)
             .filter(k => !Array.isArray(d[k])));

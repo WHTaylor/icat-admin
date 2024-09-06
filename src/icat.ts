@@ -205,28 +205,28 @@ function buildSessionUrl(sessionId: string, server: string | URL) {
 export default IcatClient;
 
 export function getEntityAttributes(entityType: string) {
-    return entityStructures[entityType].fields;
+    return entityStructures[entityType].attributes;
 }
 
 export function isXToOneRelationship(
-    entityType: string, field: string) {
+    entityType: string, fieldName: string) {
     return entityStructures[entityType].ones
-        .filter(m => m.name === field)
+        .filter(m => m.name === fieldName)
         .length > 0;
 }
 
 export function isOneToManyRelationship(
-    entityType: string, field: string) {
+    entityType: string, fieldName: string) {
     return entityStructures[entityType].manys
-        .filter(m => m.name === field)
+        .filter(m => m.name === fieldName)
         .length > 0;
 }
 
-export function getRelatedEntityAttribute(
-    entityType: string, relatedEntityField: string) {
+export function getRelatedEntityField(
+    entityType: string, fieldName: string) {
     const match = entityStructures[entityType].manys
         .concat(entityStructures[entityType].ones)
-        .filter(f => f.name === relatedEntityField);
+        .filter(f => f.name === fieldName);
     return match.length === 0
         ? undefined
         : match[0];
@@ -237,22 +237,22 @@ export function getRelatedEntityAttribute(
  * entity
  *
  * Examples:
- * entityType: "Investigation", relatedEntityField: "type"
+ * entityType: "Investigation", relatedEntityFieldName: "type"
  * result = "id"
  * An investigation has exactly one type, so we filter on the type's id
  *
- * entityType: "Investigation", relatedEntityField: "datasets"
+ * entityType: "Investigation", relatedEntityFieldName: "datasets"
  * result = "investigation.id"
  * An investigation has many datasets, so we filter on the investigation's id
  * @param entityType the entity type the relationship starts from
- * @param relatedEntityField the field being traversed to
+ * @param relatedEntityFieldName the field being traversed to
  */
 export function idReferenceFromRelatedEntity(
-    entityType: string, relatedEntityField: string) {
-    if (isXToOneRelationship(entityType, relatedEntityField)) return "id";
+    entityType: string, relatedEntityFieldName: string) {
+    if (isXToOneRelationship(entityType, relatedEntityFieldName)) return "id";
 
-    const relatedEntityType = getRelatedEntityAttribute(
-        entityType, relatedEntityField)!.type
+    const relatedEntityType = getRelatedEntityField(
+        entityType, relatedEntityFieldName)!.type
     const relatedEntityStructure = entityStructures[relatedEntityType].ones
         .filter(m => m.type === entityType)[0];
     return relatedEntityStructure.name + ".id";

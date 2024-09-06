@@ -33,6 +33,8 @@ const sortToEnd = ["createId", "createTime", "modId", "modTime"];
  * @param headers the entity attributes to sort
  */
 export function defaultHeaderSort(headers: string[]): string[] {
+    if (headers.length == 0) return [];
+
     const end = headers.filter(h => sortToEnd.includes(h)).sort();
     const start = ["id"];
     const middle = headers.filter(h => h !== "id" && !sortToEnd.includes(h)).sort();

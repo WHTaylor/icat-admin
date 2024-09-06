@@ -18,6 +18,8 @@ type Props = {
     deletions: Set<number>,
     creations: NewIcatEntity[];
     modifications: {[id: number]: EntityModification},
+    entityType: string,
+    sortingBy: {field: string | null, asc: boolean | null},
     deleteEntities: (ids: number[]) => void;
     saveEntity: (e: NewIcatEntity | ExistingIcatEntity) => Promise<number[]>;
     cancelCreation: (i: number) => void;
@@ -88,16 +90,8 @@ const EntityTableView = ({
 
     // Note: early returns need to be after all hooks
     if (data === undefined) return <LoadingIndicator/>;
-    if (data.length === 0) return <p>No entries</p>;
 
-    const fields = showAllColumns
-        ? entityStructures[entityType].fields
-            .concat(entityStructures[entityType].ones.map(o => o.name))
-        : data.flatMap(d => Object.keys(d)
-            .filter(k => !Array.isArray(d[k])));
-    const keys = defaultHeaderSort([...new Set(fields)]);
-
-    // For fields which are objects (AKA it's a related ICAT entity), display
+    // For fields which are objects (AKA X to one related entities), display
     // a dropdown that allows the user to select which field from those entities
     // to display
     const relatedFieldDisplaySelect = (k: string): JSX.Element => {
@@ -121,6 +115,17 @@ const EntityTableView = ({
                         selected={relatedDisplayFields[k] === vk}>{vk}</option>)}
         </select>);
     };
+
+    // If 'Show empty columns' is checked, display all fields and x-to-one
+    // relationships of entityType in the table.
+    // Otherwise, only show columns where at least one of the values for it in
+    // data is populated
+    const fields = showAllColumns
+        ? entityStructures[entityType].fields
+            .concat(entityStructures[entityType].ones.map(o => o.name))
+        : data.flatMap(d => Object.keys(d)
+            .filter(k => !Array.isArray(d[k])));
+    const keys = defaultHeaderSort([...new Set(fields)]);
 
     const buildEntityRow = (e: NewIcatEntity | ExistingIcatEntity, i: number): JSX.Element => {
         const isNewRow = e?.id === undefined;
@@ -185,9 +190,6 @@ const EntityTableView = ({
             markedForDeletion={deletions.has((e as ExistingIcatEntity).id)}/>;
     };
 
-    const setSortingBy = (field: string, asc: boolean) =>
-        dispatch({type: "sort", field, asc});
-
     // Slightly awkward array combination to make tsc happy
     const empty: (ExistingIcatEntity | NewIcatEntity)[] = [];
     const toDisplay = empty.concat(creations).concat(data);
@@ -195,41 +197,22 @@ const EntityTableView = ({
     return (
         <>
             <table>
-                <tr>
-                    <th>Actions</th>
-                    {keys.map(k =>
-                        <th key={k + "-header"}>
-                            <div class={style.tableHeaderContainer}>
-                            <span class={style.tableHeading}>
-                                {k}
-                                <span>
-                                    <button
-                                        className={
-                                            `${style.sortButton}
-                                            ${sortingBy.field === k && sortingBy.asc
-                                                ? style.activeSort : ''}`}
-                                        onClick={() => setSortingBy(k, true)}
-                                        title={`Sort by ${k}, ascending`}>
-                                        ▲
-                                    </button>
-                                    <button
-                                        className={
-                                            `${style.sortButton}
-                                            ${sortingBy.field === k && !sortingBy.asc
-                                                ? style.activeSort : ''}`}
-                                        onClick={() => setSortingBy(k, false)}
-                                        title={`Sort by ${k}, descending`}>
-                                        ▼
-                                    </button>
-                                </span>
-                            </span>
-                                {relatedFieldDisplaySelect(k)}
-                            </div>
-                        </th>)}
-                </tr>
                 {
-                    // Display a row for each creation, then all existing data
-                    toDisplay.map((e, i) => buildEntityRow(e, i))
+                    (toDisplay.length > 0 || showAllColumns)
+                    && <TableHeader
+                    keys={keys}
+                    sortingBy={sortingBy}
+                    setSortingBy={(field, asc) => dispatch({
+                        type: "sort", field, asc
+                    })}
+                    relatedFieldDisplaySelect={relatedFieldDisplaySelect}
+                  />
+                }
+                {
+                    toDisplay.length === 0
+                        ? <p>No entries</p>
+                        // Display a row for each creation, then all existing data
+                        : toDisplay.map((e, i) => buildEntityRow(e, i))
                 }
             </table>
             {contextMenuProps != null &&
@@ -240,6 +223,54 @@ const EntityTableView = ({
               />}
         </>
     );
+}
+
+type TableHeaderProps = {
+    keys: string[],
+    sortingBy: { field: string | null, asc: boolean | null },
+    setSortingBy: (field: string, asc: boolean) => void,
+    relatedFieldDisplaySelect: (k: string) => JSX.Element
+}
+
+const TableHeader = ({
+                         keys,
+                         sortingBy,
+                         setSortingBy,
+                         relatedFieldDisplaySelect
+                     }: TableHeaderProps) => {
+    return <tr>
+        <th>Actions</th>
+        {keys.map(k =>
+            <th key={k + "-header"}>
+                <div className={style.tableHeaderContainer}>
+                    <span className={style.tableHeading}>
+                        {k}
+                        <span>
+                            <button
+                                className={
+                                    `${style.sortButton}
+                                    ${sortingBy.field === k && sortingBy.asc
+                                        ? style.activeSort : ''}`}
+                                onClick={() => setSortingBy(k, true)}
+                                title={`Sort by ${k}, ascending`}>
+                                ▲
+                            </button>
+                            <button
+                                className={
+                                    `${style.sortButton}
+                                    ${sortingBy.field === k && !sortingBy.asc
+                                        ? style.activeSort : ''}`}
+                                onClick={() => setSortingBy(k, false)}
+                                title={`Sort by ${k}, descending`}>
+                                ▼
+                            </button>
+                        </span>
+                    </span>
+                    {relatedFieldDisplaySelect(k)}
+                </div>
+            </th>
+        )}
+    </tr>
 }
 
 export default EntityTableView;

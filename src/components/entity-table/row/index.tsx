@@ -104,9 +104,8 @@ const EntityRow = (
             return saveEntity(e);
         },
         onSuccess: (data) => {
-            isNewRow
-                ? syncModifications(data)
-                : syncModifications();
+            const id = isNewRow ? data : entity.id;
+            syncModifications(id);
         },
     });
 

@@ -6,20 +6,25 @@ import style from './style.module.css';
 import EntityRow, {EntityModification} from '../row';
 import ContextMenu, {CtxMenuDynamicProps} from '../../context-menu';
 import {defaultHeaderSort} from '../../../utils';
-import {ExistingIcatEntity, NewIcatEntity, OpenTabHandler} from "../../../types";
+import {
+    ExistingIcatEntity,
+    IcatEntityValue,
+    NewIcatEntity,
+    OpenTabHandler
+} from "../../../types";
 import {EntityDataAction} from "../../../state/connection";
 import IcatClient, {getEntityAttributes} from "../../../icat";
-import JSX = h.JSX;
 import LoadingIndicator from "../../generic/loading-indicator";
 import {entityStructures} from "../../../icatEntityStructure";
+import JSX = h.JSX;
 
 type Props = {
     data?: ExistingIcatEntity[];
     deletions: Set<number>,
     creations: NewIcatEntity[];
-    modifications: {[id: number]: EntityModification},
+    modifications: { [id: number]: EntityModification },
     entityType: string,
-    sortingBy: {field: string | null, asc: boolean | null},
+    sortingBy: { field: string | null, asc: boolean | null },
     deleteEntities: (ids: number[]) => void;
     saveEntity: (e: NewIcatEntity | ExistingIcatEntity) => Promise<number[]>;
     cancelCreation: (i: number) => void;
@@ -34,7 +39,8 @@ type Props = {
 type FieldEdit = {
     // idx will be the index in creations if a new row is being edited,
     // or the entity id if an existing row is being edited
-    idx: number | string;
+    idx: number
+    isExistingEntity: boolean
     field: string
 };
 
@@ -55,7 +61,6 @@ const EntityTableView = ({
     const [contextMenuProps, setContextMenuProps] =
         useState<CtxMenuDynamicProps | null>(null);
     // Locally saved changes to entities
-    const [editingNewRow, setEditingNewRow] = useState(false);
     const [fieldBeingEdited, setFieldBeingEdited] =
         useState<FieldEdit | null>(null);
     const stopEditing = () => setFieldBeingEdited(null);
@@ -64,11 +69,6 @@ const EntityTableView = ({
         useState<{ [k: string]: string }>({});
 
     const clearContextMenu = () => setContextMenuProps(null);
-
-    const openContextMenu = (x: number, y: number, entity: ExistingIcatEntity) => {
-        setContextMenuProps({x, y, entity});
-        stopEditing();
-    };
 
     // Set up event listener to close the context menu and stop editing when
     // clicking away
@@ -127,61 +127,110 @@ const EntityTableView = ({
             .filter(k => !Array.isArray(d[k])));
     const keys = defaultHeaderSort([...new Set(fields)]);
 
-    const buildEntityRow = (e: NewIcatEntity | ExistingIcatEntity, i: number): JSX.Element => {
-        const isNewRow = e?.id === undefined;
+    const buildCreationRow = (e: NewIcatEntity, i: number) => {
+        const makeModification = (k: string, v: IcatEntityValue) => dispatch({
+            type: "edit_creation", i, k, v
+        });
+        const syncModification = async (id: number) => await insertCreation(i, id);
+        const revertChanges = () => cancelCreation(i);
+        const openContextMenu = (_: number, __: number) => {};
+        const isRowBeingEdited =
+            fieldBeingEdited != null
+            && !fieldBeingEdited.isExistingEntity
+            && fieldBeingEdited.idx === i;
+        const constructFieldEdit = (field: string) =>
+            ({idx: i, isExistingEntity: false, field});
 
+        return buildRow(
+            e,
+            "new-entity-" + i,
+            undefined,
+            isRowBeingEdited && fieldBeingEdited.field || null,
+            revertChanges,
+            openContextMenu,
+            constructFieldEdit,
+            makeModification,
+            syncModification
+        );
+    }
+
+    const buildExistingRow = (e: ExistingIcatEntity) => {
+        const makeModification = (k: string, v: string | number | ExistingIcatEntity) =>
+            dispatch({
+                type: "edit_entity", id: e.id, k, v
+            });
+        const syncModification = async (id: number) => await reloadEntity(id);
+        const revertChanges = () => dispatch({
+            type: "cancel_modifications",
+            id: e.id
+        });
+        const openContextMenu = (x: number, y: number) => {
+            setContextMenuProps({x, y, entity: e});
+            stopEditing();
+        };
+
+        const isRowBeingEdited =
+            fieldBeingEdited != null
+            && fieldBeingEdited.isExistingEntity
+            && fieldBeingEdited.idx === e.id;
+        const constructFieldEdit = (field: string) =>
+            ({idx: e.id, isExistingEntity: true, field});
+
+        return buildRow(
+            e,
+            e.id.toString(),
+            modifications[e.id],
+            isRowBeingEdited && fieldBeingEdited.field || null,
+            revertChanges,
+            openContextMenu,
+            constructFieldEdit,
+            makeModification,
+            syncModification
+        );
+    }
+
+    const buildRow = (
+        e: NewIcatEntity | ExistingIcatEntity,
+        key: string,
+        modifications: EntityModification | undefined,
+        editingField: string | null,
+        revertChanges: () => void,
+        openContextMenu: (x: number, y: number) => void,
+        constructFieldEdit: (field: string) => FieldEdit,
+        makeModification: (k: string, v: string | number | ExistingIcatEntity) => void,
+        syncModifications: (id: number) => void,
+    ) => {
         const makeEdit = (k: string, v: string | number) => {
             const fieldIsEntity = !getEntityAttributes(entityType).includes(k)
             const newValue = fieldIsEntity
                 // TODO: Validate whether the selected entity exists
                 ? {id: Number.parseInt(v as string)}
                 : v;
-            isNewRow
-                ? dispatch({
-                    type: "edit_creation", i, k, v: newValue
-                })
-                : dispatch({
-                    type: "edit_entity", id: e.id, k, v: newValue
-                });
+            makeModification(k, newValue)
             stopEditing();
-        }
-        const syncModifications = isNewRow
-            ? async (id: number) => await insertCreation(i, id)
-            : async () => await reloadEntity(e.id);
-        const revertChanges = isNewRow
-            ? () => cancelCreation(i)
-            : () => dispatch({type: "cancel_modifications", id: e.id});
-        const isRowBeingEdited =
-            fieldBeingEdited != null
-            && (editingNewRow
-                ? isNewRow && fieldBeingEdited.idx === i
-                : !isNewRow && fieldBeingEdited.idx === e.id);
-
-        const openContextMenuAt = isNewRow
-            ? (_: number, __: number) => {}
-            : (x: number, y: number) => openContextMenu(x, y, e);
+        };
 
         return <EntityRow
-            key={isNewRow ? "new-" + i : e.id}
+            key={key}
             headers={keys}
             entity={e}
-            modifications={isNewRow ? undefined : modifications[e.id]}
-            editingField={
-                isRowBeingEdited
-                    ? fieldBeingEdited.field
-                    : null}
+            modifications={modifications}
+            editingField={editingField}
             relatedEntityDisplayFields={relatedDisplayFields}
-            openContextMenu={openContextMenuAt}
+            openContextMenu={openContextMenu}
             startEditing={(field: string) => {
                 clearContextMenu();
-                setFieldBeingEdited({idx: isNewRow ? i : e.id, field});
-                setEditingNewRow(isNewRow);
+                setFieldBeingEdited(constructFieldEdit(field));
             }}
             stopEditing={stopEditing}
             makeEdit={makeEdit}
             saveEntity={saveEntity}
             revertChanges={revertChanges}
             syncModifications={syncModifications}
+
+            // Everything about deletes assumes the entity exists because the
+            // delete button is only shown for existing entities.
+            // TODO: make this typesafe
             markToDelete={() => dispatch({type: "mark_delete", id: e.id!})}
             cancelDeletion={() => dispatch({
                 type: "cancel_deletes", ids: [e.id!]
@@ -190,15 +239,13 @@ const EntityTableView = ({
             markedForDeletion={deletions.has((e as ExistingIcatEntity).id)}/>;
     };
 
-    // Slightly awkward array combination to make tsc happy
-    const empty: (ExistingIcatEntity | NewIcatEntity)[] = [];
-    const toDisplay = empty.concat(creations).concat(data);
+    const somethingToDisplay = creations.length > 0 || data.length > 0;
 
     return (
         <>
             <table>
                 {
-                    (toDisplay.length > 0 || showAllColumns)
+                    (somethingToDisplay || showAllColumns)
                     && <TableHeader
                     keys={keys}
                     sortingBy={sortingBy}
@@ -209,10 +256,10 @@ const EntityTableView = ({
                   />
                 }
                 {
-                    toDisplay.length === 0
-                        ? <p>No entries</p>
-                        // Display a row for each creation, then all existing data
-                        : toDisplay.map((e, i) => buildEntityRow(e, i))
+                    somethingToDisplay
+                        ? creations.map((e, i) => buildCreationRow(e, i))
+                            .concat(data.map(buildExistingRow))
+                        : <p>No entries</p>
                 }
             </table>
             {contextMenuProps != null &&

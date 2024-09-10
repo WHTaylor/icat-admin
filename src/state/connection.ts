@@ -334,7 +334,7 @@ function makeEditFunction(action: EntityTabEditAction)
 
         case "sync_creation": {
             return ets => {
-                const data = (ets.data ?? []).concat(action.entity);
+                const data = [action.entity].concat(ets.data ?? []);
                 return cancelCreations({
                     ...ets,
                     data,

@@ -241,35 +241,33 @@ const EntityTableView = ({
 
     const somethingToDisplay = creations.length > 0 || data.length > 0;
 
-    return (
-        <>
-            <table>
-                {
-                    (somethingToDisplay || showAllColumns)
-                    && <TableHeader
-                    keys={keys}
-                    sortingBy={sortingBy}
-                    setSortingBy={(field, asc) => dispatch({
-                        type: "sort", field, asc
-                    })}
-                    relatedFieldDisplaySelect={relatedFieldDisplaySelect}
-                  />
-                }
-                {
-                    somethingToDisplay
-                        ? creations.map((e, i) => buildCreationRow(e, i))
-                            .concat(data.map(buildExistingRow))
-                        : <p>No entries</p>
-                }
-            </table>
-            {contextMenuProps != null &&
-              <ContextMenu {...contextMenuProps}
-                           entityType={entityType}
-                           openTab={openTab}
-                           icatClient={icatClient}
-              />}
-        </>
-    );
+    return <>
+        <table>
+            {
+                (somethingToDisplay || showAllColumns)
+                && <TableHeader
+                keys={keys}
+                sortingBy={sortingBy}
+                setSortingBy={(field, asc) => dispatch({
+                    type: "sort", field, asc
+                })}
+                relatedFieldDisplaySelect={relatedFieldDisplaySelect}
+              />
+            }
+            {
+                somethingToDisplay
+                    ? creations.map((e, i) => buildCreationRow(e, i))
+                        .concat(data.map(buildExistingRow))
+                    : <p>No entries</p>
+            }
+        </table>
+        {contextMenuProps != null &&
+          <ContextMenu {...contextMenuProps}
+                       entityType={entityType}
+                       openTab={openTab}
+                       icatClient={icatClient}
+          />}
+    </>;
 }
 
 type TableHeaderProps = {

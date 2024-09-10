@@ -338,7 +338,7 @@ function makeEditFunction(action: EntityTabEditAction)
                 return cancelCreations({
                     ...ets,
                     data,
-                }, [action.idx]);
+                }, [action.i]);
             }
         }
 

@@ -74,7 +74,7 @@ const EntityTable = (
                 handlePageChange={changePage}/>
             <label>
                 {/*
-                   The label not matching the action/state here name is
+                   The label not matching the action/state name here is
                    intentional; from a users point of view, the action is to
                    see all of the columns, but internally the difference is
                    whether we show the empty columns or not

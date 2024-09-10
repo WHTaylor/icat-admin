@@ -78,7 +78,7 @@ const ContextMenu = ({
         const f = tableFilter(relatedEntity, 0, 0, where)
 
         return {
-            queryKey: [icatClient.buildUrl(f)],
+            queryKey: [f, "count"],
             queryFn: async ({signal}: { signal: AbortSignal }) =>
                 await icatClient.getCount(f, signal),
         }

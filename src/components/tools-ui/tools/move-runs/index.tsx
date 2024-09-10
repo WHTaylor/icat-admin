@@ -56,7 +56,7 @@ const MoveRunsTool = (
             const where = "name like '" + state.instrument + "%" + r + "%'";
             const f = tableFilter("Datafile", 0, 0, where);
             return {
-                queryKey: [icatClient.buildUrl(f)],
+                queryKey: [f],
                 // TODO: filter with regex to name = <instr>0*<run>\D+
                 queryFn: async ({signal}: { signal: AbortSignal }) =>
                     await icatClient.getEntries(f, signal)
@@ -326,7 +326,7 @@ const InvestigationSelector = (
             icatClient.getEntries(f, signal)
         : () => [];
     const query = {
-        queryKey: [icatClient.buildUrl(f)],
+        queryKey: [f],
         queryFn
     };
     const {isPending, isSuccess, data} = useQuery(query);

@@ -14,7 +14,7 @@ type Props = {
     state: EntityTabState;
     openTab: OpenTabHandler,
     deleteEntities: (ids: number[]) => void;
-    insertCreation: (i: number, id: number) => void;
+    insertCreation: (i: number, id: number) => Promise<void>;
     reloadEntity: (id: number) => Promise<void>;
     dispatch: (action: EntityDataAction) => void;
 }

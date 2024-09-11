@@ -28,12 +28,12 @@ type Props = {
     deleteEntities: (ids: number[]) => void;
     saveEntity: (e: NewIcatEntity | ExistingIcatEntity) => Promise<number[]>;
     cancelCreation: (i: number) => void;
+    insertCreation: (rowIdx: number, id: number) => Promise<void>;
     reloadEntity: (id: number) => Promise<void>;
     dispatch: (action: EntityDataAction) => void;
     openTab: OpenTabHandler,
     icatClient: IcatClient,
     showAllColumns: boolean,
-    [k: string]: any;
 }
 
 type FieldEdit = {
@@ -181,7 +181,7 @@ const EntityTableView = ({
         makeModification: (k: string, v: string | number | ExistingIcatEntity) => void,
         syncModifications: (id: number) => void,
     ) => {
-        const makeEdit = (k: string, v: string | number) => {
+        const makeEdit = (k: string, v: string) => {
             const fieldIsEntity = !getEntityAttributes(entityType).includes(k)
             const newValue = fieldIsEntity
                 // TODO: Validate whether the selected entity exists

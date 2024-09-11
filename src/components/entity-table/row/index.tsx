@@ -43,8 +43,17 @@ type Props = {
     headers: string[];
     editingField: string | null;
     relatedEntityDisplayFields: { [k: string]: string };
+    markedForDeletion: boolean;
+    openContextMenu: (x: number, y: number) => void;
+    startEditing: (k: string) => void;
+    stopEditing: () => void;
+    makeEdit: (k: string, v: string) => void;
     saveEntity: (e: NewIcatEntity | ExistingIcatEntity) => Promise<number[]>;
-    [k: string]: any;
+    revertChanges: () => void;
+    syncModifications: (id: number) => void;
+    markToDelete: () => void;
+    cancelDeletion: () => void;
+    doDelete: () => void;
 }
 
 /**
@@ -104,7 +113,7 @@ const EntityRow = (
             return saveEntity(e);
         },
         onSuccess: (data) => {
-            const id = isNewRow ? data : entity.id;
+            const id = isNewRow ? data[0] : entity.id;
             syncModifications(id);
         },
     });

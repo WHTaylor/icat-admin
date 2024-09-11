@@ -241,37 +241,35 @@ const EntityTableView = ({
 
     const somethingToDisplay = creations.length > 0 || data.length > 0;
 
-    return <>
-        <table>
-            {
-                (somethingToDisplay || showAllColumns)
-                && <TableHeader
-                keys={keys}
-                sortingBy={sortingBy}
-                setSortingBy={(field, asc) => dispatch({
-                    type: "sort", field, asc
-                })}
-                relatedFieldDisplaySelect={relatedFieldDisplaySelect}
-              />
-            }
-            {
-                somethingToDisplay
-                    ? <tbody>
+    return !(somethingToDisplay || showAllColumns)
+        ? <p>No entries</p>
+        : <>
+            <table>
+                <TableHeader
+                    keys={keys}
+                    sortingBy={sortingBy}
+                    setSortingBy={(field, asc) => dispatch({
+                        type: "sort", field, asc
+                    })}
+                    relatedFieldDisplaySelect={relatedFieldDisplaySelect}
+                />
+                {
+                    somethingToDisplay && <tbody>
                     {
                         creations.map((e, i) => buildCreationRow(e, i))
                             .concat(data.map(buildExistingRow))
                     }
-                    </tbody>
-                    : <p>No entries</p>
-            }
-        </table>
-        {contextMenuProps != null &&
-          <ContextMenu {...contextMenuProps}
-                       entityType={entityType}
-                       openTab={openTab}
-                       icatClient={icatClient}
-          />}
-    </>;
+                  </tbody>
+                }
+            </table>
+
+            {contextMenuProps != null &&
+              <ContextMenu {...contextMenuProps}
+                           entityType={entityType}
+                           openTab={openTab}
+                           icatClient={icatClient}
+              />}
+        </>;
 }
 
 type TableHeaderProps = {

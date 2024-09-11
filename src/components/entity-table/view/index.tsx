@@ -37,10 +37,7 @@ type Props = {
 }
 
 type FieldEdit = {
-    // idx will be the index in creations if a new row is being edited,
-    // or the entity id if an existing row is being edited
-    idx: number
-    isExistingEntity: boolean
+    rowIdx: number
     field: string
 };
 
@@ -127,34 +124,27 @@ const EntityTableView = ({
             .filter(k => !Array.isArray(d[k])));
     const keys = defaultHeaderSort([...new Set(fields)]);
 
-    const buildCreationRow = (e: NewIcatEntity, i: number) => {
+    const buildCreationRow = (e: NewIcatEntity, rowIdx: number) => {
         const makeModification = (k: string, v: IcatEntityValue) => dispatch({
-            type: "edit_creation", i, k, v
+            type: "edit_creation", i: rowIdx, k, v
         });
-        const syncModification = async (id: number) => await insertCreation(i, id);
-        const revertChanges = () => cancelCreation(i);
+        const syncModification = async (id: number) => await insertCreation(rowIdx, id);
+        const revertChanges = () => cancelCreation(rowIdx);
         const openContextMenu = (_: number, __: number) => {};
-        const isRowBeingEdited =
-            fieldBeingEdited != null
-            && !fieldBeingEdited.isExistingEntity
-            && fieldBeingEdited.idx === i;
-        const constructFieldEdit = (field: string) =>
-            ({idx: i, isExistingEntity: false, field});
 
         return buildRow(
             e,
-            "new-entity-" + i,
+            rowIdx,
+            "new-entity-" + rowIdx,
             undefined,
-            isRowBeingEdited && fieldBeingEdited.field || null,
             revertChanges,
             openContextMenu,
-            constructFieldEdit,
             makeModification,
             syncModification
         );
     }
 
-    const buildExistingRow = (e: ExistingIcatEntity) => {
+    const buildExistingRow = (e: ExistingIcatEntity, rowIdx: number) => {
         const makeModification = (k: string, v: string | number | ExistingIcatEntity) =>
             dispatch({
                 type: "edit_entity", id: e.id, k, v
@@ -169,21 +159,13 @@ const EntityTableView = ({
             stopEditing();
         };
 
-        const isRowBeingEdited =
-            fieldBeingEdited != null
-            && fieldBeingEdited.isExistingEntity
-            && fieldBeingEdited.idx === e.id;
-        const constructFieldEdit = (field: string) =>
-            ({idx: e.id, isExistingEntity: true, field});
-
         return buildRow(
             e,
+            rowIdx,
             e.id.toString(),
             modifications[e.id],
-            isRowBeingEdited && fieldBeingEdited.field || null,
             revertChanges,
             openContextMenu,
-            constructFieldEdit,
             makeModification,
             syncModification
         );
@@ -191,12 +173,11 @@ const EntityTableView = ({
 
     const buildRow = (
         e: NewIcatEntity | ExistingIcatEntity,
+        rowIdx: number,
         key: string,
         modifications: EntityModification | undefined,
-        editingField: string | null,
         revertChanges: () => void,
         openContextMenu: (x: number, y: number) => void,
-        constructFieldEdit: (field: string) => FieldEdit,
         makeModification: (k: string, v: string | number | ExistingIcatEntity) => void,
         syncModifications: (id: number) => void,
     ) => {
@@ -215,12 +196,14 @@ const EntityTableView = ({
             headers={keys}
             entity={e}
             modifications={modifications}
-            editingField={editingField}
+            editingField={fieldBeingEdited != null && fieldBeingEdited.rowIdx === rowIdx
+                ? fieldBeingEdited.field
+                : null}
             relatedEntityDisplayFields={relatedDisplayFields}
             openContextMenu={openContextMenu}
             startEditing={(field: string) => {
                 clearContextMenu();
-                setFieldBeingEdited(constructFieldEdit(field));
+                setFieldBeingEdited({rowIdx, field});
             }}
             stopEditing={stopEditing}
             makeEdit={makeEdit}
@@ -256,8 +239,9 @@ const EntityTableView = ({
                 {
                     somethingToDisplay && <tbody>
                     {
-                        creations.map((e, i) => buildCreationRow(e, i))
-                            .concat(data.map(buildExistingRow))
+                        creations.map(buildCreationRow)
+                            .concat(data.map((e, i) =>
+                                buildExistingRow(e, i + creations.length)))
                     }
                   </tbody>
                 }

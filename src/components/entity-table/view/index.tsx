@@ -256,8 +256,12 @@ const EntityTableView = ({
             }
             {
                 somethingToDisplay
-                    ? creations.map((e, i) => buildCreationRow(e, i))
-                        .concat(data.map(buildExistingRow))
+                    ? <tbody>
+                    {
+                        creations.map((e, i) => buildCreationRow(e, i))
+                            .concat(data.map(buildExistingRow))
+                    }
+                    </tbody>
                     : <p>No entries</p>
             }
         </table>
@@ -283,7 +287,8 @@ const TableHeader = ({
                          setSortingBy,
                          relatedFieldDisplaySelect
                      }: TableHeaderProps) => {
-    return <tr>
+    return <thead>
+    <tr>
         <th>Actions</th>
         {keys.map(k =>
             <th key={k + "-header"}>
@@ -316,6 +321,7 @@ const TableHeader = ({
             </th>
         )}
     </tr>
+    </thead>
 }
 
 export default EntityTableView;

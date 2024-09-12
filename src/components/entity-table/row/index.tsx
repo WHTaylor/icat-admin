@@ -13,7 +13,8 @@ import {
 } from "../../../types";
 import {inIcatFormat, parseDate,} from "../../../dateUtils";
 import OnChangeInput from "../../generic/on-change-input";
-import {JSX} from "preact";
+import RowActions from "./actions";
+import {memo} from "react";
 
 function formatCellContent(cellContent: IcatEntityValue | undefined | null)
     : string {
@@ -51,14 +52,19 @@ type Props = {
     startEditing: (k: string, i: number) => void;
     stopEditing: () => void;
     makeEdit: (k: string, v: string, i: number) => void;
-    actions: JSX.Element;
+    saveEntity: (e: IcatEntity) => Promise<number[]>;
+    syncChanges: (id: number, rowIdx: number) => void;
+    revertChanges: (i: number) => void;
+    markToDelete: (id: number) => void;
+    cancelDeletion: (id: number) => void;
+    doDelete: (id: number) => void;
 }
 
 /**
  * Renders a single entity as a table row, and provides controls for editing
  * the entity
  */
-const EntityRow = (
+const EntityRow = memo((
     {
         entity,
         modifications,
@@ -71,7 +77,12 @@ const EntityRow = (
         startEditing,
         stopEditing,
         makeEdit,
-        actions
+        saveEntity,
+        syncChanges,
+        revertChanges,
+        markToDelete,
+        cancelDeletion,
+        doDelete,
     }: Props) => {
 
     const inputEl = useRef<HTMLInputElement>(null);
@@ -156,7 +167,18 @@ const EntityRow = (
     return (
         <tr onContextMenu={doOpenContextMenu} class={style.entityRow}>
             <td>
-                {actions}
+                <RowActions
+                    entity={entity}
+                    modifications={modifications}
+                    rowIdx={rowIdx}
+                    saveEntity={saveEntity}
+                    syncChanges={syncChanges}
+                    markedForDeletion={markedForDeletion}
+                    revertChanges={revertChanges}
+                    markToDelete={markToDelete}
+                    cancelDeletion={cancelDeletion}
+                    doDelete={doDelete}
+                />
             </td>
             {headers.map(k =>
                 k === editingField
@@ -181,5 +203,6 @@ const EntityRow = (
             )}
         </tr>
     );
-}
+});
+
 export default EntityRow;

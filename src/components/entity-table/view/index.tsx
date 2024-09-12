@@ -17,7 +17,6 @@ import {EntityDataAction} from "../../../state/connection";
 import IcatClient, {getEntityAttributes} from "../../../icat";
 import LoadingIndicator from "../../generic/loading-indicator";
 import {entityStructures} from "../../../icatEntityStructure";
-import RowActions from "../row/actions";
 import JSX = h.JSX;
 
 type Props = {
@@ -158,6 +157,37 @@ const EntityTableView = ({
         [wrapModifier, modifyEntity]
     );
 
+    const syncEntity = useCallback(
+        (id: number, _: number) => reloadEntity(id),
+        [reloadEntity]
+    );
+    const syncCreation = useCallback(
+        (id: number, rowIdx: number) => insertCreation(rowIdx, id),
+        [insertCreation]
+    );
+    const revertModifications = useCallback(
+        (id: number) => dispatch({
+            type: "cancel_modifications",
+            id
+        }),
+        [dispatch]
+    );
+    const markToDelete = useCallback(
+        (id: number) => dispatch({type: "mark_delete", id}),
+        [dispatch]
+    );
+    const cancelDeletion = useCallback(
+        (id: number) => dispatch({
+            type: "cancel_deletes", ids: [id]
+        }),
+        [dispatch]
+    );
+    const doDelete = useCallback(
+        (id: number) => deleteEntities([id]),
+        [deleteEntities]
+    );
+
+
     // Note: early returns need to be after all hooks
     if (data === undefined) return <LoadingIndicator/>;
 
@@ -187,32 +217,26 @@ const EntityTableView = ({
     };
 
     const buildCreationRow = (e: NewIcatEntity, rowIdx: number) => {
-        const revertChanges = () => cancelCreation(rowIdx);
-
         return buildRow(
             e,
             rowIdx,
             "new-entity-" + rowIdx,
             undefined,
-            id => insertCreation(rowIdx, id),
-            revertChanges,
+            syncCreation,
+            cancelCreation,
             noContextMenu,
             doModifyCreation,
         );
     }
 
     const buildExistingRow = (e: ExistingIcatEntity, rowIdx: number) => {
-        const revertChanges = () => dispatch({
-            type: "cancel_modifications",
-            id: e.id
-        });
         return buildRow(
             e,
             rowIdx,
             e.id.toString(),
             modifications[e.id],
-            id => reloadEntity(id),
-            revertChanges,
+            syncEntity,
+            revertModifications,
             openContextMenu,
             doModifyEntity,
         );
@@ -223,45 +247,34 @@ const EntityTableView = ({
         rowIdx: number,
         key: string,
         modifications: EntityModification | undefined,
-        syncModifications: (id: number) => void,
-        revertChanges: () => void,
+        syncModifications: (id: number, rowIdx: number) => void,
+        revertChanges: (i: number) => void,
         openContextMenu: (x: number, y: number, e: IcatEntity) => void,
         makeEdit: (k: string,
                    v: TableIcatEntityValue,
                    i: number) => void,
-    ) => {
-        const actions = <RowActions
-            entity={e}
-            modifications={modifications}
-            saveEntity={saveEntity}
-            syncChanges={syncModifications}
-            markedForDeletion={e.id !== undefined && deletions.has(e.id)}
-            revertChanges={revertChanges}
-            markToDelete={() => dispatch({type: "mark_delete", id: e.id!})}
-            cancelDeletion={() => dispatch({
-                type: "cancel_deletes", ids: [e.id!]
-            })}
-            doDelete={() => deleteEntities([(e as ExistingIcatEntity).id])}
-        />;
-
-        return <EntityRow
-            key={key}
-            entity={e}
-            modifications={modifications}
-            rowIdx={rowIdx}
-            headers={keys}
-            editingField={fieldBeingEdited != null && fieldBeingEdited.rowIdx === rowIdx
-                ? fieldBeingEdited.field
-                : null}
-            relatedEntityDisplayFields={relatedDisplayFields}
-            markedForDeletion={e.id !== undefined && deletions.has(e.id)}
-            openContextMenu={openContextMenu}
-            startEditing={startEditing}
-            stopEditing={stopEditing}
-            makeEdit={makeEdit}
-            actions={actions}
-        />;
-    };
+    ) => <EntityRow
+        key={key}
+        entity={e}
+        modifications={modifications}
+        rowIdx={rowIdx}
+        headers={keys}
+        editingField={fieldBeingEdited != null && fieldBeingEdited.rowIdx === rowIdx
+            ? fieldBeingEdited.field
+            : null}
+        relatedEntityDisplayFields={relatedDisplayFields}
+        markedForDeletion={e.id !== undefined && deletions.has(e.id)}
+        openContextMenu={openContextMenu}
+        startEditing={startEditing}
+        stopEditing={stopEditing}
+        makeEdit={makeEdit}
+        saveEntity={saveEntity}
+        syncChanges={syncModifications}
+        revertChanges={revertChanges}
+        markToDelete={markToDelete}
+        cancelDeletion={cancelDeletion}
+        doDelete={doDelete}
+    />;
 
     const somethingToDisplay = creations.length > 0 || data.length > 0;
 

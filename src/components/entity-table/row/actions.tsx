@@ -14,19 +14,21 @@ type ActionButtonData = {
 type RowActionsProps = {
     entity: IcatEntity,
     modifications: EntityModification | undefined,
+    rowIdx: number;
     saveEntity: (e: IcatEntity) => Promise<number[]>,
-    syncChanges: (id: number) => void,
+    syncChanges: (id: number, rowIdx: number) => void,
     markedForDeletion: boolean,
-    revertChanges: () => void,
-    markToDelete: () => void,
-    cancelDeletion: () => void,
-    doDelete: () => void
+    revertChanges: (i: number) => void,
+    markToDelete: (id: number) => void,
+    cancelDeletion: (id: number) => void,
+    doDelete: (id: number) => void
 }
 
 const RowActions = (
     {
         entity,
         modifications,
+        rowIdx,
         saveEntity,
         syncChanges,
         markedForDeletion,
@@ -47,7 +49,7 @@ const RowActions = (
         },
         onSuccess: (data) => {
             const isNewEntity = entity.id === undefined;
-            syncChanges(isNewEntity ? data[0] : entity.id as number);
+            syncChanges(isNewEntity ? data[0] : entity.id as number, rowIdx);
         },
     });
 
@@ -62,22 +64,22 @@ const RowActions = (
 
     const actions: ActionButtonData[] = [];
     if (entity.id === undefined) {
-        actions.push({title: "Cancel creation", clickEventHandler: revertChanges, icon: "🚫"});
+        actions.push({title: "Cancel creation", clickEventHandler: () => revertChanges(rowIdx), icon: "🚫"});
         actions.push({
             title: "Create row",
             clickEventHandler: _ => saveMutation.mutate(),
             icon: "💾"
         });
     } else if (markedForDeletion) {
-        actions.push({title: "Cancel deletion", clickEventHandler: cancelDeletion, icon: "↩️"});
-        actions.push({title: "Confirm deletion", clickEventHandler: doDelete, icon: "✔️"});
+        actions.push({title: "Cancel deletion", clickEventHandler: () => cancelDeletion(entity.id as number), icon: "↩️"});
+        actions.push({title: "Confirm deletion", clickEventHandler: () => doDelete(entity.id as number), icon: "✔️"});
     } else {
-        actions.push({title: "Mark for deletion", clickEventHandler: markToDelete, icon: "🗑"});
+        actions.push({title: "Mark for deletion", clickEventHandler: () => markToDelete(entity.id as number), icon: "🗑"});
     }
 
     if (modifications !== undefined) {
         actions.push(
-            {title: "Revert changes", clickEventHandler: revertChanges, icon: "↩️"});
+            {title: "Revert changes", clickEventHandler: () => revertChanges(entity.id as number), icon: "↩️"});
         actions.push(
             {
                 title: "Save changes",

@@ -15,7 +15,7 @@ type IcatResponse = { [k: string]: ExistingIcatEntity }[]
 
 // Unpack the entries returned from the API, because they are formatted like
 // { 'Investigation': { 'id': 123...}}
-// Assumes all entites are the same type
+// Assumes all entities are the same type
 function unpack(data: IcatResponse): ExistingIcatEntity[] {
     if (data.length === 0) return [];
     const first = data[0];
@@ -107,7 +107,7 @@ class IcatClient {
     async refresh() {
         if (this.sessionId === null) return;
 
-        fetch(this.sessionUrl(this.sessionId).toString(), {method: "PUT"});
+        await fetch(this.sessionUrl(this.sessionId).toString(), {method: "PUT"});
     }
 
     async getEntries(filter: TableFilter, signal: AbortSignal | null = null) {

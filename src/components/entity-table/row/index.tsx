@@ -4,7 +4,12 @@ import style from './style.module.css';
 
 import {commonFields} from '../../../utils';
 import ReadMore from '../../generic/read-more';
-import {ExistingIcatEntity, IcatEntityValue, NewIcatEntity} from "../../../types";
+import {
+    ExistingIcatEntity,
+    IcatEntity,
+    IcatEntityValue,
+    NewIcatEntity
+} from "../../../types";
 import {inIcatFormat, parseDate,} from "../../../dateUtils";
 import OnChangeInput from "../../generic/on-change-input";
 import {JSX} from "preact";
@@ -40,7 +45,7 @@ type Props = {
     editingField: string | null;
     relatedEntityDisplayFields: { [k: string]: string };
     markedForDeletion: boolean;
-    openContextMenu: (x: number, y: number) => void;
+    openContextMenu: (x: number, y: number, e: IcatEntity) => void;
     startEditing: (k: string) => void;
     stopEditing: () => void;
     makeEdit: (k: string, v: string) => void;
@@ -70,7 +75,7 @@ const EntityRow = (
 
     const doOpenContextMenu = (ev: MouseEvent) => {
         ev.preventDefault();
-        openContextMenu(ev.pageX, ev.pageY);
+        openContextMenu(ev.pageX, ev.pageY, entity);
     };
 
     useEffect(() => {

@@ -1,16 +1,18 @@
 import style from './style.module.css';
-import {ExistingIcatEntity, OpenTabHandler} from "../../types";
+import {ExistingIcatEntity, IcatEntity, OpenTabHandler} from "../../types";
 import {tableFilter} from "../../utils";
 import IcatClient, {
     getRelatedEntityField,
-    idReferenceFromRelatedEntity, isOneToManyRelationship, isXToOneRelationship
+    idReferenceFromRelatedEntity,
+    isOneToManyRelationship,
+    isXToOneRelationship
 } from "../../icat";
 import {useQueries} from "@tanstack/react-query";
 
 export type CtxMenuDynamicProps = {
     x: number;
     y: number;
-    entity: ExistingIcatEntity;
+    entity: IcatEntity;
 }
 
 export type CtxMenuProps = CtxMenuDynamicProps & {

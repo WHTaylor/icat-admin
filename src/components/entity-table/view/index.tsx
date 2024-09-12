@@ -1,4 +1,4 @@
-import {useEffect, useMemo, useState} from "preact/hooks";
+import {useCallback, useEffect, useMemo, useState} from "preact/hooks";
 import {h} from "preact";
 
 import style from './style.module.css';
@@ -8,6 +8,7 @@ import ContextMenu, {CtxMenuDynamicProps} from '../../context-menu';
 import {defaultHeaderSort} from '../../../utils';
 import {
     ExistingIcatEntity,
+    IcatEntity,
     IcatEntityValue,
     NewIcatEntity,
     OpenTabHandler
@@ -61,12 +62,20 @@ const EntityTableView = ({
     // Locally saved changes to entities
     const [fieldBeingEdited, setFieldBeingEdited] =
         useState<FieldEdit | null>(null);
-    const stopEditing = () => setFieldBeingEdited(null);
+    const stopEditing = useCallback(
+        () => setFieldBeingEdited(null),
+        [setFieldBeingEdited]
+    );
     // Field to show for each related entity in table
     const [relatedDisplayFields, setRelatedDisplayFields] =
         useState<{ [k: string]: string }>({});
 
     const clearContextMenu = () => setContextMenuProps(null);
+
+    const openContextMenu = useCallback((x: number, y: number, e: IcatEntity) => {
+        setContextMenuProps({x, y, entity: e});
+        stopEditing();
+    }, [setContextMenuProps, stopEditing]);
 
     // Set up event listener to close the context menu and stop editing when
     // clicking away
@@ -157,11 +166,6 @@ const EntityTableView = ({
             type: "cancel_modifications",
             id: e.id
         });
-        const openContextMenu = (x: number, y: number) => {
-            setContextMenuProps({x, y, entity: e});
-            stopEditing();
-        };
-
         return buildRow(
             e,
             rowIdx,
@@ -181,7 +185,7 @@ const EntityTableView = ({
         modifications: EntityModification | undefined,
         syncModifications: (id: number) => void,
         revertChanges: () => void,
-        openContextMenu: (x: number, y: number) => void,
+        openContextMenu: (x: number, y: number, e: IcatEntity) => void,
         makeModification: (k: string, v: string | number | ExistingIcatEntity) => void,
     ) => {
         const makeEdit = (k: string, v: string) => {
@@ -316,5 +320,5 @@ const TableHeader = ({
 
 export default EntityTableView;
 
-function noContextMenu(_: number, __: number) {
+function noContextMenu(_: number, __: number, ___: IcatEntity) {
 }

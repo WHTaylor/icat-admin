@@ -9,9 +9,9 @@ import {defaultHeaderSort} from '../../../utils';
 import {
     ExistingIcatEntity,
     IcatEntity,
-    IcatEntityValue,
     NewIcatEntity,
-    OpenTabHandler
+    OpenTabHandler,
+    TableIcatEntityValue
 } from "../../../types";
 import {EntityDataAction} from "../../../state/connection";
 import IcatClient, {getEntityAttributes} from "../../../icat";
@@ -70,8 +70,18 @@ const EntityTableView = ({
     const [relatedDisplayFields, setRelatedDisplayFields] =
         useState<{ [k: string]: string }>({});
 
-    const clearContextMenu = () => setContextMenuProps(null);
+    const clearContextMenu = useCallback(
+        () => setContextMenuProps(null),
+        [setContextMenuProps]
+    );
 
+    const startEditing = useCallback(
+        (field: string, rowIdx: number) => {
+            clearContextMenu();
+            setFieldBeingEdited({rowIdx, field});
+        },
+        [clearContextMenu, setFieldBeingEdited]
+    );
     const openContextMenu = useCallback((x: number, y: number, e: IcatEntity) => {
         setContextMenuProps({x, y, entity: e});
         stopEditing();
@@ -111,6 +121,43 @@ const EntityTableView = ({
         },
         [showAllColumns, data, entityType]);
 
+    const modifyCreation = useCallback(
+        (k: string, v: TableIcatEntityValue, i: number) =>
+            dispatch({
+                type: "edit_creation", i, k, v
+            }),
+        [dispatch]
+    );
+    const modifyEntity = useCallback(
+        (k: string, v: TableIcatEntityValue, id: number) =>
+            dispatch({
+                type: "edit_entity", id, k, v
+            }),
+        [dispatch]
+    );
+    const wrapModifier = useCallback(
+        (f: (k: string, v: TableIcatEntityValue, i: number) => void) =>
+            (k: string, v: TableIcatEntityValue, i: number) => {
+                const fieldIsEntity = !getEntityAttributes(entityType).includes(k)
+                const newValue = fieldIsEntity
+                    // TODO: Validate whether the selected entity exists
+                    ? {id: Number.parseInt(v as string)}
+                    : v;
+                f(k, newValue, i);
+                stopEditing();
+            },
+        [entityType, stopEditing]
+    );
+
+    const doModifyCreation = useMemo(
+        () => wrapModifier(modifyCreation),
+        [wrapModifier, modifyCreation]
+    );
+    const doModifyEntity = useMemo(
+        () => wrapModifier(modifyEntity),
+        [wrapModifier, modifyEntity]
+    );
+
     // Note: early returns need to be after all hooks
     if (data === undefined) return <LoadingIndicator/>;
 
@@ -140,9 +187,6 @@ const EntityTableView = ({
     };
 
     const buildCreationRow = (e: NewIcatEntity, rowIdx: number) => {
-        const makeModification = (k: string, v: IcatEntityValue) => dispatch({
-            type: "edit_creation", i: rowIdx, k, v
-        });
         const revertChanges = () => cancelCreation(rowIdx);
 
         return buildRow(
@@ -153,15 +197,11 @@ const EntityTableView = ({
             id => insertCreation(rowIdx, id),
             revertChanges,
             noContextMenu,
-            makeModification,
+            doModifyCreation,
         );
     }
 
     const buildExistingRow = (e: ExistingIcatEntity, rowIdx: number) => {
-        const makeModification = (k: string, v: string | number | ExistingIcatEntity) =>
-            dispatch({
-                type: "edit_entity", id: e.id, k, v
-            });
         const revertChanges = () => dispatch({
             type: "cancel_modifications",
             id: e.id
@@ -174,7 +214,7 @@ const EntityTableView = ({
             id => reloadEntity(id),
             revertChanges,
             openContextMenu,
-            makeModification,
+            doModifyEntity,
         );
     }
 
@@ -186,18 +226,10 @@ const EntityTableView = ({
         syncModifications: (id: number) => void,
         revertChanges: () => void,
         openContextMenu: (x: number, y: number, e: IcatEntity) => void,
-        makeModification: (k: string, v: string | number | ExistingIcatEntity) => void,
+        makeEdit: (k: string,
+                   v: TableIcatEntityValue,
+                   i: number) => void,
     ) => {
-        const makeEdit = (k: string, v: string) => {
-            const fieldIsEntity = !getEntityAttributes(entityType).includes(k)
-            const newValue = fieldIsEntity
-                // TODO: Validate whether the selected entity exists
-                ? {id: Number.parseInt(v as string)}
-                : v;
-            makeModification(k, newValue)
-            stopEditing();
-        };
-
         const actions = <RowActions
             entity={e}
             modifications={modifications}
@@ -214,23 +246,20 @@ const EntityTableView = ({
 
         return <EntityRow
             key={key}
-            headers={keys}
             entity={e}
-            actions={actions}
             modifications={modifications}
+            rowIdx={rowIdx}
+            headers={keys}
             editingField={fieldBeingEdited != null && fieldBeingEdited.rowIdx === rowIdx
                 ? fieldBeingEdited.field
                 : null}
             relatedEntityDisplayFields={relatedDisplayFields}
+            markedForDeletion={e.id !== undefined && deletions.has(e.id)}
             openContextMenu={openContextMenu}
-            startEditing={(field: string) => {
-                clearContextMenu();
-                setFieldBeingEdited({rowIdx, field});
-            }}
+            startEditing={startEditing}
             stopEditing={stopEditing}
             makeEdit={makeEdit}
-
-            markedForDeletion={e.id !== undefined && deletions.has(e.id)}
+            actions={actions}
         />;
     };
 

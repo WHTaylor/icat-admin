@@ -28,9 +28,17 @@ export type TableFilter = {
 }
 
 /**
+ * The types which the values of an entity being displayed in an entity-table
+ * can have.
+ *
+ * Only scalar and X-one values are displayed in the tables, which is why array
+ * values (one-many relationships) aren't included here.
+ */
+export type TableIcatEntityValue = string | number | ExistingIcatEntity;
+/**
  * The types which the values of an ICAT entity can be
  */
-export type IcatEntityValue = string | number | ExistingIcatEntity | ExistingIcatEntity[];
+export type IcatEntityValue = TableIcatEntityValue | ExistingIcatEntity[];
 
 export type IcatEntity = {
     [k: string]: IcatEntityValue;

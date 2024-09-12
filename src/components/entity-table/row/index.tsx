@@ -8,7 +8,8 @@ import {
     ExistingIcatEntity,
     IcatEntity,
     IcatEntityValue,
-    NewIcatEntity
+    NewIcatEntity,
+    TableIcatEntityValue
 } from "../../../types";
 import {inIcatFormat, parseDate,} from "../../../dateUtils";
 import OnChangeInput from "../../generic/on-change-input";
@@ -35,20 +36,21 @@ function formatCellContent(cellContent: IcatEntityValue | undefined | null)
  * related entity.
  */
 export type EntityModification = {
-    [k: string]: string | number | { id: number }
+    [k: string]: TableIcatEntityValue
 }
 
 type Props = {
     entity: ExistingIcatEntity | NewIcatEntity;
     modifications?: EntityModification;
+    rowIdx: number;
     headers: string[];
     editingField: string | null;
     relatedEntityDisplayFields: { [k: string]: string };
     markedForDeletion: boolean;
     openContextMenu: (x: number, y: number, e: IcatEntity) => void;
-    startEditing: (k: string) => void;
+    startEditing: (k: string, i: number) => void;
     stopEditing: () => void;
-    makeEdit: (k: string, v: string) => void;
+    makeEdit: (k: string, v: string, i: number) => void;
     actions: JSX.Element;
 }
 
@@ -60,6 +62,7 @@ const EntityRow = (
     {
         entity,
         modifications,
+        rowIdx,
         headers,
         editingField,
         relatedEntityDisplayFields,
@@ -141,7 +144,7 @@ const EntityRow = (
         // All entities have some common fields which can't be edited
         if (commonFields.includes(k)) return;
         ev.stopPropagation();
-        startEditing(k);
+        startEditing(k, rowIdx);
     };
 
     const getStyleForField = (k: string): string | undefined => {
@@ -163,7 +166,11 @@ const EntityRow = (
                             ref={inputEl}
                             value={getInitialEditValue(k)}
                             class={style.editInput}
-                            onChange={ev => makeEdit(editingField, (ev.target as HTMLInputElement).value)}/>
+                            onChange={ev => makeEdit(
+                                editingField,
+                                (ev.target as HTMLInputElement).value,
+                                isNewRow ? rowIdx : entity.id)
+                            }/>
                     </td>
                     : <td
                         key={k}

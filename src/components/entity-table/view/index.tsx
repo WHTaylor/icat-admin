@@ -1,4 +1,4 @@
-import {useEffect, useState} from "preact/hooks";
+import {useEffect, useMemo, useState} from "preact/hooks";
 import {h} from "preact";
 
 import style from './style.module.css';
@@ -86,6 +86,22 @@ const EntityTableView = ({
         return () => document.removeEventListener("click", cancelInteractions);
     });
 
+    const keys = useMemo(
+        () => {
+            const fields = showAllColumns
+                // If 'Show empty columns' is checked, display all fields and x-to-one
+                // relationships of entityType in the table.
+                ? entityStructures[entityType].attributes
+                    .concat(entityStructures[entityType].ones.map(o => o.name))
+
+                // Otherwise, only show columns where at least one of the values for it in
+                // data is populated
+                : (data ?? []).flatMap(d => Object.keys(d)
+                    .filter(k => !Array.isArray(d[k])));
+            return defaultHeaderSort([...new Set(fields)]);
+        },
+        [showAllColumns, data, entityType]);
+
     // Note: early returns need to be after all hooks
     if (data === undefined) return <LoadingIndicator/>;
 
@@ -114,23 +130,11 @@ const EntityTableView = ({
         </select>);
     };
 
-    // If 'Show empty columns' is checked, display all fields and x-to-one
-    // relationships of entityType in the table.
-    // Otherwise, only show columns where at least one of the values for it in
-    // data is populated
-    const fields = showAllColumns
-        ? entityStructures[entityType].attributes
-            .concat(entityStructures[entityType].ones.map(o => o.name))
-        : data.flatMap(d => Object.keys(d)
-            .filter(k => !Array.isArray(d[k])));
-    const keys = defaultHeaderSort([...new Set(fields)]);
-
     const buildCreationRow = (e: NewIcatEntity, rowIdx: number) => {
         const makeModification = (k: string, v: IcatEntityValue) => dispatch({
             type: "edit_creation", i: rowIdx, k, v
         });
         const revertChanges = () => cancelCreation(rowIdx);
-        const openContextMenu = (_: number, __: number) => {};
 
         return buildRow(
             e,
@@ -139,7 +143,7 @@ const EntityTableView = ({
             undefined,
             id => insertCreation(rowIdx, id),
             revertChanges,
-            openContextMenu,
+            noContextMenu,
             makeModification,
         );
     }
@@ -311,3 +315,6 @@ const TableHeader = ({
 }
 
 export default EntityTableView;
+
+function noContextMenu(_: number, __: number) {
+}

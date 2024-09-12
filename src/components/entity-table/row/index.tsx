@@ -2,16 +2,12 @@ import {useEffect, useRef} from "preact/hooks";
 
 import style from './style.module.css';
 
-import {commonFields, serialize} from '../../../utils';
+import {commonFields} from '../../../utils';
 import ReadMore from '../../generic/read-more';
-import SuccessIndicator from '../../success-indicator';
 import {ExistingIcatEntity, IcatEntityValue, NewIcatEntity} from "../../../types";
-import {
-    inIcatFormat,
-    parseDate,
-} from "../../../dateUtils";
+import {inIcatFormat, parseDate,} from "../../../dateUtils";
 import OnChangeInput from "../../generic/on-change-input";
-import {useMutation, UseMutationResult} from "@tanstack/react-query";
+import {JSX} from "preact";
 
 function formatCellContent(cellContent: IcatEntityValue | undefined | null)
     : string {
@@ -48,12 +44,7 @@ type Props = {
     startEditing: (k: string) => void;
     stopEditing: () => void;
     makeEdit: (k: string, v: string) => void;
-    saveEntity: (e: NewIcatEntity | ExistingIcatEntity) => Promise<number[]>;
-    revertChanges: () => void;
-    syncModifications: (id: number) => void;
-    markToDelete: () => void;
-    cancelDeletion: () => void;
-    doDelete: () => void;
+    actions: JSX.Element;
 }
 
 /**
@@ -72,12 +63,7 @@ const EntityRow = (
         startEditing,
         stopEditing,
         makeEdit,
-        saveEntity,
-        revertChanges,
-        syncModifications,
-        markToDelete,
-        cancelDeletion,
-        doDelete
+        actions
     }: Props) => {
 
     const inputEl = useRef<HTMLInputElement>(null);
@@ -102,21 +88,6 @@ const EntityRow = (
     });
 
     const isNewRow = entity.id === undefined;
-
-    const mutation = useMutation({
-        mutationFn: () => {
-            // If entity.id is undefined, this is a new entity to be created
-            // Otherwise we just want to send modifications with the current id
-            const e = serialize(isNewRow
-                ? entity
-                : {...modifications, id: entity.id});
-            return saveEntity(e);
-        },
-        onSuccess: (data) => {
-            const id = isNewRow ? data[0] : entity.id;
-            syncModifications(id);
-        },
-    });
 
     const getCurrentValue = (field: string): IcatEntityValue => {
         const isModified = modifications !== undefined
@@ -177,16 +148,7 @@ const EntityRow = (
     return (
         <tr onContextMenu={doOpenContextMenu} class={style.entityRow}>
             <td>
-                <RowActions
-                    isNewRow={isNewRow}
-                    isModified={modifications !== undefined}
-                    markedForDeletion={markedForDeletion}
-                    mutation={mutation}
-                    revertChanges={revertChanges}
-                    markToDelete={markToDelete}
-                    cancelDeletion={cancelDeletion}
-                    doDelete={doDelete}
-                />
+                {actions}
             </td>
             {headers.map(k =>
                 k === editingField
@@ -208,71 +170,4 @@ const EntityRow = (
         </tr>
     );
 }
-
-type ActionButtonData = {
-    title: string;
-    clickEventHandler: (ev: MouseEvent) => void;
-    icon: string;
-}
-
-type RowActionsProps = {
-    mutation: UseMutationResult<number[], Error, void, unknown>,
-    isNewRow: boolean,
-    isModified: boolean,
-    markedForDeletion: boolean,
-    revertChanges: () => void,
-    markToDelete: () => void,
-    cancelDeletion: () => void,
-    doDelete: () => void
-}
-
-const RowActions = (
-    {
-        mutation,
-        isNewRow,
-        isModified,
-        markedForDeletion,
-        revertChanges,
-        markToDelete,
-        cancelDeletion,
-        doDelete
-    }: RowActionsProps) => {
-    if (!mutation.isIdle) {
-        return <SuccessIndicator saveState={{
-            failed: mutation.isError,
-            isSaving: mutation.isPending,
-            clear: mutation.reset,
-            error: mutation.error
-        }}/>;
-    }
-
-    const actions: ActionButtonData[] = [];
-    if (isNewRow) {
-        actions.push({title: "Cancel creation", clickEventHandler: revertChanges, icon: "🚫"});
-        actions.push({title: "Create row", clickEventHandler: _ => mutation.mutate(), icon: "💾"});
-    } else if (markedForDeletion) {
-        actions.push({title: "Cancel deletion", clickEventHandler: cancelDeletion, icon: "↩️"});
-        actions.push({title: "Confirm deletion", clickEventHandler: doDelete, icon: "✔️"});
-    } else {
-        actions.push({title: "Mark for deletion", clickEventHandler: markToDelete, icon: "🗑"});
-    }
-
-    if (isModified) {
-        actions.push(
-            {title: "Revert changes", clickEventHandler: revertChanges, icon: "↩️"});
-        actions.push(
-            {title: "Save changes", clickEventHandler: _ => mutation.mutate(), icon: "💾"});
-    }
-    return (<>
-        {actions.map(a =>
-            <button
-                class={style.actionButton}
-                key={a.title}
-                title={a.title}
-                onClick={a.clickEventHandler}>
-                {a.icon}
-            </button>)}
-    </>);
-}
-
 export default EntityRow;

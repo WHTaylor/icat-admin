@@ -16,6 +16,7 @@ import {EntityDataAction} from "../../../state/connection";
 import IcatClient, {getEntityAttributes} from "../../../icat";
 import LoadingIndicator from "../../generic/loading-indicator";
 import {entityStructures} from "../../../icatEntityStructure";
+import RowActions from "../row/actions";
 import JSX = h.JSX;
 
 type Props = {
@@ -128,7 +129,6 @@ const EntityTableView = ({
         const makeModification = (k: string, v: IcatEntityValue) => dispatch({
             type: "edit_creation", i: rowIdx, k, v
         });
-        const syncModification = async (id: number) => await insertCreation(rowIdx, id);
         const revertChanges = () => cancelCreation(rowIdx);
         const openContextMenu = (_: number, __: number) => {};
 
@@ -137,10 +137,10 @@ const EntityTableView = ({
             rowIdx,
             "new-entity-" + rowIdx,
             undefined,
+            id => insertCreation(rowIdx, id),
             revertChanges,
             openContextMenu,
             makeModification,
-            syncModification
         );
     }
 
@@ -149,7 +149,6 @@ const EntityTableView = ({
             dispatch({
                 type: "edit_entity", id: e.id, k, v
             });
-        const syncModification = async (id: number) => await reloadEntity(id);
         const revertChanges = () => dispatch({
             type: "cancel_modifications",
             id: e.id
@@ -164,10 +163,10 @@ const EntityTableView = ({
             rowIdx,
             e.id.toString(),
             modifications[e.id],
+            id => reloadEntity(id),
             revertChanges,
             openContextMenu,
             makeModification,
-            syncModification
         );
     }
 
@@ -176,10 +175,10 @@ const EntityTableView = ({
         rowIdx: number,
         key: string,
         modifications: EntityModification | undefined,
+        syncModifications: (id: number) => void,
         revertChanges: () => void,
         openContextMenu: (x: number, y: number) => void,
         makeModification: (k: string, v: string | number | ExistingIcatEntity) => void,
-        syncModifications: (id: number) => void,
     ) => {
         const makeEdit = (k: string, v: string) => {
             const fieldIsEntity = !getEntityAttributes(entityType).includes(k)
@@ -191,10 +190,25 @@ const EntityTableView = ({
             stopEditing();
         };
 
+        const actions = <RowActions
+            entity={e}
+            modifications={modifications}
+            saveEntity={saveEntity}
+            syncChanges={syncModifications}
+            markedForDeletion={e.id !== undefined && deletions.has(e.id)}
+            revertChanges={revertChanges}
+            markToDelete={() => dispatch({type: "mark_delete", id: e.id!})}
+            cancelDeletion={() => dispatch({
+                type: "cancel_deletes", ids: [e.id!]
+            })}
+            doDelete={() => deleteEntities([(e as ExistingIcatEntity).id])}
+        />;
+
         return <EntityRow
             key={key}
             headers={keys}
             entity={e}
+            actions={actions}
             modifications={modifications}
             editingField={fieldBeingEdited != null && fieldBeingEdited.rowIdx === rowIdx
                 ? fieldBeingEdited.field
@@ -207,19 +221,9 @@ const EntityTableView = ({
             }}
             stopEditing={stopEditing}
             makeEdit={makeEdit}
-            saveEntity={saveEntity}
-            revertChanges={revertChanges}
-            syncModifications={syncModifications}
 
-            // Everything about deletes assumes the entity exists because the
-            // delete button is only shown for existing entities.
-            // TODO: make this typesafe
-            markToDelete={() => dispatch({type: "mark_delete", id: e.id!})}
-            cancelDeletion={() => dispatch({
-                type: "cancel_deletes", ids: [e.id!]
-            })}
-            doDelete={() => deleteEntities([(e as ExistingIcatEntity).id])}
-            markedForDeletion={deletions.has((e as ExistingIcatEntity).id)}/>;
+            markedForDeletion={e.id !== undefined && deletions.has(e.id)}
+        />;
     };
 
     const somethingToDisplay = creations.length > 0 || data.length > 0;

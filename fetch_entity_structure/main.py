@@ -35,13 +35,14 @@ def run(url):
         }
     entity_structure_map = json.dumps(res, sort_keys=True, indent=4)
 
-    related_entity_type = 'type RelatedEntityField = { name: string; type: string; }'
+    related_entity_type = 'type RelatedEntityField = { name: string; type: IcatEntityName; }'
     entity_type = 'type EntityStructure = { "ones": RelatedEntityField[]; "manys": RelatedEntityField[]; "attributes": string[] }'
-    map_type = 'type EntityStructureMap = { [k: string]: EntityStructure }'
+    map_type = 'type EntityStructureMap = Record<IcatEntityName, EntityStructure>'
 
     lines = [
         _header + "\n",
-        "export const entityNames = " + json.dumps(entity_names) + "\n\n",
+        "export const entityNames = " + json.dumps(entity_names) + " as const;\n",
+        "export type IcatEntityName = typeof entityNames[number];\n\n",
         related_entity_type + "\n",
         "// Entities have three types of fields:\n",
         "// 'attributes' are scalar values\n",

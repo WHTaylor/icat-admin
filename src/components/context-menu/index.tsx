@@ -8,6 +8,7 @@ import IcatClient, {
     isXToOneRelationship
 } from "../../icat";
 import {useQueries} from "@tanstack/react-query";
+import {IcatEntityName} from "../../icatEntityStructure";
 
 export type CtxMenuDynamicProps = {
     x: number;
@@ -16,7 +17,7 @@ export type CtxMenuDynamicProps = {
 }
 
 export type CtxMenuProps = CtxMenuDynamicProps & {
-    entityType: string,
+    entityType: IcatEntityName,
     openTab: OpenTabHandler,
     icatClient: IcatClient
 }
@@ -44,7 +45,8 @@ const ContextMenu = ({
      * @param field the name of a field on the entity which refers to another type
      * of entity
      */
-    const relatedEntityFilterComponents = (field: string) => {
+    const relatedEntityFilterComponents =
+        (field: string): [IcatEntityName, string] | null => {
         const isXToOne = isXToOneRelationship(entityType, field);
         const isOneToMany = isOneToManyRelationship(entityType, field);
         if (!isXToOne && !isOneToMany) {

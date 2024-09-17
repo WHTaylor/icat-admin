@@ -16,7 +16,7 @@ import {
 import {EntityDataAction} from "../../../state/connection";
 import IcatClient, {getEntityAttributes} from "../../../icat";
 import LoadingIndicator from "../../generic/loading-indicator";
-import {entityStructures} from "../../../icatEntityStructure";
+import {entityStructures, IcatEntityName} from "../../../icatEntityStructure";
 import JSX = h.JSX;
 
 type Props = {
@@ -24,7 +24,7 @@ type Props = {
     deletions: Set<number>,
     creations: NewIcatEntity[];
     modifications: { [id: number]: EntityModification },
-    entityType: string,
+    entityType: IcatEntityName,
     sortingBy: { field: string | null, asc: boolean | null },
     deleteEntities: (ids: number[]) => void;
     saveEntity: (e: NewIcatEntity | ExistingIcatEntity) => Promise<number[]>;

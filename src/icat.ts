@@ -9,7 +9,7 @@ import {queryWhereFromInput} from './utils';
 import {Connection} from "./connectioncache";
 import {ExistingIcatEntity, NewIcatEntity, TableFilter} from "./types";
 import {simplifyIcatErrMessage} from "./icatErrorHandling";
-import {entityStructures} from "./icatEntityStructure";
+import {entityStructures, IcatEntityName} from "./icatEntityStructure";
 
 type IcatResponse = { [k: string]: ExistingIcatEntity }[]
 
@@ -204,26 +204,26 @@ function buildSessionUrl(sessionId: string, server: string | URL) {
 
 export default IcatClient;
 
-export function getEntityAttributes(entityType: string) {
+export function getEntityAttributes(entityType: IcatEntityName) {
     return entityStructures[entityType].attributes;
 }
 
 export function isXToOneRelationship(
-    entityType: string, fieldName: string) {
+    entityType: IcatEntityName, fieldName: string) {
     return entityStructures[entityType].ones
         .filter(m => m.name === fieldName)
         .length > 0;
 }
 
 export function isOneToManyRelationship(
-    entityType: string, fieldName: string) {
+    entityType: IcatEntityName, fieldName: string) {
     return entityStructures[entityType].manys
         .filter(m => m.name === fieldName)
         .length > 0;
 }
 
 export function getRelatedEntityField(
-    entityType: string, fieldName: string) {
+    entityType: IcatEntityName, fieldName: string) {
     const match = entityStructures[entityType].manys
         .concat(entityStructures[entityType].ones)
         .filter(f => f.name === fieldName);
@@ -248,7 +248,7 @@ export function getRelatedEntityField(
  * @param relatedEntityFieldName the field being traversed to
  */
 export function idReferenceFromRelatedEntity(
-    entityType: string, relatedEntityFieldName: string) {
+    entityType: IcatEntityName, relatedEntityFieldName: string) {
     if (isXToOneRelationship(entityType, relatedEntityFieldName)) return "id";
 
     const relatedEntityType = getRelatedEntityField(

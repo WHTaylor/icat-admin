@@ -1,4 +1,5 @@
 import {EntityModification} from "./components/entity-table/row";
+import {IcatEntityName} from "./icatEntityStructure";
 
 /**
  * All the state for a single tab within an EntityBrowser
@@ -18,7 +19,7 @@ export type EntityTabState = {
  * The filter which defines the data that should be fetched for an entity tab
  */
 export type TableFilter = {
-    table: string;
+    table: IcatEntityName;
     offset: number;
     limit: number;
     where?: string;
@@ -58,4 +59,4 @@ export type NewIcatEntity = IcatEntity & {
     id?: never
 };
 
-export type OpenTabHandler = (entityName: string, where?: string) => void;
+export type OpenTabHandler = (entityName: IcatEntityName, where?: string) => void;

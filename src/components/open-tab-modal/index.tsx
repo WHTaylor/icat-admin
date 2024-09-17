@@ -1,4 +1,4 @@
-import {entityNames} from '../../icatEntityStructure';
+import {entityNames, IcatEntityName} from '../../icatEntityStructure';
 
 import {useEffect, useRef, useState} from "preact/hooks";
 import style from './style.module.css';
@@ -7,7 +7,7 @@ import {TargetedEvent} from "react";
 const MAX_MATCHES = 20;
 
 type Props = {
-    openTab: (e: string) => void;
+    openTab: (e: IcatEntityName) => void;
     close: () => void;
 }
 
@@ -18,7 +18,7 @@ type Props = {
  * @constructor
  */
 const OpenTabModal = ({openTab, close}: Props) => {
-    const [matches, setMatches] = useState<string[]>([]);
+    const [matches, setMatches] = useState<IcatEntityName[]>([]);
     const [selectedIdx, setSelectedIdx] = useState<number | null>(null);
 
     const inputEl = useRef<HTMLInputElement>(null)
@@ -82,7 +82,7 @@ const OpenTabModal = ({openTab, close}: Props) => {
         confirmSelection(matches[selectedIdx])
     }
 
-    const confirmSelection = (selection: string) => {
+    const confirmSelection = (selection: IcatEntityName) => {
         openTab(selection);
         close();
     }
@@ -132,7 +132,7 @@ const OpenTabModal = ({openTab, close}: Props) => {
     </div>
 }
 
-function getMatches(input: string): string[] {
+function getMatches(input: string): IcatEntityName[] {
     if (!input) return [];
     const pattern = ".*" + [...(input.toLowerCase())].join(".*") + ".*";
     const re = new RegExp(pattern);

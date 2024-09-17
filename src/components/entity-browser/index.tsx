@@ -1,7 +1,7 @@
 import {Dispatch, useEffect, useState} from "preact/hooks";
 
 import IcatClient  from '../../icat';
-import {entityNames}  from '../../icatEntityStructure';
+import {entityNames, IcatEntityName} from '../../icatEntityStructure';
 import {tableFilter,} from '../../utils';
 import EntityTable from '../entity-table/container';
 import TabWindow from '../tab-window';
@@ -77,7 +77,7 @@ const EntityBrowser = (
         }), 1);
     };
 
-    const openTab: OpenTabHandler = (entityName, where) =>
+    const openTab: OpenTabHandler = (entityName: IcatEntityName, where?: string) =>
         openTabForFilter(tableFilter(entityName, 0, 50, where));
 
     const swapTabs = (a: number, b: number) => {

@@ -1,8 +1,9 @@
 import {ExistingIcatEntity, NewIcatEntity, TableFilter} from "./types";
 import {inIcatFormat, parseDate} from "./dateUtils";
+import {IcatEntityName} from "./icatEntityStructure";
 
 export function tableFilter(
-    table: string,
+    table: IcatEntityName,
     offset: number,
     limit: number,
     where?: string,

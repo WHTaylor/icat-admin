@@ -18,6 +18,9 @@ _header = (
     " /* eslint quote-props: 0 */\n"
 )
 
+def name_key(d):
+    return d["name"]
+
 def run(url):
     client = suds.client.Client(url)
 
@@ -29,9 +32,9 @@ def run(url):
     for name in tqdm(entity_names):
         ei = client.service.getEntityInfo(name)
         res[name] = {
-                "ones": [{"name": f.name, "type": f.type} for f in ei.fields if f.relType == "ONE"],
-                "manys": [{"name": f.name, "type": f.type} for f in ei.fields if f.relType == "MANY"],
-                "attributes": [f.name for f in ei.fields if f.relType == "ATTRIBUTE"],
+                "ones": sorted([{"name": f.name, "type": f.type} for f in ei.fields if f.relType == "ONE"], key=name_key),
+                "manys": sorted([{"name": f.name, "type": f.type} for f in ei.fields if f.relType == "MANY"], key=name_key),
+                "attributes": sorted([f.name for f in ei.fields if f.relType == "ATTRIBUTE"]),
         }
     entity_structure_map = json.dumps(res, sort_keys=True, indent=4)
 

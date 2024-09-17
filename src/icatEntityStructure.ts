@@ -19,14 +19,14 @@ type EntityStructureMap = Record<IcatEntityName, EntityStructure>
 export const entityStructures: EntityStructureMap = {
     "Affiliation": {
         "attributes": [
-            "modTime",
-            "createTime",
             "createId",
-            "name",
-            "pid",
-            "modId",
+            "createTime",
             "fullReference",
-            "id"
+            "id",
+            "modId",
+            "modTime",
+            "name",
+            "pid"
         ],
         "manys": [],
         "ones": [
@@ -38,13 +38,13 @@ export const entityStructures: EntityStructureMap = {
     },
     "Application": {
         "attributes": [
-            "createTime",
-            "version",
             "createId",
-            "name",
-            "modId",
+            "createTime",
             "id",
-            "modTime"
+            "modId",
+            "modTime",
+            "name",
+            "version"
         ],
         "manys": [
             {
@@ -61,29 +61,25 @@ export const entityStructures: EntityStructureMap = {
     },
     "DataCollection": {
         "attributes": [
-            "modId",
             "createId",
-            "doi",
             "createTime",
-            "modTime",
-            "id"
+            "doi",
+            "id",
+            "modId",
+            "modTime"
         ],
         "manys": [
+            {
+                "name": "dataCollectionDatafiles",
+                "type": "DataCollectionDatafile"
+            },
             {
                 "name": "dataCollectionDatasets",
                 "type": "DataCollectionDataset"
             },
             {
-                "name": "parameters",
-                "type": "DataCollectionParameter"
-            },
-            {
                 "name": "dataCollectionInvestigations",
                 "type": "DataCollectionInvestigation"
-            },
-            {
-                "name": "jobsAsOutput",
-                "type": "Job"
             },
             {
                 "name": "dataPublications",
@@ -94,39 +90,43 @@ export const entityStructures: EntityStructureMap = {
                 "type": "Job"
             },
             {
-                "name": "dataCollectionDatafiles",
-                "type": "DataCollectionDatafile"
+                "name": "jobsAsOutput",
+                "type": "Job"
+            },
+            {
+                "name": "parameters",
+                "type": "DataCollectionParameter"
             }
         ],
         "ones": []
     },
     "DataCollectionDatafile": {
         "attributes": [
-            "id",
-            "modTime",
-            "createTime",
             "createId",
-            "modId"
+            "createTime",
+            "id",
+            "modId",
+            "modTime"
         ],
         "manys": [],
         "ones": [
             {
-                "name": "datafile",
-                "type": "Datafile"
-            },
-            {
                 "name": "dataCollection",
                 "type": "DataCollection"
+            },
+            {
+                "name": "datafile",
+                "type": "Datafile"
             }
         ]
     },
     "DataCollectionDataset": {
         "attributes": [
-            "id",
-            "modTime",
-            "createTime",
             "createId",
-            "modId"
+            "createTime",
+            "id",
+            "modId",
+            "modTime"
         ],
         "manys": [],
         "ones": [
@@ -142,62 +142,62 @@ export const entityStructures: EntityStructureMap = {
     },
     "DataCollectionInvestigation": {
         "attributes": [
-            "id",
-            "modTime",
-            "createTime",
             "createId",
-            "modId"
+            "createTime",
+            "id",
+            "modId",
+            "modTime"
         ],
         "manys": [],
         "ones": [
             {
-                "name": "investigation",
-                "type": "Investigation"
-            },
-            {
                 "name": "dataCollection",
                 "type": "DataCollection"
+            },
+            {
+                "name": "investigation",
+                "type": "Investigation"
             }
         ]
     },
     "DataCollectionParameter": {
         "attributes": [
-            "rangeTop",
-            "modId",
             "createId",
-            "rangeBottom",
             "createTime",
-            "numericValue",
             "dateTimeValue",
-            "stringValue",
             "error",
+            "id",
+            "modId",
             "modTime",
-            "id"
+            "numericValue",
+            "rangeBottom",
+            "rangeTop",
+            "stringValue"
         ],
         "manys": [],
         "ones": [
             {
-                "name": "type",
-                "type": "ParameterType"
-            },
-            {
                 "name": "dataCollection",
                 "type": "DataCollection"
+            },
+            {
+                "name": "type",
+                "type": "ParameterType"
             }
         ]
     },
     "DataPublication": {
         "attributes": [
-            "createTime",
-            "pid",
             "createId",
-            "modTime",
+            "createTime",
+            "description",
             "id",
-            "subject",
             "modId",
-            "title",
+            "modTime",
+            "pid",
             "publicationDate",
-            "description"
+            "subject",
+            "title"
         ],
         "manys": [
             {
@@ -205,12 +205,12 @@ export const entityStructures: EntityStructureMap = {
                 "type": "DataPublicationDate"
             },
             {
-                "name": "relatedItems",
-                "type": "RelatedItem"
-            },
-            {
                 "name": "fundingReferences",
                 "type": "DataPublicationFunding"
+            },
+            {
+                "name": "relatedItems",
+                "type": "RelatedItem"
             },
             {
                 "name": "users",
@@ -223,24 +223,24 @@ export const entityStructures: EntityStructureMap = {
                 "type": "DataCollection"
             },
             {
-                "name": "type",
-                "type": "DataPublicationType"
-            },
-            {
                 "name": "facility",
                 "type": "Facility"
+            },
+            {
+                "name": "type",
+                "type": "DataPublicationType"
             }
         ]
     },
     "DataPublicationDate": {
         "attributes": [
             "createId",
-            "id",
-            "date",
             "createTime",
-            "modTime",
+            "date",
+            "dateType",
+            "id",
             "modId",
-            "dateType"
+            "modTime"
         ],
         "manys": [],
         "ones": [
@@ -252,33 +252,33 @@ export const entityStructures: EntityStructureMap = {
     },
     "DataPublicationFunding": {
         "attributes": [
-            "id",
-            "modTime",
-            "createTime",
             "createId",
-            "modId"
+            "createTime",
+            "id",
+            "modId",
+            "modTime"
         ],
         "manys": [],
         "ones": [
             {
-                "name": "funding",
-                "type": "FundingReference"
-            },
-            {
                 "name": "dataPublication",
                 "type": "DataPublication"
+            },
+            {
+                "name": "funding",
+                "type": "FundingReference"
             }
         ]
     },
     "DataPublicationType": {
         "attributes": [
-            "modTime",
-            "createTime",
             "createId",
-            "modId",
+            "createTime",
             "description",
-            "name",
-            "id"
+            "id",
+            "modId",
+            "modTime",
+            "name"
         ],
         "manys": [
             {
@@ -295,17 +295,17 @@ export const entityStructures: EntityStructureMap = {
     },
     "DataPublicationUser": {
         "attributes": [
-            "orderKey",
-            "familyName",
-            "givenName",
-            "email",
-            "modId",
-            "fullName",
-            "id",
-            "modTime",
-            "createTime",
             "contributorType",
-            "createId"
+            "createId",
+            "createTime",
+            "email",
+            "familyName",
+            "fullName",
+            "givenName",
+            "id",
+            "modId",
+            "modTime",
+            "orderKey"
         ],
         "manys": [
             {
@@ -315,34 +315,38 @@ export const entityStructures: EntityStructureMap = {
         ],
         "ones": [
             {
-                "name": "user",
-                "type": "User"
-            },
-            {
                 "name": "publication",
                 "type": "DataPublication"
+            },
+            {
+                "name": "user",
+                "type": "User"
             }
         ]
     },
     "Datafile": {
         "attributes": [
-            "id",
-            "location",
-            "createId",
-            "datafileCreateTime",
             "checksum",
-            "modTime",
-            "name",
+            "createId",
+            "createTime",
+            "datafileCreateTime",
             "datafileModTime",
             "description",
-            "createTime",
-            "fileSize",
             "doi",
-            "modId"
+            "fileSize",
+            "id",
+            "location",
+            "modId",
+            "modTime",
+            "name"
         ],
         "manys": [
             {
-                "name": "sourceDatafiles",
+                "name": "dataCollectionDatafiles",
+                "type": "DataCollectionDatafile"
+            },
+            {
+                "name": "destDatafiles",
                 "type": "RelatedDatafile"
             },
             {
@@ -350,11 +354,7 @@ export const entityStructures: EntityStructureMap = {
                 "type": "DatafileParameter"
             },
             {
-                "name": "dataCollectionDatafiles",
-                "type": "DataCollectionDatafile"
-            },
-            {
-                "name": "destDatafiles",
+                "name": "sourceDatafiles",
                 "type": "RelatedDatafile"
             }
         ],
@@ -372,14 +372,14 @@ export const entityStructures: EntityStructureMap = {
     "DatafileFormat": {
         "attributes": [
             "createId",
-            "modId",
-            "name",
-            "version",
-            "modTime",
-            "id",
             "createTime",
+            "description",
+            "id",
+            "modId",
+            "modTime",
+            "name",
             "type",
-            "description"
+            "version"
         ],
         "manys": [
             {
@@ -396,67 +396,67 @@ export const entityStructures: EntityStructureMap = {
     },
     "DatafileParameter": {
         "attributes": [
-            "rangeTop",
-            "modId",
             "createId",
-            "rangeBottom",
             "createTime",
-            "numericValue",
             "dateTimeValue",
-            "stringValue",
             "error",
+            "id",
+            "modId",
             "modTime",
-            "id"
+            "numericValue",
+            "rangeBottom",
+            "rangeTop",
+            "stringValue"
         ],
         "manys": [],
         "ones": [
             {
-                "name": "type",
-                "type": "ParameterType"
-            },
-            {
                 "name": "datafile",
                 "type": "Datafile"
+            },
+            {
+                "name": "type",
+                "type": "ParameterType"
             }
         ]
     },
     "Dataset": {
         "attributes": [
-            "name",
-            "doi",
-            "startDate",
-            "fileCount",
-            "id",
-            "createTime",
             "complete",
-            "location",
             "createId",
-            "modTime",
-            "endDate",
+            "createTime",
             "description",
+            "doi",
+            "endDate",
+            "fileCount",
+            "fileSize",
+            "id",
+            "location",
             "modId",
-            "fileSize"
+            "modTime",
+            "name",
+            "startDate"
         ],
         "manys": [
             {
-                "name": "datasetTechniques",
-                "type": "DatasetTechnique"
+                "name": "dataCollectionDatasets",
+                "type": "DataCollectionDataset"
             },
             {
                 "name": "datafiles",
                 "type": "Datafile"
             },
             {
-                "name": "parameters",
-                "type": "DatasetParameter"
-            },
-            {
-                "name": "dataCollectionDatasets",
-                "type": "DataCollectionDataset"
-            },
-            {
                 "name": "datasetInstruments",
                 "type": "DatasetInstrument"
+            },
+            {
+                "name": "datasetTechniques",
+                "type": "DatasetTechnique"
+            },
+            {
+                "name": "parameters",
+                "type": "DatasetParameter"
             }
         ],
         "ones": [
@@ -465,22 +465,22 @@ export const entityStructures: EntityStructureMap = {
                 "type": "Investigation"
             },
             {
-                "name": "type",
-                "type": "DatasetType"
-            },
-            {
                 "name": "sample",
                 "type": "Sample"
+            },
+            {
+                "name": "type",
+                "type": "DatasetType"
             }
         ]
     },
     "DatasetInstrument": {
         "attributes": [
-            "id",
-            "modTime",
-            "createTime",
             "createId",
-            "modId"
+            "createTime",
+            "id",
+            "modId",
+            "modTime"
         ],
         "manys": [],
         "ones": [
@@ -496,59 +496,59 @@ export const entityStructures: EntityStructureMap = {
     },
     "DatasetParameter": {
         "attributes": [
-            "rangeTop",
-            "modId",
             "createId",
-            "rangeBottom",
             "createTime",
-            "numericValue",
             "dateTimeValue",
-            "stringValue",
             "error",
+            "id",
+            "modId",
             "modTime",
-            "id"
+            "numericValue",
+            "rangeBottom",
+            "rangeTop",
+            "stringValue"
         ],
         "manys": [],
         "ones": [
             {
-                "name": "type",
-                "type": "ParameterType"
-            },
-            {
                 "name": "dataset",
                 "type": "Dataset"
+            },
+            {
+                "name": "type",
+                "type": "ParameterType"
             }
         ]
     },
     "DatasetTechnique": {
         "attributes": [
-            "id",
-            "modTime",
-            "createTime",
             "createId",
-            "modId"
+            "createTime",
+            "id",
+            "modId",
+            "modTime"
         ],
         "manys": [],
         "ones": [
             {
-                "name": "technique",
-                "type": "Technique"
-            },
-            {
                 "name": "dataset",
                 "type": "Dataset"
+            },
+            {
+                "name": "technique",
+                "type": "Technique"
             }
         ]
     },
     "DatasetType": {
         "attributes": [
-            "modTime",
-            "createTime",
             "createId",
-            "name",
+            "createTime",
             "description",
+            "id",
             "modId",
-            "id"
+            "modTime",
+            "name"
         ],
         "manys": [
             {
@@ -565,45 +565,25 @@ export const entityStructures: EntityStructureMap = {
     },
     "Facility": {
         "attributes": [
-            "modTime",
-            "description",
-            "createTime",
-            "fullName",
             "createId",
+            "createTime",
             "daysUntilRelease",
+            "description",
+            "fullName",
             "id",
             "modId",
-            "url",
-            "name"
+            "modTime",
+            "name",
+            "url"
         ],
         "manys": [
-            {
-                "name": "investigations",
-                "type": "Investigation"
-            },
-            {
-                "name": "dataPublicationTypes",
-                "type": "DataPublicationType"
-            },
-            {
-                "name": "sampleTypes",
-                "type": "SampleType"
-            },
-            {
-                "name": "facilityCycles",
-                "type": "FacilityCycle"
-            },
-            {
-                "name": "parameterTypes",
-                "type": "ParameterType"
-            },
             {
                 "name": "applications",
                 "type": "Application"
             },
             {
-                "name": "instruments",
-                "type": "Instrument"
+                "name": "dataPublicationTypes",
+                "type": "DataPublicationType"
             },
             {
                 "name": "dataPublications",
@@ -618,8 +598,28 @@ export const entityStructures: EntityStructureMap = {
                 "type": "DatasetType"
             },
             {
+                "name": "facilityCycles",
+                "type": "FacilityCycle"
+            },
+            {
+                "name": "instruments",
+                "type": "Instrument"
+            },
+            {
                 "name": "investigationTypes",
                 "type": "InvestigationType"
+            },
+            {
+                "name": "investigations",
+                "type": "Investigation"
+            },
+            {
+                "name": "parameterTypes",
+                "type": "ParameterType"
+            },
+            {
+                "name": "sampleTypes",
+                "type": "SampleType"
             }
         ],
         "ones": []
@@ -627,14 +627,14 @@ export const entityStructures: EntityStructureMap = {
     "FacilityCycle": {
         "attributes": [
             "createId",
-            "modId",
-            "endDate",
-            "description",
-            "id",
-            "modTime",
             "createTime",
-            "startDate",
-            "name"
+            "description",
+            "endDate",
+            "id",
+            "modId",
+            "modTime",
+            "name",
+            "startDate"
         ],
         "manys": [
             {
@@ -651,36 +651,36 @@ export const entityStructures: EntityStructureMap = {
     },
     "FundingReference": {
         "attributes": [
-            "createId",
-            "modId",
-            "funderName",
             "awardNumber",
-            "id",
-            "modTime",
-            "createTime",
             "awardTitle",
-            "funderIdentifier"
+            "createId",
+            "createTime",
+            "funderIdentifier",
+            "funderName",
+            "id",
+            "modId",
+            "modTime"
         ],
         "manys": [
             {
-                "name": "publications",
-                "type": "DataPublicationFunding"
-            },
-            {
                 "name": "investigations",
                 "type": "InvestigationFunding"
+            },
+            {
+                "name": "publications",
+                "type": "DataPublicationFunding"
             }
         ],
         "ones": []
     },
     "Grouping": {
         "attributes": [
-            "modTime",
-            "createTime",
             "createId",
-            "name",
+            "createTime",
+            "id",
             "modId",
-            "id"
+            "modTime",
+            "name"
         ],
         "manys": [
             {
@@ -688,35 +688,31 @@ export const entityStructures: EntityStructureMap = {
                 "type": "InvestigationGroup"
             },
             {
-                "name": "userGroups",
-                "type": "UserGroup"
-            },
-            {
                 "name": "rules",
                 "type": "Rule"
+            },
+            {
+                "name": "userGroups",
+                "type": "UserGroup"
             }
         ],
         "ones": []
     },
     "Instrument": {
         "attributes": [
-            "url",
             "createId",
-            "id",
-            "fullName",
-            "type",
-            "description",
-            "modId",
-            "pid",
             "createTime",
+            "description",
+            "fullName",
+            "id",
+            "modId",
+            "modTime",
             "name",
-            "modTime"
+            "pid",
+            "type",
+            "url"
         ],
         "manys": [
-            {
-                "name": "shifts",
-                "type": "Shift"
-            },
             {
                 "name": "datasetInstruments",
                 "type": "DatasetInstrument"
@@ -728,6 +724,10 @@ export const entityStructures: EntityStructureMap = {
             {
                 "name": "investigationInstruments",
                 "type": "InvestigationInstrument"
+            },
+            {
+                "name": "shifts",
+                "type": "Shift"
             }
         ],
         "ones": [
@@ -739,70 +739,58 @@ export const entityStructures: EntityStructureMap = {
     },
     "InstrumentScientist": {
         "attributes": [
-            "id",
-            "modTime",
-            "createTime",
             "createId",
-            "modId"
+            "createTime",
+            "id",
+            "modId",
+            "modTime"
         ],
         "manys": [],
         "ones": [
             {
-                "name": "user",
-                "type": "User"
-            },
-            {
                 "name": "instrument",
                 "type": "Instrument"
+            },
+            {
+                "name": "user",
+                "type": "User"
             }
         ]
     },
     "Investigation": {
         "attributes": [
-            "title",
-            "fileSize",
-            "startDate",
-            "endDate",
-            "modId",
-            "fileCount",
-            "createTime",
             "createId",
-            "visitId",
-            "releaseDate",
-            "id",
+            "createTime",
             "doi",
+            "endDate",
+            "fileCount",
+            "fileSize",
+            "id",
+            "modId",
             "modTime",
             "name",
-            "summary"
+            "releaseDate",
+            "startDate",
+            "summary",
+            "title",
+            "visitId"
         ],
         "manys": [
-            {
-                "name": "parameters",
-                "type": "InvestigationParameter"
-            },
-            {
-                "name": "shifts",
-                "type": "Shift"
-            },
-            {
-                "name": "studyInvestigations",
-                "type": "StudyInvestigation"
-            },
-            {
-                "name": "publications",
-                "type": "Publication"
-            },
             {
                 "name": "dataCollectionInvestigations",
                 "type": "DataCollectionInvestigation"
             },
             {
-                "name": "samples",
-                "type": "Sample"
-            },
-            {
                 "name": "datasets",
                 "type": "Dataset"
+            },
+            {
+                "name": "fundingReferences",
+                "type": "InvestigationFunding"
+            },
+            {
+                "name": "investigationFacilityCycles",
+                "type": "InvestigationFacilityCycle"
             },
             {
                 "name": "investigationGroups",
@@ -813,40 +801,52 @@ export const entityStructures: EntityStructureMap = {
                 "type": "InvestigationInstrument"
             },
             {
-                "name": "fundingReferences",
-                "type": "InvestigationFunding"
+                "name": "investigationUsers",
+                "type": "InvestigationUser"
             },
             {
                 "name": "keywords",
                 "type": "Keyword"
             },
             {
-                "name": "investigationUsers",
-                "type": "InvestigationUser"
+                "name": "parameters",
+                "type": "InvestigationParameter"
             },
             {
-                "name": "investigationFacilityCycles",
-                "type": "InvestigationFacilityCycle"
+                "name": "publications",
+                "type": "Publication"
+            },
+            {
+                "name": "samples",
+                "type": "Sample"
+            },
+            {
+                "name": "shifts",
+                "type": "Shift"
+            },
+            {
+                "name": "studyInvestigations",
+                "type": "StudyInvestigation"
             }
         ],
         "ones": [
             {
-                "name": "type",
-                "type": "InvestigationType"
-            },
-            {
                 "name": "facility",
                 "type": "Facility"
+            },
+            {
+                "name": "type",
+                "type": "InvestigationType"
             }
         ]
     },
     "InvestigationFacilityCycle": {
         "attributes": [
-            "id",
-            "modTime",
-            "createTime",
             "createId",
-            "modId"
+            "createTime",
+            "id",
+            "modId",
+            "modTime"
         ],
         "manys": [],
         "ones": [
@@ -862,78 +862,78 @@ export const entityStructures: EntityStructureMap = {
     },
     "InvestigationFunding": {
         "attributes": [
-            "id",
-            "modTime",
-            "createTime",
             "createId",
-            "modId"
+            "createTime",
+            "id",
+            "modId",
+            "modTime"
         ],
         "manys": [],
         "ones": [
             {
-                "name": "investigation",
-                "type": "Investigation"
-            },
-            {
                 "name": "funding",
                 "type": "FundingReference"
+            },
+            {
+                "name": "investigation",
+                "type": "Investigation"
             }
         ]
     },
     "InvestigationGroup": {
         "attributes": [
             "createId",
-            "id",
             "createTime",
+            "id",
+            "modId",
             "modTime",
-            "role",
-            "modId"
+            "role"
         ],
         "manys": [],
         "ones": [
             {
-                "name": "investigation",
-                "type": "Investigation"
-            },
-            {
                 "name": "grouping",
                 "type": "Grouping"
+            },
+            {
+                "name": "investigation",
+                "type": "Investigation"
             }
         ]
     },
     "InvestigationInstrument": {
         "attributes": [
-            "id",
-            "modTime",
-            "createTime",
             "createId",
-            "modId"
+            "createTime",
+            "id",
+            "modId",
+            "modTime"
         ],
         "manys": [],
         "ones": [
             {
-                "name": "investigation",
-                "type": "Investigation"
-            },
-            {
                 "name": "instrument",
                 "type": "Instrument"
+            },
+            {
+                "name": "investigation",
+                "type": "Investigation"
             }
         ]
     },
     "InvestigationParameter": {
         "attributes": [
-            "rangeTop",
-            "modId",
             "createId",
-            "rangeBottom",
             "createTime",
-            "numericValue",
             "dateTimeValue",
-            "stringValue",
             "error",
+            "id",
+            "modId",
             "modTime",
-            "id"
+            "numericValue",
+            "rangeBottom",
+            "rangeTop",
+            "stringValue"
         ],
         "manys": [],
         "ones": [
@@ -949,13 +949,13 @@ export const entityStructures: EntityStructureMap = {
     },
     "InvestigationType": {
         "attributes": [
-            "description",
             "createId",
+            "createTime",
+            "description",
+            "id",
             "modId",
             "modTime",
-            "name",
-            "id",
-            "createTime"
+            "name"
         ],
         "manys": [
             {
@@ -973,42 +973,42 @@ export const entityStructures: EntityStructureMap = {
     "InvestigationUser": {
         "attributes": [
             "createId",
-            "id",
             "createTime",
+            "id",
+            "modId",
             "modTime",
-            "role",
-            "modId"
+            "role"
         ],
         "manys": [],
         "ones": [
             {
-                "name": "user",
-                "type": "User"
-            },
-            {
                 "name": "investigation",
                 "type": "Investigation"
+            },
+            {
+                "name": "user",
+                "type": "User"
             }
         ]
     },
     "Job": {
         "attributes": [
-            "modTime",
-            "createTime",
-            "createId",
             "arguments",
+            "createId",
+            "createTime",
+            "id",
             "modId",
-            "id"
+            "modTime"
         ],
         "manys": [],
         "ones": [
             {
-                "name": "inputDataCollection",
-                "type": "DataCollection"
-            },
-            {
                 "name": "application",
                 "type": "Application"
+            },
+            {
+                "name": "inputDataCollection",
+                "type": "DataCollection"
             },
             {
                 "name": "outputDataCollection",
@@ -1018,11 +1018,11 @@ export const entityStructures: EntityStructureMap = {
     },
     "Keyword": {
         "attributes": [
-            "id",
-            "modTime",
-            "createTime",
             "createId",
+            "createTime",
+            "id",
             "modId",
+            "modTime",
             "name"
         ],
         "manys": [],
@@ -1035,51 +1035,51 @@ export const entityStructures: EntityStructureMap = {
     },
     "ParameterType": {
         "attributes": [
-            "id",
-            "name",
-            "enforced",
-            "maximumNumericValue",
-            "createId",
-            "unitsFullName",
-            "pid",
-            "applicableToSample",
-            "modId",
-            "applicableToDatafile",
-            "modTime",
-            "minimumNumericValue",
-            "applicableToInvestigation",
-            "applicableToDataset",
             "applicableToDataCollection",
+            "applicableToDatafile",
+            "applicableToDataset",
+            "applicableToInvestigation",
+            "applicableToSample",
+            "createId",
             "createTime",
             "description",
-            "verified",
+            "enforced",
+            "id",
+            "maximumNumericValue",
+            "minimumNumericValue",
+            "modId",
+            "modTime",
+            "name",
+            "pid",
+            "units",
+            "unitsFullName",
             "valueType",
-            "units"
+            "verified"
         ],
         "manys": [
             {
-                "name": "investigationParameters",
-                "type": "InvestigationParameter"
-            },
-            {
                 "name": "dataCollectionParameters",
                 "type": "DataCollectionParameter"
-            },
-            {
-                "name": "datasetParameters",
-                "type": "DatasetParameter"
             },
             {
                 "name": "datafileParameters",
                 "type": "DatafileParameter"
             },
             {
-                "name": "sampleParameters",
-                "type": "SampleParameter"
+                "name": "datasetParameters",
+                "type": "DatasetParameter"
+            },
+            {
+                "name": "investigationParameters",
+                "type": "InvestigationParameter"
             },
             {
                 "name": "permissibleStringValues",
                 "type": "PermissibleStringValue"
+            },
+            {
+                "name": "sampleParameters",
+                "type": "SampleParameter"
             }
         ],
         "ones": [
@@ -1091,11 +1091,11 @@ export const entityStructures: EntityStructureMap = {
     },
     "PermissibleStringValue": {
         "attributes": [
-            "id",
-            "modTime",
-            "createTime",
             "createId",
+            "createTime",
+            "id",
             "modId",
+            "modTime",
             "value"
         ],
         "manys": [],
@@ -1108,12 +1108,12 @@ export const entityStructures: EntityStructureMap = {
     },
     "PublicStep": {
         "attributes": [
-            "id",
-            "modTime",
-            "createTime",
             "createId",
-            "modId",
+            "createTime",
             "field",
+            "id",
+            "modId",
+            "modTime",
             "origin"
         ],
         "manys": [],
@@ -1122,15 +1122,15 @@ export const entityStructures: EntityStructureMap = {
     "Publication": {
         "attributes": [
             "createId",
+            "createTime",
+            "doi",
+            "fullReference",
+            "id",
             "modId",
             "modTime",
-            "repositoryId",
-            "doi",
-            "url",
             "repository",
-            "id",
-            "fullReference",
-            "createTime"
+            "repositoryId",
+            "url"
         ],
         "manys": [],
         "ones": [
@@ -1143,20 +1143,20 @@ export const entityStructures: EntityStructureMap = {
     "RelatedDatafile": {
         "attributes": [
             "createId",
-            "id",
             "createTime",
-            "relation",
+            "id",
+            "modId",
             "modTime",
-            "modId"
+            "relation"
         ],
         "manys": [],
         "ones": [
             {
-                "name": "sourceDatafile",
+                "name": "destDatafile",
                 "type": "Datafile"
             },
             {
-                "name": "destDatafile",
+                "name": "sourceDatafile",
                 "type": "Datafile"
             }
         ]
@@ -1164,15 +1164,15 @@ export const entityStructures: EntityStructureMap = {
     "RelatedItem": {
         "attributes": [
             "createId",
-            "modId",
-            "title",
-            "id",
-            "modTime",
             "createTime",
             "fullReference",
+            "id",
             "identifier",
+            "modId",
+            "modTime",
+            "relatedItemType",
             "relationType",
-            "relatedItemType"
+            "title"
         ],
         "manys": [],
         "ones": [
@@ -1184,12 +1184,12 @@ export const entityStructures: EntityStructureMap = {
     },
     "Rule": {
         "attributes": [
-            "crudFlags",
             "createId",
-            "id",
             "createTime",
-            "modTime",
+            "crudFlags",
+            "id",
             "modId",
+            "modTime",
             "what"
         ],
         "manys": [],
@@ -1203,70 +1203,70 @@ export const entityStructures: EntityStructureMap = {
     "Sample": {
         "attributes": [
             "createId",
-            "modId",
-            "name",
-            "id",
-            "modTime",
             "createTime",
+            "id",
+            "modId",
+            "modTime",
+            "name",
             "pid"
         ],
         "manys": [
             {
-                "name": "parameters",
-                "type": "SampleParameter"
-            },
-            {
                 "name": "datasets",
                 "type": "Dataset"
+            },
+            {
+                "name": "parameters",
+                "type": "SampleParameter"
             }
         ],
         "ones": [
             {
-                "name": "type",
-                "type": "SampleType"
-            },
-            {
                 "name": "investigation",
                 "type": "Investigation"
+            },
+            {
+                "name": "type",
+                "type": "SampleType"
             }
         ]
     },
     "SampleParameter": {
         "attributes": [
-            "rangeTop",
-            "modId",
             "createId",
-            "rangeBottom",
             "createTime",
-            "numericValue",
             "dateTimeValue",
-            "stringValue",
             "error",
+            "id",
+            "modId",
             "modTime",
-            "id"
+            "numericValue",
+            "rangeBottom",
+            "rangeTop",
+            "stringValue"
         ],
         "manys": [],
         "ones": [
             {
-                "name": "type",
-                "type": "ParameterType"
-            },
-            {
                 "name": "sample",
                 "type": "Sample"
+            },
+            {
+                "name": "type",
+                "type": "ParameterType"
             }
         ]
     },
     "SampleType": {
         "attributes": [
-            "createTime",
             "createId",
+            "createTime",
             "id",
-            "name",
-            "molecularFormula",
+            "modId",
             "modTime",
-            "safetyInformation",
-            "modId"
+            "molecularFormula",
+            "name",
+            "safetyInformation"
         ],
         "manys": [
             {
@@ -1284,13 +1284,13 @@ export const entityStructures: EntityStructureMap = {
     "Shift": {
         "attributes": [
             "comment",
-            "createTime",
             "createId",
-            "id",
-            "startDate",
+            "createTime",
             "endDate",
+            "id",
+            "modId",
             "modTime",
-            "modId"
+            "startDate"
         ],
         "manys": [],
         "ones": [
@@ -1306,17 +1306,17 @@ export const entityStructures: EntityStructureMap = {
     },
     "Study": {
         "attributes": [
-            "description",
-            "modId",
             "createId",
-            "pid",
             "createTime",
-            "name",
-            "status",
-            "startDate",
+            "description",
             "endDate",
+            "id",
+            "modId",
             "modTime",
-            "id"
+            "name",
+            "pid",
+            "startDate",
+            "status"
         ],
         "manys": [
             {
@@ -1333,11 +1333,11 @@ export const entityStructures: EntityStructureMap = {
     },
     "StudyInvestigation": {
         "attributes": [
-            "id",
-            "modTime",
-            "createTime",
             "createId",
-            "modId"
+            "createTime",
+            "id",
+            "modId",
+            "modTime"
         ],
         "manys": [],
         "ones": [
@@ -1353,14 +1353,14 @@ export const entityStructures: EntityStructureMap = {
     },
     "Technique": {
         "attributes": [
-            "modTime",
-            "createTime",
-            "pid",
             "createId",
-            "name",
-            "modId",
+            "createTime",
+            "description",
             "id",
-            "description"
+            "modId",
+            "modTime",
+            "name",
+            "pid"
         ],
         "manys": [
             {
@@ -1372,17 +1372,17 @@ export const entityStructures: EntityStructureMap = {
     },
     "User": {
         "attributes": [
-            "givenName",
-            "email",
-            "createTime",
+            "affiliation",
             "createId",
-            "name",
-            "modTime",
+            "createTime",
+            "email",
+            "familyName",
             "fullName",
+            "givenName",
             "id",
             "modId",
-            "familyName",
-            "affiliation",
+            "modTime",
+            "name",
             "orcidId"
         ],
         "manys": [
@@ -1395,37 +1395,37 @@ export const entityStructures: EntityStructureMap = {
                 "type": "InstrumentScientist"
             },
             {
+                "name": "investigationUsers",
+                "type": "InvestigationUser"
+            },
+            {
                 "name": "studies",
                 "type": "Study"
             },
             {
                 "name": "userGroups",
                 "type": "UserGroup"
-            },
-            {
-                "name": "investigationUsers",
-                "type": "InvestigationUser"
             }
         ],
         "ones": []
     },
     "UserGroup": {
         "attributes": [
-            "id",
-            "modTime",
-            "createTime",
             "createId",
-            "modId"
+            "createTime",
+            "id",
+            "modId",
+            "modTime"
         ],
         "manys": [],
         "ones": [
             {
-                "name": "user",
-                "type": "User"
-            },
-            {
                 "name": "grouping",
                 "type": "Grouping"
+            },
+            {
+                "name": "user",
+                "type": "User"
             }
         ]
     }

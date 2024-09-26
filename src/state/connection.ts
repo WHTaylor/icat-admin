@@ -353,7 +353,8 @@ function makeEditFunction(action: EntityTabEditAction)
 
                 // If we've modified the value back to the original, remove the modification
                 // TODO: Fix this for dates - toString isn't enough
-                if (action.v === originalValue.toString()
+                if (originalValue === undefined && (typeof action.v === "string" && action.v.trim() === "")
+                    || action.v === originalValue?.toString()
                     || (typeof originalValue === "object" && !Array.isArray(originalValue))
                     && originalValue.id === (action.v as IcatEntity).id) {
                     delete edited[action.k];

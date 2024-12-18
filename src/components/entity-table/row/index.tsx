@@ -1,5 +1,3 @@
-import {useEffect, useRef} from "preact/hooks";
-
 import style from './style.module.css';
 
 import {commonFields} from '../../../utils';
@@ -85,26 +83,10 @@ const EntityRow = memo((
         doDelete,
     }: Props) => {
 
-    const inputEl = useRef<HTMLInputElement>(null);
-
     const doOpenContextMenu = (ev: MouseEvent) => {
         ev.preventDefault();
         openContextMenu(ev.pageX, ev.pageY, entity);
     };
-
-    useEffect(() => {
-        if (inputEl.current === null) return;
-
-        const el = inputEl.current;
-        el.focus();
-
-        const cancelOnEsc = (ev: KeyboardEvent) => {
-            if (ev.key === "Escape") stopEditing();
-        };
-
-        el.addEventListener("keydown", cancelOnEsc);
-        return () => el.removeEventListener("keydown", cancelOnEsc);
-    });
 
     const isNewRow = entity.id === undefined;
 
@@ -158,6 +140,18 @@ const EntityRow = memo((
         startEditing(k, rowIdx);
     };
 
+    // When an input element is created to start editing a field, focus it and
+    // bind ESC as a way to stop editing
+    const onOpenEditInput = (el: HTMLInputElement) => {
+        el.focus();
+
+        const cancelOnEsc = (ev: KeyboardEvent) => {
+            if (ev.key === "Escape") stopEditing();
+        };
+
+        el.addEventListener("keydown", cancelOnEsc);
+    }
+
     const getStyleForField = (k: string): string | undefined => {
         if (markedForDeletion) return style.markedForDeletion;
         if (isNewRow) return style.newRow
@@ -185,7 +179,7 @@ const EntityRow = memo((
                     ? <td key={k}>
                         <OnChangeInput
                             type="text"
-                            ref={inputEl}
+                            postRender={onOpenEditInput}
                             value={getInitialEditValue(k)}
                             class={style.editInput}
                             onChange={ev => makeEdit(

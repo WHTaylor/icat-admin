@@ -47,24 +47,24 @@ const ContextMenu = ({
      */
     const relatedEntityFilterComponents =
         (field: string): [IcatEntityName, string] | null => {
-        const isXToOne = isXToOneRelationship(entityType, field);
-        const isOneToMany = isOneToManyRelationship(entityType, field);
-        if (!isXToOne && !isOneToMany) {
-            return null;
+            const isXToOne = isXToOneRelationship(entityType, field);
+            const isOneToMany = isOneToManyRelationship(entityType, field);
+            if (!isXToOne && !isOneToMany) {
+                return null;
+            }
+
+            const relatedEntityField = getRelatedEntityField(
+                entityType, field)!;
+
+            const idFilterField = idReferenceFromRelatedEntity(
+                entityType, relatedEntityField.name);
+
+            const referenceId = isOneToMany
+                ? entity.id
+                : (entity[field] as ExistingIcatEntity).id;
+
+            return [relatedEntityField.type, `${idFilterField} = ${referenceId}`];
         }
-
-        const relatedEntityField = getRelatedEntityField(
-            entityType, field)!;
-
-        const idFilterField = idReferenceFromRelatedEntity(
-            entityType, relatedEntityField.name);
-
-        const referenceId = isOneToMany
-            ? entity.id
-            : (entity[field] as ExistingIcatEntity).id;
-
-        return [relatedEntityField.type, `${idFilterField} = ${referenceId}`];
-    }
 
     // For each one-many relationship, fetch how many related entities there are
     const arrayCountQueries = relatedEntityArrays.map(k => {

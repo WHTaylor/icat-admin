@@ -1,7 +1,7 @@
 import {JSX} from "preact";
 
 type Omitted = 'onChange' | 'onInput';
-type Props = Omit<JSX.HTMLAttributes<HTMLInputElement>, Omitted> & {
+type Props = Omit<JSX.InputHTMLAttributes<HTMLInputElement>, Omitted> & {
     onChange?: (ev: Event) => void;
     onInput?: (ev: Event) => void;
 }

@@ -1,7 +1,6 @@
-import {JSX, Ref} from "preact";
-import {forwardRef} from "react";
+import {JSX} from "preact";
 
-type Omitted = 'onChange' | 'onInput' | 'ref';
+type Omitted = 'onChange' | 'onInput';
 type Props = Omit<JSX.HTMLAttributes<HTMLInputElement>, Omitted> & {
     onChange?: (ev: Event) => void;
     onInput?: (ev: Event) => void;
@@ -14,17 +13,17 @@ type Props = Omit<JSX.HTMLAttributes<HTMLInputElement>, Omitted> & {
  * causes JSX onChange to bind the oninput attribute instead, to match React's
  * functionality, but we want to make use of onchange in some cases.
  */
-const OnChangeInput = forwardRef((props: Props, ref: Ref<HTMLInputElement>) => {
+const OnChangeInput = (props: Props) => {
     const refWithRebindOnChange = (el: HTMLInputElement | null) => {
         if (!el) return;
 
         el.onchange = props.onChange ?? null;
         el.oninput = props.onInput ?? null;
 
-        if (ref === undefined || ref === null) return;
+        if (props.ref === undefined || props.ref === null) return;
 
-        if (typeof ref === "function") ref(el);
-        else ref.current = el;
+        if (typeof props.ref === "function") props.ref(el);
+        else props.ref.current = el;
     }
 
     return <input
@@ -33,6 +32,6 @@ const OnChangeInput = forwardRef((props: Props, ref: Ref<HTMLInputElement>) => {
         onChange={undefined}
         onInput={undefined}
     />;
-});
+};
 
 export default OnChangeInput;

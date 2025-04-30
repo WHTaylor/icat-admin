@@ -433,11 +433,6 @@ const MoveExecutor = (
             };
             return icatClient.writeEntity("Datafile", toUpdate);
         },
-        // Assigning a fixed id means mutations will run serially
-        // TODO: Run in 'partial' parallel, e.g a few at once
-        scope: {
-            id: "move-run-datafile"
-        },
         onSuccess: () => setSuccessCount(c => c + 1),
         onError: () => setErrorCount(c => c + 1),
         retry: 1,
@@ -446,18 +441,19 @@ const MoveExecutor = (
 
     const isExecuting = moveDfMutation.isPending;
 
+    const chunkSize = 10;
     const executeMove = async () => {
-        for (const df of datafiles) {
-            await moveDfMutation.mutate(
-                df, {
-                    onSettled: () => {
-                        setTimeout(() => {
-                            setSuccessCount(0)
-                            setErrorCount(0);
-                        }, 2000)
-                    },
-                });
+        for (let i = 0; i < datafiles.length; i += chunkSize) {
+            const chunk = datafiles.slice(i, i + chunkSize);
+            await Promise.all(
+                chunk.map(df => moveDfMutation.mutateAsync(df)))
+                .catch(console.warn);
         }
+
+        setTimeout(() => {
+            setSuccessCount(0)
+            setErrorCount(0);
+        }, 2000)
     }
 
     const suffix = moveDfMutation.isPending

@@ -29,7 +29,7 @@ if (typeof window === 'undefined') {
         // Using id => this._data[id] instead of function syntax breaks the prod build
         getItem (id) {
             return this._data[id]
-        }, //eslint-disable-line
+        },
         removeItem (id) {
             return delete this._data[id];
         },

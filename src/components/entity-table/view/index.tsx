@@ -233,8 +233,8 @@ const EntityTableView = ({
             undefined,
             (id: number) => syncCreation(id, rowIdx),
             () => cancelCreation(rowIdx),
-            noContextMenu,
             doModifyCreation,
+            undefined,
         );
     }
 
@@ -246,8 +246,8 @@ const EntityTableView = ({
             modifications[e.id],
             syncEntity,
             () => revertModifications(e.id),
-            openContextMenu,
             doModifyEntity,
+            openContextMenu,
         );
     }
 
@@ -258,10 +258,10 @@ const EntityTableView = ({
         modifications: EntityModification | undefined,
         syncModifications: (id: number) => void,
         revertChanges: () => void,
-        openContextMenu: (x: number, y: number, e: IcatEntity) => void,
         makeEdit: (k: string,
                    v: TableIcatEntityValue,
                    i: number) => void,
+        openContextMenu?: (x: number, y: number, e: IcatEntity) => void,
     ) => <EntityRow
         key={key}
         entity={e}
@@ -369,6 +369,3 @@ const TableHeader = ({
 }
 
 export default EntityTableView;
-
-function noContextMenu(_: number, __: number, ___: IcatEntity) {
-}

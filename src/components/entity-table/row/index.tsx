@@ -46,7 +46,7 @@ type Props = {
     editingField: string | null;
     relatedEntityDisplayFields: { [k: string]: string };
     markedForDeletion: boolean;
-    openContextMenu: (x: number, y: number, e: IcatEntity) => void;
+    openContextMenu?: (x: number, y: number, e: IcatEntity) => void;
     startEditing: (k: string, i: number) => void;
     makeEdit: (k: string, v: string, i: number) => void;
     saveEntity: (e: IcatEntity) => Promise<number[]>;
@@ -82,6 +82,8 @@ const EntityRow = memo((
     }: Props) => {
 
     const doOpenContextMenu = (ev: MouseEvent) => {
+        if (openContextMenu === undefined) return;
+
         ev.preventDefault();
         openContextMenu(ev.pageX, ev.pageY, entity);
     };

@@ -1,7 +1,23 @@
-.block {
-    display: block;
+.loginForm {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5em;
 }
 
-.inline {
-    display: inline;
+.loginForm label {
+    display:block;
+    margin-bottom: 0.1em;
+}
+
+.loginForm input {
+    max-width: 10em
+}
+
+.loginForm button {
+    max-width: 10em;
+}
+
+.serverSelectorInput {
+    display: flex;
+    gap: 0.3em;
 }

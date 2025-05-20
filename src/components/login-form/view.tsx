@@ -41,24 +41,31 @@ const LoginFormView = ({doLogin, errMsg, isLoggingIn}: Props) => {
     return (
         <form
             class="mainContent"
+            className={`mainContent ${style.loginForm}`}
             onSubmit={submit}>
 
             <ServerSelector/>
 
-            <label for="pluginInput" class={style.block}>Auth plugin:</label>
-            <input type="text" name="plugin" id="pluginInput" defaultValue="anon" class={style.block}/>
+            <div>
+                <label htmlFor="pluginInput">Auth plugin:</label>
+                <input type="text" name="plugin" id="pluginInput" defaultValue="anon"/>
+            </div>
 
-            <label for="usernameInput" class={style.block}>Username:</label>
-            <input type="text" name="username" id="usernameInput" class={style.block}/>
+            <div>
+                <label for="usernameInput">Username:</label>
+                <input type="text" name="username" id="usernameInput"/>
+            </div>
 
-            <label for="passwordInput" class={style.block}>Password:</label>
-            <input type="password" name="password" id="passwordInput" class={style.block}/>
+            <div>
+                <label htmlFor="passwordInput">Password:</label>
+                <input type="password" name="password" id="passwordInput"/>
+            </div>
 
-            <button class={style.block}>Login</button>
+            <button>Login</button>
 
             {errMsg != null && <p>{errMsg}</p>}
             {isLoggingIn &&
-              <WithSuffix suffix={<LoadingIndicator/>}>Logging in...</WithSuffix>}
+                <WithSuffix suffix={<LoadingIndicator/>}>Logging in...</WithSuffix>}
         </form>);
 }
 
@@ -78,20 +85,21 @@ const ServerSelector = () => {
     const [addingServer, setAddingServer] = useState(serverOptions.length === 0);
 
     const input = addingServer
-        ? <input id="serverInput" type="text" class={style.inline}/>
-        : <select id="serverInput" class={style.inline}>{serverOptions}</select>;
+        ? <input id="serverInput" type="text"/>
+        : <select id="serverInput">{serverOptions}</select>;
 
     const button = <button
         type="button"
-        onClick={() => setAddingServer(!addingServer)}
-        class={style.inline}>
+        onClick={() => setAddingServer(!addingServer)}>
         {addingServer ? "Cancel" : "Add new server"} </button>;
 
     return (
         <div>
-            <label for="serverInput" class={style.block}>ICAT Server:</label>
-            {input}
-            {serverOptions.length > 0 && button}
+            <label for="serverInput">ICAT Server:</label>
+            <span className={style.serverSelectorInput}>
+                {input}
+                {serverOptions.length > 0 && button}
+            </span>
         </div>
     );
 };

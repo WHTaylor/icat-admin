@@ -48,7 +48,6 @@ type Props = {
     markedForDeletion: boolean;
     openContextMenu: (x: number, y: number, e: IcatEntity) => void;
     startEditing: (k: string, i: number) => void;
-    stopEditing: () => void;
     makeEdit: (k: string, v: string, i: number) => void;
     saveEntity: (e: IcatEntity) => Promise<number[]>;
     syncChanges: (id: number) => void;
@@ -73,7 +72,6 @@ const EntityRow = memo((
         markedForDeletion,
         openContextMenu,
         startEditing,
-        stopEditing,
         makeEdit,
         saveEntity,
         syncChanges,
@@ -140,18 +138,6 @@ const EntityRow = memo((
         startEditing(k, rowIdx);
     };
 
-    // When an input element is created to start editing a field, focus it and
-    // bind ESC as a way to stop editing
-    const onOpenEditInput = (el: HTMLInputElement) => {
-        el.focus();
-
-        const cancelOnEsc = (ev: KeyboardEvent) => {
-            if (ev.key === "Escape") stopEditing();
-        };
-
-        el.addEventListener("keydown", cancelOnEsc);
-    }
-
     const getStyleForField = (k: string): string | undefined => {
         if (markedForDeletion) return style.markedForDeletion;
         if (isNewRow) return style.newRow
@@ -178,7 +164,7 @@ const EntityRow = memo((
                     ? <td key={k}>
                         <OnChangeInput
                             type="text"
-                            postRender={onOpenEditInput}
+                            postRender={el => el.focus()}
                             value={getInitialEditValue(k)}
                             class={style.editInput}
                             onChange={ev => makeEdit(

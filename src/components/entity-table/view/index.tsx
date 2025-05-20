@@ -104,6 +104,15 @@ const EntityTableView = ({
         return () => document.removeEventListener("click", cancelInteractions);
     });
 
+    useEffect(() => {
+        const stopEditingOnEsc = (ev: KeyboardEvent) => {
+            if (ev.key === "Escape") stopEditing();
+        };
+
+        document.addEventListener("keydown", stopEditingOnEsc);
+        return () => document.removeEventListener("keydown", stopEditingOnEsc)
+    }, [stopEditing]);
+
     const keys = useMemo(
         () => {
             const fields = showAllColumns
@@ -266,7 +275,6 @@ const EntityTableView = ({
         markedForDeletion={e.id !== undefined && deletions.has(e.id)}
         openContextMenu={openContextMenu}
         startEditing={startEditing}
-        stopEditing={stopEditing}
         makeEdit={makeEdit}
         saveEntity={saveEntity}
         syncChanges={syncModifications}

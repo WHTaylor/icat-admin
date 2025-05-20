@@ -158,7 +158,7 @@ const EntityTableView = ({
     );
 
     const syncEntity = useCallback(
-        (id: number, _: number) => reloadEntity(id),
+        (id: number) => reloadEntity(id),
         [reloadEntity]
     );
     const syncCreation = useCallback(
@@ -222,8 +222,8 @@ const EntityTableView = ({
             rowIdx,
             "new-entity-" + rowIdx,
             undefined,
-            syncCreation,
-            cancelCreation,
+            (id: number) => syncCreation(id, rowIdx),
+            () => cancelCreation(rowIdx),
             noContextMenu,
             doModifyCreation,
         );
@@ -236,7 +236,7 @@ const EntityTableView = ({
             e.id.toString(),
             modifications[e.id],
             syncEntity,
-            revertModifications,
+            () => revertModifications(e.id),
             openContextMenu,
             doModifyEntity,
         );
@@ -247,8 +247,8 @@ const EntityTableView = ({
         rowIdx: number,
         key: string,
         modifications: EntityModification | undefined,
-        syncModifications: (id: number, rowIdx: number) => void,
-        revertChanges: (i: number) => void,
+        syncModifications: (id: number) => void,
+        revertChanges: () => void,
         openContextMenu: (x: number, y: number, e: IcatEntity) => void,
         makeEdit: (k: string,
                    v: TableIcatEntityValue,

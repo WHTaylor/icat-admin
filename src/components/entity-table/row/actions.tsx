@@ -14,11 +14,10 @@ type ActionButtonData = {
 type RowActionsProps = {
     entity: IcatEntity,
     modifications: EntityModification | undefined,
-    rowIdx: number;
     saveEntity: (e: IcatEntity) => Promise<number[]>,
-    syncChanges: (id: number, rowIdx: number) => void,
+    syncChanges: (id: number) => void,
     markedForDeletion: boolean,
-    revertChanges: (i: number) => void,
+    revertChanges: () => void,
     markToDelete: (id: number) => void,
     cancelDeletion: (id: number) => void,
     doDelete: (id: number) => void
@@ -28,7 +27,6 @@ const RowActions = (
     {
         entity,
         modifications,
-        rowIdx,
         saveEntity,
         syncChanges,
         markedForDeletion,
@@ -49,7 +47,8 @@ const RowActions = (
         },
         onSuccess: (data) => {
             const isNewEntity = entity.id === undefined;
-            syncChanges(isNewEntity ? data[0] : entity.id as number, rowIdx);
+            // If this was a create, the new id will be returned in 'data'
+            syncChanges(isNewEntity ? data[0] : entity.id as number);
         },
     });
 
@@ -64,7 +63,7 @@ const RowActions = (
 
     const actions: ActionButtonData[] = [];
     if (entity.id === undefined) {
-        actions.push({title: "Cancel creation", clickEventHandler: () => revertChanges(rowIdx), icon: "🚫"});
+        actions.push({title: "Cancel creation", clickEventHandler: revertChanges, icon: "🚫"});
         actions.push({
             title: "Create row",
             clickEventHandler: _ => saveMutation.mutate(),
@@ -79,7 +78,7 @@ const RowActions = (
 
     if (modifications !== undefined) {
         actions.push(
-            {title: "Revert changes", clickEventHandler: () => revertChanges(entity.id as number), icon: "↩️"});
+            {title: "Revert changes", clickEventHandler: revertChanges, icon: "↩️"});
         actions.push(
             {
                 title: "Save changes",

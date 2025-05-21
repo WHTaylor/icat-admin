@@ -12,8 +12,7 @@ import {
 /** Actions which affect top level app state */
 type AppStateAction =
     ConnectionCreateAction |
-    ConnectionCloseAction |
-    PageChangeAction;
+    ConnectionCloseAction;
 
 type ConnectionCreateAction = {
     type: "create_connection",
@@ -25,20 +24,8 @@ type ConnectionCloseAction = {
     idx: number
 };
 
-type PageChangeAction = {
-    type: "change_page",
-    page: Page
-};
-
-/** The page can be:
- 1. The index for the open server connection
- 2. The tips page
- 3. The about page
- 4. The login page (ServerConnector), if undefined */
-export type Page = number | "tips" | "about" | undefined
 type AppState = {
     connections: ConnectionState[]
-    activePage: Page
 }
 
 export function appStateReducer(
@@ -51,31 +38,15 @@ export function appStateReducer(
         case "create_connection": {
             const newConnection = makeNewConnectionState(action.connectionInfo);
             return {
-                activePage: state.connections.length,
                 connections: state.connections.concat(newConnection)
             };
         }
 
         case "close_connection": {
-            const c = state.activePage;
-            let newActivePage;
-            if (typeof c !== "number") newActivePage = c;
-            else if (state.connections.length == 1) newActivePage = undefined;
-            else if (action.idx < c
-                || action.idx === state.connections.length - 1) newActivePage = c - 1;
-
-            const newConnections = state.connections
-                .slice(0, action.idx)
-                .concat(state.connections
-                    .slice(action.idx + 1));
-
             return {
-                activePage: newActivePage, connections: newConnections
+                connections: state.connections.filter((_, i) => i !== action.idx)
             };
         }
-
-        case "change_page":
-            return {...state, activePage: action.page};
     }
 
     // Handle actions which affect a single connection

@@ -2,7 +2,7 @@ import style from './style.module.css';
 import CloseButton from '../controls/close-button';
 
 import {Connection} from "../../connectioncache";
-import {Page} from "../../state/app";
+import {useAppStore} from "../../state/store";
 
 function stripProtocol(server: string) {
     return server.split("://").slice(-1);
@@ -10,9 +10,6 @@ function stripProtocol(server: string) {
 
 
 type Props = {
-    connections: Connection[];
-    activePage: Page;
-    setActivePage: (i: Page) => void;
     closeConnection: (n: number) => void;
 }
 /**
@@ -21,11 +18,12 @@ type Props = {
  */
 const Header = (
     {
-        connections,
-        activePage,
-        setActivePage,
         closeConnection
     }: Props) => {
+    const activePage = useAppStore((state) => state.activePage);
+    const setActivePage = useAppStore((state) => state.setActivePage);
+    const connections = useAppStore((state) => state.connections)
+
     return (
         <header class={style.header}>
             <h1>ICAT admin</h1>

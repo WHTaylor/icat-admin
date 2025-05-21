@@ -38,9 +38,9 @@ const CloseButton = (
         xmlns="http://www.w3.org/2000/svg"
         >
         <circle
-            cx="12"
-            cy="12"
-            r="10"
+            cx="50%"
+            cy="50%"
+            r="40%"
             stroke={lineColour}
             stroke-width="1.5"
             fill={fillColour}

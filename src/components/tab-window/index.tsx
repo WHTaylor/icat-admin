@@ -14,13 +14,6 @@ type Props = {
  * closing them
  */
 const TabWindow = (props: Props) => {
-    const handleMouseDown = (ev: MouseEvent, i: number) => {
-        // Only want middle mouse clicks
-        if (ev.buttons != 4) return;
-        ev.preventDefault();
-        props.closeTab(i);
-    }
-
     const startDrag = (ev: DragEvent, i: number) => {
         if (!ev.dataTransfer) return;
         ev.dataTransfer.setData("index", i.toString());
@@ -37,13 +30,9 @@ const TabWindow = (props: Props) => {
     }
 
     const getTabXs = () =>
-        Array.from(document.querySelectorAll(`.${style.tabSwitcher} .${style.entityTabButton}`))
+        Array.from(document.querySelectorAll(`.${style.tabSwitcher} .${style.entityTab}`))
             .map(el => el.getBoundingClientRect())
             .map(r => r.x);
-
-    const getTabClasses = (i: number) =>
-        style.entityTabButton + " "
-        + (i === props.activeTabIdx ? style.selectedTab : "");
 
     return (
         <div
@@ -51,24 +40,60 @@ const TabWindow = (props: Props) => {
             onDragOver={ev => ev.preventDefault()}
             onDrop={endDrag}>
             {props.tabs.map(([table, key], i) =>
-                <button
+                <TabButton
                     key={key}
-                    onClick={() => props.handleChangeTabIdx(i)}
-                    onMouseDown={ev => handleMouseDown(ev, i)}
-                    class={getTabClasses(i)}
-                    draggable={true}
-                    onDragStart={ev => startDrag(ev, i)}>
-                    {table}
-                    <CloseButton
-                        onClickHandler={() => {
-                            props.closeTab(i);
-                        }}
-                        lineColour="black"
-                        additionalClass={style.closeButton}
-                        fillColour={i === props.activeTabIdx ? undefined : "white"}
-                    />
-                </button>)}
+                    table={table}
+                    isActive={i === props.activeTabIdx}
+                    changeTab={() => props.handleChangeTabIdx(i)}
+                    closeTab={() => props.closeTab(i)}
+                    startDrag={ev => startDrag(ev, i)}
+                />
+            )}
         </div>)
+}
+
+type TabButtonProps = {
+    table: string
+    isActive: boolean
+    changeTab: () => void
+    closeTab: () => void
+    startDrag: (ev: DragEvent) => void
+}
+
+const TabButton = (
+    {
+        table,
+        isActive,
+        changeTab,
+        closeTab,
+        startDrag
+    }: TabButtonProps) => {
+    const classes = style.entityTab
+        + (isActive ? " " + style.selectedTab : "");
+
+    const closeOnMiddleClick = (ev: MouseEvent) => {
+        if (ev.buttons != 4) return;
+        ev.preventDefault();
+        closeTab();
+    }
+
+    return <div
+        draggable={true}
+        onDragStart={startDrag}
+        onMouseDown={closeOnMiddleClick}
+        class={classes}>
+
+        <button onClick={changeTab}>
+            {table}
+        </button>
+
+        <CloseButton
+            onClickHandler={closeTab}
+            lineColour="black"
+            additionalClass={style.closeButton}
+            fillColour={isActive ? undefined : "white"}
+        />
+    </div>
 }
 
 export default TabWindow;

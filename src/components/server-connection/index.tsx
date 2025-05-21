@@ -47,7 +47,6 @@ const ServerConnection = (
         ? <EntityBrowser
             icatClient={icatClient}
             entityTabs={connection.entityTabs}
-            activeTabIdx={connection.activeTab}
             dispatch={dispatch}
             key={connection.connectionInfo.sessionId}/>
         : <ToolsUI

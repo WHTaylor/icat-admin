@@ -37,7 +37,7 @@ const App = () => {
 
     const createConnection = (login: Connection) => {
         saveLogin(login);
-        store.openConnection(login);
+        store.createConnection(login);
         store.setActivePage(store.connections.length)
         dispatch({
             type: "create_connection",
@@ -50,21 +50,12 @@ const App = () => {
 
         invalidateLogin(c.server, c.username);
         await new IcatClient(c.server, c.sessionId).logout();
-        store.closeConnection(i);
+        store.removeConnection(i);
         dispatch({
             type: "close_connection",
             idx: i
         });
 
-        // Update the active page based on what we closed:
-        // - Not on a connection page? No change
-        // - Closed the only open connection? Go to login form
-        // - Closed connection to the left? Update active to keep same connection
-        // - Closed active connection whilst it was last tab? Move 1 to left
-        if (typeof store.activePage !== "number") return;
-        else if (store.connections.length === 1) store.setActivePage(undefined);
-        else if (i < store.activePage || i === store.connections.length - 1)
-            store.setActivePage(store.activePage - 1);
     }
 
     // If on the login page, and no servers are currently active, try to

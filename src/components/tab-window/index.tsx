@@ -1,10 +1,10 @@
 import style from './style.module.css';
 import CloseButton from "../controls/close-button";
+import {useAppStore} from "../../state/store";
 
 type Props = {
     activeTabIdx?: number;
     closeTab: (i: number) => void;
-    handleChangeTabIdx: (i: number) => void;
     swapTabs: (a: number, b: number) => void;
     tabs: [table: string, key: number][];
 }
@@ -14,6 +14,8 @@ type Props = {
  * closing them
  */
 const TabWindow = (props: Props) => {
+    const setActiveTab = useAppStore((state) => state.setActiveTab);
+
     const startDrag = (ev: DragEvent, i: number) => {
         if (!ev.dataTransfer) return;
         ev.dataTransfer.setData("index", i.toString());
@@ -44,7 +46,7 @@ const TabWindow = (props: Props) => {
                     key={key}
                     table={table}
                     isActive={i === props.activeTabIdx}
-                    changeTab={() => props.handleChangeTabIdx(i)}
+                    changeTab={() => setActiveTab(i)}
                     closeTab={() => props.closeTab(i)}
                     startDrag={ev => startDrag(ev, i)}
                 />

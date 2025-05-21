@@ -10,11 +10,11 @@ import {ConnectionStateAction} from "../../state/connection";
 import {useQueries} from "@tanstack/react-query";
 import {EntityTabState, OpenTabHandler, TableFilter} from "../../types";
 import LeftColumnList from "../left-column-list";
+import {useAppStore} from "../../state/store";
 
 type Props = {
     icatClient: IcatClient
     entityTabs: EntityTabState[];
-    activeTabIdx?: number;
     dispatch: Dispatch<ConnectionStateAction>
     key: string;
 }
@@ -30,10 +30,12 @@ const EntityBrowser = (
     {
         icatClient,
         entityTabs,
-        activeTabIdx,
         dispatch
     }: Props) => {
     const [isOpenTabModalOpen, setIsOpenTabModalOpen] = useState(false);
+    const activeTabIdx = useAppStore((state) => state.getActiveConnectionTabs()?.activeTab);
+    const createEntityTab = useAppStore((state) => state.createEntityTab);
+    const closeEntityTab = useAppStore((state) => state.closeEntityTab);
 
     const queries = entityTabs.map(et => ({
         queryKey: [icatClient, et.filter],
@@ -68,6 +70,7 @@ const EntityBrowser = (
 
     const openTabForFilter = (f: TableFilter) => {
         dispatch({type: "create_tab", filter: f})
+        createEntityTab(f);
         // Timeout is used as a small hack to make sure scroll happens after component
         // rerenders (or at least, that's what it appears to do).
         setTimeout(() => window.scrollTo({
@@ -85,7 +88,10 @@ const EntityBrowser = (
         dispatch({type: "swap", a, b});
     };
 
-    const closeTab = (idx: number) => dispatch({type: "close_tab", idx});
+    const closeTab = (idx: number) => {
+        dispatch({type: "close_tab", idx});
+        closeEntityTab(idx);
+    }
 
     const deleteEntities = (ids: number[]) => {
         if (activeTabIdx === undefined) return;
@@ -152,10 +158,6 @@ const EntityBrowser = (
                 <TabWindow
                   activeTabIdx={activeTabIdx}
                   closeTab={closeTab}
-                  handleChangeTabIdx={i => dispatch({
-                      type: "change_tab",
-                      idx: i
-                  })}
                   swapTabs={swapTabs}
                   tabs={entityTabs.map(tab =>
                       [tab.filter.table, tab.key])}/>

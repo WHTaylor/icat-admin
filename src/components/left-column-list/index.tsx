@@ -1,14 +1,14 @@
 import style from "./style.module.css";
-import {JSX} from "preact";
+import React from "react";
 
 const LeftColumnList = (props: {
     title: string,
-    makeChildren: (className: string) => JSX.Element[]
+    children: React.ReactNode
 }) =>
     <div className={style.leftColumn}>
         <h2>{props.title}</h2>
         <ul className={style.tableList}>
-            {props.makeChildren(style.entityButton)}
+            {props.children}
         </ul>
     </div>
 

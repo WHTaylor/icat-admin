@@ -136,16 +136,16 @@ const EntityBrowser = (
 
     return (
         <>
-            <LeftColumnList
-                title={"ICAT Tables"}
-                makeChildren={c => entityNames.map(en =>
-                    <li key={en}>
-                        <button
-                            className={c}
-                            onClick={() => openTab(en)}>
-                            {en}
-                        </button>
-                    </li>)}/>
+            <LeftColumnList title={"ICAT Tables"}>
+                {
+                    entityNames.map(en =>
+                        <li key={en}>
+                            <button onClick={() => openTab(en)}>
+                                {en}
+                            </button>
+                        </li>)
+                }
+            </LeftColumnList>
 
             {entityTabs.length > 0 &&
               <div className="mainContentAndRightColumn">

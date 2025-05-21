@@ -44,20 +44,20 @@ const ToolsUI = (
         : "Oh no"
 
     return <>
-        <LeftColumnList
-            title={"Tools"}
-            makeChildren={c => toolTabs.map(t =>
-                <li key={t.tool}>
-                    <button
-                        className={c}
-                        onClick={() => dispatch({
-                            type: "set_active_tool",
-                            tool: t.tool
-                        })}>
-                        {prettifyToolName(t.tool)}
-                    </button>
-                </li>
-            )}/>
+        <LeftColumnList title={"Tools"}>
+            {
+                toolTabs.map(t =>
+                    <li key={t.tool}>
+                        <button
+                            onClick={() => dispatch({
+                                type: "set_active_tool",
+                                tool: t.tool
+                            })}>
+                            {prettifyToolName(t.tool)}
+                        </button>
+                    </li>)
+            }
+        </LeftColumnList>
         <div class="mainContentAndRightColumn">
             {activeTool}
         </div>

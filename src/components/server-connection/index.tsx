@@ -49,11 +49,7 @@ const ServerConnection = (
             entityTabs={connection.entityTabs}
             dispatch={dispatch}
             key={connection.connectionInfo.sessionId}/>
-        : <ToolsUI
-            dispatch={dispatch}
-            state={connection.toolsState}
-            icatClient={icatClient}
-        />
+        : <ToolsUI icatClient={icatClient}/>
 
     return <div class="page">
         <span class={"leftColumn " + style.uiSwitcher}>

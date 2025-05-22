@@ -9,12 +9,6 @@ import {
 } from "../types";
 import {difference, withReplaced} from "../utils";
 import {Connection} from "../connectioncache";
-import {
-    handleToolAction,
-    makeNewToolsState,
-    ToolsAction,
-    ToolsUIState
-} from "./tools";
 
 export type UI = "Browser" | "Tools";
 
@@ -23,7 +17,6 @@ export type ConnectionState = {
     activeUI: UI
     entityTabs: EntityTabState[]
     activeTab?: number
-    toolsState: ToolsUIState
 };
 
 export const makeNewConnectionState = (connectionInfo: Connection) => ({
@@ -31,15 +24,13 @@ export const makeNewConnectionState = (connectionInfo: Connection) => ({
     activeUI: "Browser" as UI,
     entityTabs: [],
     activeTab: undefined,
-    toolsState: makeNewToolsState()
 })
 
 /** Actions which affect the state of a single connection */
 export type ConnectionStateAction =
     SwitchUIAction |
     EntityTabAction |
-    EntityTabEditAction |
-    ToolsAction
+    EntityTabEditAction
 
 type SwitchUIAction = {
     type: "switch_ui",
@@ -234,18 +225,6 @@ export function connectionTabReducer(
             activeTab,
             entityTabs: rearranged
         };
-    }
-
-    if (
-        action.type === "set_active_tool"
-        || action.type === "move_runs_add_range"
-        || action.type === "move_runs_remove_range"
-        || action.type === "move_runs_set_instrument"
-        || action.type === "move_runs_set_investigation") {
-        return {
-            ...state,
-            toolsState: handleToolAction(action, state.toolsState)
-        }
     }
 
     const edit = makeEditFunction(action);

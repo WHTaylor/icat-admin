@@ -7,20 +7,18 @@ import {
 } from "@tanstack/react-query";
 import {range, tableFilter} from "../../../../utils";
 import {ExistingIcatEntity} from "../../../../types";
-import {Dispatch, useState} from "preact/hooks";
-import {ConnectionStateAction} from "../../../../state/connection";
-import {MoveRunsState, RunRange} from "../../../../state/tools";
+import {useState} from "preact/hooks";
+import {RunRange} from "../../../../state/toolsSlice";
 import OnChangeInput from "../../../generic/on-change-input";
 import CloseButton from "../../../controls/close-button";
 import LoadingIndicator from "../../../generic/loading-indicator";
 import {JSX} from "preact";
 import IcatClient from "../../../../icat";
 import {WithSuffix} from "../../../generic/with-indicator";
+import {useAppStore} from "../../../../state/store";
 
 type Props = {
     icatClient: IcatClient
-    dispatch: Dispatch<ConnectionStateAction>
-    state: MoveRunsState
 }
 
 type IcatInstrument = ExistingIcatEntity & {
@@ -30,10 +28,11 @@ type IcatInstrument = ExistingIcatEntity & {
 const MoveRunsTool = (
     {
         icatClient,
-        dispatch,
-        state
     }: Props
 ) => {
+    const state = useAppStore((state) => state.moveRuns);
+    const addRange = useAppStore((state) => state.addMoveRunsRange);
+
     const [singleRunInputValue, setSingleRunInputValue] = useState<string>("");
     const [startRangeInputValue, setStartRangeInputValue] = useState<string>("");
     const [endRangeInputValue, setEndRangeInputValue] = useState<string>("");
@@ -69,11 +68,10 @@ const MoveRunsTool = (
     const handleAddSingleClick = () => {
         const val = singleRunInputValue.trim();
         if (val.length === 0) return;
-        dispatch({
-            type: "move_runs_add_range",
-            runStart: Number(val),
-            runEnd: Number(val)
-        })
+        addRange({
+            start: Number(val),
+            end: Number(val)
+        });
     }
 
     const handleAddSingleKey = (ev: KeyboardEvent) => {
@@ -84,11 +82,10 @@ const MoveRunsTool = (
         const start = startRangeInputValue.trim();
         const end = endRangeInputValue.trim();
         if (start.length === 0 || end.length === 0) return;
-        dispatch({
-            type: "move_runs_add_range",
-            runStart: Number(start),
-            runEnd: Number(end)
-        })
+        addRange({
+            start: Number(start),
+            end: Number(end)
+        });
     }
 
     const handleAddRangeKey = (ev: KeyboardEvent) => {
@@ -116,11 +113,7 @@ const MoveRunsTool = (
         </p>
         <div>
             <h3>Select Instrument</h3>
-            <InstrumentSelector
-                icatClient={icatClient}
-                instrument={state.instrument}
-                setInstrument={i => dispatch(
-                    {type: "move_runs_set_instrument", instrument: i})}/>
+            <InstrumentSelector icatClient={icatClient}/>
         </div>
         <div>
             <h3>Select run(s)</h3>
@@ -174,20 +167,13 @@ const MoveRunsTool = (
 
                 {state.runRanges.length > 0 &&
                   <SelectedRuns
-                    runRanges={state.runRanges}
-                    dispatch={dispatch}
                     dfQueryResultsByRunNumbers={dfQueryResultsByRunNumbers}
                   />}
             </div>
         </div>
         <div>
             <h3>Select investigation</h3>
-            <InvestigationSelector
-                icatClient={icatClient}
-                investigation={state.investigation}
-                setInvestigation={i => dispatch(
-                    {type: "move_runs_set_investigation", investigation: i})}
-            />
+            <InvestigationSelector icatClient={icatClient}/>
         </div>
         {cantExecuteReasons.length === 0
             ? <MoveExecutor
@@ -205,21 +191,14 @@ const MoveRunsTool = (
 
 const SelectedRuns = (
     {
-        runRanges,
-        dispatch,
         dfQueryResultsByRunNumbers
     }: {
-        runRanges: RunRange[],
-        dispatch: Dispatch<ConnectionStateAction>
         dfQueryResultsByRunNumbers: {
             [_: number]: UseQueryResult<ExistingIcatEntity[], Error>
         }
     }) => {
-    const close = (a: number, b?: number) => dispatch({
-        type: "move_runs_remove_range",
-        runStart: a,
-        runEnd: b === undefined ? a : b
-    });
+    const runRanges = useAppStore((state) => state.moveRuns.runRanges);
+    const removeRunRange = useAppStore((state) => state.removeMoveRunsRange);
 
     const getContentForRange = (runRange: RunRange) => {
         const results = range(runRange.start, runRange.end + 1)
@@ -254,7 +233,7 @@ const SelectedRuns = (
             }
         }
         return <Card
-            close={() => close(rr.start, rr.end)}
+            close={() => removeRunRange({start: rr.start, end: rr.end})}
             rows={rows}/>
     }
 
@@ -268,13 +247,12 @@ const SelectedRuns = (
 const InstrumentSelector = (
     {
         icatClient,
-        instrument,
-        setInstrument
     }: {
         icatClient: IcatClient,
-        instrument: string | undefined,
-        setInstrument: (i: string) => void
     }) => {
+    const instrument = useAppStore((state) => state.moveRuns.instrument);
+    const setInstrument = useAppStore((state) => state.setMoveRunsInstrument);
+
     const instrumentResult = useQuery(
         {
             queryKey: [icatClient, "instruments"],
@@ -304,13 +282,12 @@ const InstrumentSelector = (
 const InvestigationSelector = (
     {
         icatClient,
-        investigation,
-        setInvestigation
     }: {
         icatClient: IcatClient,
-        investigation?: ExistingIcatEntity
-        setInvestigation: (i?: ExistingIcatEntity) => void
     }) => {
+    const investigation = useAppStore((state) => state.moveRuns.investigation);
+    const setInvestigation = useAppStore((state) => state.setMoveRunsInvestigation);
+
     const [investigationName, setInvestigationName] = useState<string>("");
     const isValidInvestigationName = investigationName.trim().length > 0;
     const f = tableFilter(

@@ -1,6 +1,6 @@
 import style from './style.module.css';
 import CloseButton from "../controls/close-button";
-import {useAppStore} from "../../state/store";
+import {useConnectionStore} from "../../state/stores";
 
 type Props = {
     activeTabIdx?: number;
@@ -14,7 +14,7 @@ type Props = {
  * closing them
  */
 const TabWindow = (props: Props) => {
-    const setActiveTab = useAppStore((state) => state.setActiveTab);
+    const setActiveTab = useConnectionStore((state) => state.setActiveTab);
 
     const startDrag = (ev: DragEvent, i: number) => {
         if (!ev.dataTransfer) return;

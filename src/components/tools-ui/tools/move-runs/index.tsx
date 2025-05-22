@@ -15,7 +15,7 @@ import LoadingIndicator from "../../../generic/loading-indicator";
 import {JSX} from "preact";
 import IcatClient from "../../../../icat";
 import {WithSuffix} from "../../../generic/with-indicator";
-import {useAppStore} from "../../../../state/store";
+import {useConnectionStore} from "../../../../state/stores";
 
 type Props = {
     icatClient: IcatClient
@@ -30,8 +30,8 @@ const MoveRunsTool = (
         icatClient,
     }: Props
 ) => {
-    const state = useAppStore((state) => state.moveRuns);
-    const addRange = useAppStore((state) => state.addMoveRunsRange);
+    const state = useConnectionStore((state) => state.moveRuns);
+    const addRange = useConnectionStore((state) => state.addMoveRunsRange);
 
     const [singleRunInputValue, setSingleRunInputValue] = useState<string>("");
     const [startRangeInputValue, setStartRangeInputValue] = useState<string>("");
@@ -197,8 +197,8 @@ const SelectedRuns = (
             [_: number]: UseQueryResult<ExistingIcatEntity[], Error>
         }
     }) => {
-    const runRanges = useAppStore((state) => state.moveRuns.runRanges);
-    const removeRunRange = useAppStore((state) => state.removeMoveRunsRange);
+    const runRanges = useConnectionStore((state) => state.moveRuns.runRanges);
+    const removeRunRange = useConnectionStore((state) => state.removeMoveRunsRange);
 
     const getContentForRange = (runRange: RunRange) => {
         const results = range(runRange.start, runRange.end + 1)
@@ -250,8 +250,8 @@ const InstrumentSelector = (
     }: {
         icatClient: IcatClient,
     }) => {
-    const instrument = useAppStore((state) => state.moveRuns.instrument);
-    const setInstrument = useAppStore((state) => state.setMoveRunsInstrument);
+    const instrument = useConnectionStore((state) => state.moveRuns.instrument);
+    const setInstrument = useConnectionStore((state) => state.setMoveRunsInstrument);
 
     const instrumentResult = useQuery(
         {
@@ -285,8 +285,8 @@ const InvestigationSelector = (
     }: {
         icatClient: IcatClient,
     }) => {
-    const investigation = useAppStore((state) => state.moveRuns.investigation);
-    const setInvestigation = useAppStore((state) => state.setMoveRunsInvestigation);
+    const investigation = useConnectionStore((state) => state.moveRuns.investigation);
+    const setInvestigation = useConnectionStore((state) => state.setMoveRunsInvestigation);
 
     const [investigationName, setInvestigationName] = useState<string>("");
     const isValidInvestigationName = investigationName.trim().length > 0;

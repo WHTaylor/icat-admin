@@ -2,7 +2,7 @@ import style from './style.module.css';
 import CloseButton from '../controls/close-button';
 
 import {Connection} from "../../connectioncache";
-import {useAppStore} from "../../state/store";
+import {useAppStore} from "../../state/stores";
 
 function stripProtocol(server: string) {
     return server.split("://").slice(-1);

@@ -10,7 +10,7 @@ import {ConnectionStateAction} from "../../state/connection";
 import {useQueries} from "@tanstack/react-query";
 import {EntityTabState, OpenTabHandler, TableFilter} from "../../types";
 import LeftColumnList from "../left-column-list";
-import {useAppStore} from "../../state/store";
+import {useConnectionStore} from "../../state/stores";
 
 type Props = {
     icatClient: IcatClient
@@ -33,9 +33,9 @@ const EntityBrowser = (
         dispatch
     }: Props) => {
     const [isOpenTabModalOpen, setIsOpenTabModalOpen] = useState(false);
-    const activeTabIdx = useAppStore((state) => state.getActiveConnectionTabs()?.activeTab);
-    const createEntityTab = useAppStore((state) => state.createEntityTab);
-    const closeEntityTab = useAppStore((state) => state.closeEntityTab);
+    const activeTabIdx = useConnectionStore((state) => state.activeTab);
+    const createEntityTab = useConnectionStore((state) => state.createEntityTab);
+    const closeEntityTab = useConnectionStore((state) => state.closeEntityTab);
 
     const queries = entityTabs.map(et => ({
         queryKey: [icatClient, et.filter],

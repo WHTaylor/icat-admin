@@ -14,7 +14,7 @@ import {
 import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
 import {appStateReducer} from "../state/app";
 import ServerConnection from "./server-connection";
-import {useAppStore} from "../state/store";
+import {ConnectionStoreContext, useAppStore} from "../state/stores";
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -38,24 +38,21 @@ const App = () => {
     const createConnection = (login: Connection) => {
         saveLogin(login);
         store.createConnection(login);
-        store.setActivePage(store.connections.length)
         dispatch({
             type: "create_connection",
             connectionInfo: login
         });
     };
 
-    const removeConnection = async (i: number) => {
-        const c = store.connections[i];
-
+    const removeConnection = async (idx: number) => {
+        const c = store.connections[idx];
         invalidateLogin(c.server, c.username);
         await new IcatClient(c.server, c.sessionId).logout();
-        store.removeConnection(i);
+        store.removeConnection(idx);
         dispatch({
             type: "close_connection",
-            idx: i
+            idx
         });
-
     }
 
     // If on the login page, and no servers are currently active, try to
@@ -66,7 +63,9 @@ const App = () => {
         const login = getLastLogin();
         if (login === null || login.sessionId == undefined) return;
         isValidSession(login)
-            .then(res => {if (res) createConnection(login)});
+            .then(res => {
+                if (res) createConnection(login)
+            });
     });
 
     // es pattern matching when?
@@ -76,15 +75,18 @@ const App = () => {
             ? <Tips/>
             : store.activePage == "about"
                 ? <About/>
-                : <ServerConnection
-                    connection={{
-                        ...state.connections[store.activePage],
-                        connectionInfo: store.connections[store.activePage]
-                    }}
-                    dispatch={a => dispatch({
-                        ...a, connectionIdx: store.activePage as number
-                    })}
-                />
+                : <ConnectionStoreContext
+                    value={store.connectionStores[store.activePage]}>
+                    <ServerConnection
+                        connection={{
+                            ...state.connections[store.activePage],
+                            connectionInfo: store.connections[store.activePage]
+                        }}
+                        dispatch={a => dispatch({
+                            ...a, connectionIdx: store.activePage as number
+                        })}
+                    />
+                </ConnectionStoreContext>
 
     return (
         <QueryClientProvider client={queryClient}>

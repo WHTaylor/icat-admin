@@ -1,8 +1,8 @@
 import MoveRunsTool from "./tools/move-runs";
 import IcatClient from "../../icat";
 import LeftColumnList from "../left-column-list";
-import {useAppStore} from "../../state/store";
 import {Tool} from "../../state/toolsSlice";
+import {useConnectionStore} from "../../state/stores";
 
 type Props = {
     icatClient: IcatClient
@@ -30,8 +30,8 @@ const ToolsUI = (
     {
         icatClient
     }: Props) => {
-    const activeTool = useAppStore((state) => state.activeTool);
-    const setActiveTool = useAppStore((state) => state.setActiveTool);
+    const activeTool = useConnectionStore((state) => state.activeTool);
+    const setActiveTool = useConnectionStore((state) => state.setActiveTool);
 
     return <>
         <LeftColumnList title={"Tools"}>

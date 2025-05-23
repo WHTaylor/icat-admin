@@ -10,32 +10,22 @@ import {
 import {difference, withReplaced} from "../utils";
 import {Connection} from "../connectioncache";
 
-export type UI = "Browser" | "Tools";
-
 export type ConnectionState = {
     connectionInfo: Connection
-    activeUI: UI
     entityTabs: EntityTabState[]
     activeTab?: number
 };
 
 export const makeNewConnectionState = (connectionInfo: Connection) => ({
     connectionInfo,
-    activeUI: "Browser" as UI,
     entityTabs: [],
     activeTab: undefined,
 })
 
 /** Actions which affect the state of a single connection */
 export type ConnectionStateAction =
-    SwitchUIAction |
     EntityTabAction |
     EntityTabEditAction
-
-type SwitchUIAction = {
-    type: "switch_ui",
-    ui: UI
-}
 
 /** Actions which change the number, position, or active entity tab */
 type EntityTabAction =
@@ -174,13 +164,7 @@ export function connectionTabReducer(
     state: ConnectionState,
     action: ConnectionStateAction
 ): ConnectionState {
-    if (action.type == "switch_ui") {
-        if (action.ui == state.activeUI) return state;
-        return {
-            ...state,
-            activeUI: action.ui
-        };
-    } else if (action.type == "change_tab") {
+    if (action.type == "change_tab") {
         return {...state, activeTab: action.idx};
     } else if (action.type == "create_tab") {
         const entities = state.entityTabs.concat({

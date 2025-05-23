@@ -3,6 +3,7 @@ import {createToolsSlice, ToolsSlice} from "./toolsSlice";
 import {createEntityTabsSlice, EntityTabsSlice} from "./entityTabsSlice";
 import {createContext, useContext} from "react";
 import {Connection} from "../connectioncache";
+import {ConnectionUISlice, createConnectionUISlice} from "./connectionUiSlice";
 
 /** The page can be:
  1. The index for the open server connection
@@ -56,10 +57,12 @@ export const useAppStore = create<AppStore>((set) => ({
 }));
 
 type ConnectionStore = EntityTabsSlice
-    & ToolsSlice;
+    & ToolsSlice
+    & ConnectionUISlice;
 export const createConnectionStore = () => create<ConnectionStore>((...a) => ({
     ...createEntityTabsSlice(...a),
     ...createToolsSlice(...a),
+    ...createConnectionUISlice(...a)
 }));
 
 export const ConnectionStoreContext =

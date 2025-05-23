@@ -1,9 +1,10 @@
 import style from './style.module.css'
 import EntityBrowser from '../entity-browser';
 import {ConnectionState, ConnectionStateAction} from "../../state/connection";
-import {Dispatch, useCallback, useEffect, useMemo} from "preact/hooks";
+import {Dispatch, useEffect, useMemo} from "preact/hooks";
 import ToolsUI from "../tools-ui";
 import IcatClient from "../../icat";
+import {useConnectionStore} from "../../state/stores";
 
 type Props = {
     connection: ConnectionState
@@ -15,35 +16,31 @@ const ServerConnection = (
         connection,
         dispatch,
     }: Props) => {
-    const openBrowser = useCallback(() =>
-            dispatch({type: "switch_ui", ui: "Browser"}),
-        [dispatch]);
-    const openTools = useCallback(() =>
-            dispatch({type: "switch_ui", ui: "Tools"}),
-        [dispatch]);
+    const activeUI = useConnectionStore((state) => state.activeUI);
+    const setActiveUI = useConnectionStore((state) => state.setActiveUI);
 
     useEffect(() => {
         const readKey = (ev: KeyboardEvent) => {
             if (ev.altKey && ev.shiftKey) {
                 if (ev.key === "T") {
                     ev.stopPropagation();
-                    openTools();
+                    setActiveUI("Tools");
                 } else if (ev.key === "B") {
                     ev.stopPropagation();
-                    openBrowser();
+                    setActiveUI("Browser");
                 }
             }
         }
         document.addEventListener("keydown", readKey);
         return () => document.removeEventListener("keydown", readKey);
-    }, [connection, openBrowser, openTools])
+    }, [setActiveUI])
 
     const icatClient = useMemo(() => new IcatClient(
             connection.connectionInfo.server,
             connection.connectionInfo.sessionId),
         [connection.connectionInfo.server, connection.connectionInfo.sessionId]);
 
-    const content = connection.activeUI == "Browser"
+    const content = activeUI === "Browser"
         ? <EntityBrowser
             icatClient={icatClient}
             entityTabs={connection.entityTabs}
@@ -56,8 +53,8 @@ const ServerConnection = (
             <button
                 title="Switch to browser (Alt-Shift-B)"
                 type="button"
-                onClick={openBrowser}
-                class={connection.activeUI === "Browser" ? style.active : ""}
+                onClick={() => setActiveUI("Browser")}
+                class={activeUI === "Browser" ? style.active : ""}
             >
                 Browse
             </button>
@@ -67,8 +64,8 @@ const ServerConnection = (
             <button
                 title="Switch to tools (Alt-Shift-T)"
                 type="button"
-                onClick={openTools}
-                class={connection.activeUI === "Tools" ? style.active : ""}
+                onClick={() => setActiveUI("Tools")}
+                class={activeUI === "Tools" ? style.active : ""}
             >
                 Tools
             </button>

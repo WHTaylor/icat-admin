@@ -31,7 +31,7 @@ describe('Opening an entity on one server should not open it on another', () => 
     cy.openEntityByTyping('Facility');
     cy.get('header nav a').first().click();
     cy.get('[class*="active"]').should('include.text', 'icatisis');
-    const tabs = cy.get('[class*="tabSwitcher"] button')
+    const tabs = cy.get('[class*="entityTab"] button')
         .should('have.length', 0);
   })
 })

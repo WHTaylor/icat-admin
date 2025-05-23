@@ -19,7 +19,7 @@ describe('Changing field only affects active tab', () => {
     cy.contains(/^Instrument$/).click();
     cy.contains("NIMROD").click().type("{backspace}{enter}");
     cy.get('td[class*=modified]').should('have.length', 1);
-    cy.get('[class*="tabSwitcher"] button').first().click();
+    cy.get('[class*="entityTab"] button').first().click();
     cy.get('td[class*=modified]').should('have.length', 0);
   })
 })

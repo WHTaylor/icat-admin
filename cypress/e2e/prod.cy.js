@@ -42,7 +42,7 @@ describe('Can open many tables at once', () => {
     buttons.should('have.length.greaterThan', 0);
     const numButtons = buttons.click({multiple: true})
       .then($b => {
-        const tabs = cy.get('[class*="tabSwitcher"] > button');
+        const tabs = cy.get('[class*="tabSwitcher"] > [class*="entityTab"]');
         tabs.should('have.length', $b.length);
       });
   })

@@ -47,3 +47,19 @@ describe('Can open many tables at once', () => {
       });
   })
 })
+describe('Changing filter works', () => {
+  it('passes', () => {
+    cy.openEntityByTyping('Facility');
+    cy.get('[class*="entityRow"]')
+      .should('have.length', 1);
+    cy.get('[class*="filterInput"]').type('id = 1{enter}');
+    cy.get('[class*="entityRow"]')
+      .should('have.length', 1);
+    cy.get('[class*="filterInput"]').clear()
+    cy.get('[class*="filterInput"]').type('id = 999{enter}');
+    cy.contains('No entries')
+    cy.get('[class*="filterInput"]').clear()
+    cy.get('[class*="filterInput"]').type('invalid{enter}');
+    cy.get("#errorMessage").should('exist');
+  })
+})

@@ -95,7 +95,7 @@ const EntityTable = (
         </span>
 
         {errMsg !== undefined
-            ? <p>{errMsg}</p>
+            ? <p id="errorMessage">{errMsg}</p>
             : <EntityTableView
                 entityType={filter.table}
                 saveEntity={e =>

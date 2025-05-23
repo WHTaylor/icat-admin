@@ -7,17 +7,32 @@ type EntityTabsState = {
 }
 
 type EntityTabsActions = {
+    getActiveTab: () => EntityTabState | undefined
     createEntityTab: (filter: TableFilter) => void
     closeEntityTab: (idx: number) => void
     setActiveTab: (idx: number) => void
+    toggleShowAllColumns: () => void
 }
 
 export type EntityTabsSlice = EntityTabsState & EntityTabsActions;
 
 export const createEntityTabsSlice: StateCreator<EntityTabsSlice> = (set, get) => {
+    const withActiveTabModified = (f: (tab: EntityTabState) => EntityTabState) => {
+        const activeTab = get().activeTab;
+        if (activeTab === undefined) return get().tabs;
+        const modified = [...get().tabs];
+        modified[activeTab] = f(modified[activeTab]);
+        return modified;
+    }
+
     return {
         tabs: [],
         activeTab: undefined,
+        getActiveTab: () => {
+            const activeTab = get().activeTab;
+            if (activeTab === undefined) return undefined;
+            return get().tabs[activeTab]
+        },
         createEntityTab: (filter: TableFilter) => {
             const newTab = {
                 filter,
@@ -52,6 +67,12 @@ export const createEntityTabsSlice: StateCreator<EntityTabsSlice> = (set, get) =
         },
         setActiveTab: (idx: number) => set(() => ({
             activeTab: idx
+        })),
+        toggleShowAllColumns: () => set(() => ({
+            tabs: withActiveTabModified(ets => ({
+                ...ets,
+                showAllColumns: !ets.showAllColumns
+            }))
         }))
     }
 }

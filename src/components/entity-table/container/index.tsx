@@ -8,6 +8,7 @@ import OnChangeInput from "../../generic/on-change-input";
 import {EntityDataAction} from "../../../state/connection";
 import {EntityTabState, NewIcatEntity, OpenTabHandler, TableFilter} from "../../../types";
 import PaginationControl from "../../controls/pagination-control";
+import {useConnectionStore} from "../../../state/stores";
 
 type Props = {
     icatClient: IcatClient,
@@ -29,7 +30,10 @@ const EntityTable = (
         reloadEntity,
         dispatch,
     }: Props) => {
-    const {filter, data, deletions, creations, errMsg, showAllColumns} = state;
+    const {filter, data, deletions, creations, errMsg} = state;
+    const activeTab = useConnectionStore((state) => state.getActiveTab());
+    const showAllColumns = activeTab?.showAllColumns || false;
+    const toggleShowAllColumns = useConnectionStore((state) => state.toggleShowAllColumns);
 
     const handleFilterChange =
         (f: TableFilter) => dispatch({type: "edit_filter", filter: f});
@@ -84,7 +88,7 @@ const EntityTable = (
                     type="checkbox"
                     checked={showAllColumns}
                     defaultChecked={showAllColumns}
-                    onChange={() => dispatch({type: "toggle_show_empty_columns"})}
+                    onChange={toggleShowAllColumns}
                 />
             </label>
             <EntityCounter filter={filter} icatClient={icatClient}/>

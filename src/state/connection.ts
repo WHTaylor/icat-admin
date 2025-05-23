@@ -31,8 +31,7 @@ export type ConnectionStateAction =
 type EntityTabAction =
     EntityTabCreateAction |
     EntityTabCloseAction |
-    EntityTabSwapAction |
-    EntityTabChangeAction
+    EntityTabSwapAction
 
 /** Actions which change the state of a single entity tab */
 export type EntityDataAction =
@@ -50,8 +49,7 @@ export type EntityDataAction =
     EntitySyncCreationAction |
     EntityModifyAction |
     EntityCancelModificationsAction |
-    EntitySyncModificationAction |
-    EntityToggleShowEmptyColumns
+    EntitySyncModificationAction
 
 /** idx is the entity tab to make the change to */
 type EntityTabEditAction = { idx: number } & EntityDataAction;
@@ -70,11 +68,6 @@ type EntityTabSwapAction = {
     type: "swap"
     a: number
     b: number
-}
-
-type EntityTabChangeAction = {
-    type: "change_tab"
-    idx: number
 }
 
 type EntitySetDataAction = {
@@ -156,17 +149,11 @@ type EntitySyncModificationAction = {
     entity: ExistingIcatEntity
 }
 
-type EntityToggleShowEmptyColumns = {
-    type: "toggle_show_empty_columns"
-}
-
 export function connectionTabReducer(
     state: ConnectionState,
     action: ConnectionStateAction
 ): ConnectionState {
-    if (action.type == "change_tab") {
-        return {...state, activeTab: action.idx};
-    } else if (action.type == "create_tab") {
+    if (action.type == "create_tab") {
         const entities = state.entityTabs.concat({
             filter: action.filter,
             key: Math.random(),
@@ -346,9 +333,6 @@ function makeEditFunction(action: EntityTabEditAction)
                     ? action.entity
                     : e)
             }, action.entity.id);
-
-        case "toggle_show_empty_columns":
-            return ets => ({...ets, showAllColumns: !ets.showAllColumns});
     }
 }
 

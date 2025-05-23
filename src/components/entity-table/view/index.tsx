@@ -13,25 +13,17 @@ import {
     OpenTabHandler,
     TableIcatEntityValue
 } from "../../../types";
-import {EntityDataAction} from "../../../state/connection";
 import IcatClient, {getEntityAttributes} from "../../../icat";
 import LoadingIndicator from "../../generic/loading-indicator";
 import {entityStructures, IcatEntityName} from "../../../icatEntityStructure";
+import {useConnectionStore} from "../../../state/stores";
 import JSX = h.JSX;
 
 type Props = {
-    data?: ExistingIcatEntity[];
-    deletions: Set<number>,
-    creations: NewIcatEntity[];
-    modifications: { [id: number]: EntityModification },
     entityType: IcatEntityName,
-    sortingBy: { field: string | null, asc: boolean | null },
     deleteEntities: (ids: number[]) => void;
     saveEntity: (e: NewIcatEntity | ExistingIcatEntity) => Promise<number[]>;
-    cancelCreation: (i: number) => void;
     insertCreation: (rowIdx: number, id: number) => Promise<void>;
-    reloadEntity: (id: number) => Promise<void>;
-    dispatch: (action: EntityDataAction) => void;
     openTab: OpenTabHandler,
     icatClient: IcatClient,
     showAllColumns: boolean,
@@ -47,15 +39,24 @@ type FieldEdit = {
  * each row being rendered as an {@link EntityRow}
  */
 const EntityTableView = ({
-                             data, deletions, creations, modifications,
                              entityType,
-                             sortingBy, saveEntity, reloadEntity,
+                             saveEntity,
                              deleteEntities,
-                             cancelCreation, insertCreation,
-                             dispatch,
+                             insertCreation,
                              openTab, icatClient,
                              showAllColumns
                          }: Props) => {
+    const data = useConnectionStore((state) => state.getActiveTab()?.data);
+    const creations = useConnectionStore((state) => state.getActiveTab()?.creations) ?? [];
+    const modifications = useConnectionStore((state) => state.getActiveTab()?.modifications) ?? {};
+    const filter = useConnectionStore((state) => state.getActiveTab()?.filter)!;
+    const deletions = useConnectionStore((state) => state.getActiveTab()?.deletions)!;
+    const cancelCreations = useConnectionStore((state) => state.cancelCreations);
+    const editCreation = useConnectionStore((state) => state.editCreation);
+    const cancelModifications = useConnectionStore((state) => state.cancelModifications);
+    const syncModifications = useConnectionStore((state) => state.syncModifications);
+    const editEntity = useConnectionStore((state) => state.editEntity);
+
     const [contextMenuProps, setContextMenuProps] =
         useState<CtxMenuDynamicProps | null>(null);
     // Locally saved changes to entities
@@ -130,18 +131,12 @@ const EntityTableView = ({
         [showAllColumns, data, entityType]);
 
     const modifyCreation = useCallback(
-        (k: string, v: TableIcatEntityValue, i: number) =>
-            dispatch({
-                type: "edit_creation", i, k, v
-            }),
-        [dispatch]
+        (k: string, v: TableIcatEntityValue, i: number) => editCreation(i, k, v),
+        [editCreation]
     );
     const modifyEntity = useCallback(
-        (k: string, v: TableIcatEntityValue, id: number) =>
-            dispatch({
-                type: "edit_entity", id, k, v
-            }),
-        [dispatch]
+        (k: string, v: TableIcatEntityValue, id: number) => editEntity(id, k, v),
+        [editEntity]
     );
     const wrapModifier = useCallback(
         (f: (k: string, v: TableIcatEntityValue, i: number) => void) =>
@@ -166,30 +161,9 @@ const EntityTableView = ({
         [wrapModifier, modifyEntity]
     );
 
-    const syncEntity = useCallback(
-        (id: number) => reloadEntity(id),
-        [reloadEntity]
-    );
     const syncCreation = useCallback(
         (id: number, rowIdx: number) => insertCreation(rowIdx, id),
         [insertCreation]
-    );
-    const revertModifications = useCallback(
-        (id: number) => dispatch({
-            type: "cancel_modifications",
-            id
-        }),
-        [dispatch]
-    );
-    const markToDelete = useCallback(
-        (id: number) => dispatch({type: "mark_delete", id}),
-        [dispatch]
-    );
-    const cancelDeletion = useCallback(
-        (id: number) => dispatch({
-            type: "cancel_deletes", ids: [id]
-        }),
-        [dispatch]
     );
     const doDelete = useCallback(
         (id: number) => deleteEntities([id]),
@@ -204,7 +178,7 @@ const EntityTableView = ({
     // a dropdown that allows the user to select which field from those entities
     // to display
     const relatedFieldDisplaySelect = (k: string): JSX.Element => {
-        const firstEntityWithValue = data.find(e => e[k] !== undefined);
+        const firstEntityWithValue = data?.find(e => e[k] !== undefined);
         if (firstEntityWithValue === undefined) return <></>;
 
         const fieldValue = firstEntityWithValue[k];
@@ -232,11 +206,16 @@ const EntityTableView = ({
             "new-entity-" + rowIdx,
             undefined,
             (id: number) => syncCreation(id, rowIdx),
-            () => cancelCreation(rowIdx),
+            () => cancelCreations([rowIdx]),
             doModifyCreation,
             undefined,
         );
     }
+
+    const reloadEntity = async (id: number) => {
+        const entity = await icatClient.getById(filter.table, id);
+        syncModifications(entity);
+    };
 
     const buildExistingRow = (e: ExistingIcatEntity, rowIdx: number) => {
         return buildRow(
@@ -244,8 +223,8 @@ const EntityTableView = ({
             rowIdx,
             e.id.toString(),
             modifications[e.id],
-            syncEntity,
-            () => revertModifications(e.id),
+            reloadEntity,
+            () => cancelModifications(e.id),
             doModifyEntity,
             openContextMenu,
         );
@@ -279,12 +258,10 @@ const EntityTableView = ({
         saveEntity={saveEntity}
         syncChanges={syncModifications}
         revertChanges={revertChanges}
-        markToDelete={markToDelete}
-        cancelDeletion={cancelDeletion}
         doDelete={doDelete}
     />;
 
-    const somethingToDisplay = creations.length > 0 || data.length > 0;
+    const somethingToDisplay = creations.length > 0 || (data?.length ?? 0) > 0;
 
     return !(somethingToDisplay || showAllColumns)
         ? <p>No entries</p>
@@ -292,18 +269,14 @@ const EntityTableView = ({
             <table>
                 <TableHeader
                     keys={keys}
-                    sortingBy={sortingBy}
-                    setSortingBy={(field, asc) => dispatch({
-                        type: "sort", field, asc
-                    })}
                     relatedFieldDisplaySelect={relatedFieldDisplaySelect}
                 />
                 {
                     somethingToDisplay && <tbody>
                     {
                         creations.map(buildCreationRow)
-                            .concat(data.map((e, i) =>
-                                buildExistingRow(e, i + creations.length)))
+                            .concat(data?.map((e, i) =>
+                                buildExistingRow(e, i + creations.length)) ?? [])
                     }
                   </tbody>
                 }
@@ -320,17 +293,17 @@ const EntityTableView = ({
 
 type TableHeaderProps = {
     keys: string[],
-    sortingBy: { field: string | null, asc: boolean | null },
-    setSortingBy: (field: string, asc: boolean) => void,
     relatedFieldDisplaySelect: (k: string) => JSX.Element
 }
 
 const TableHeader = ({
                          keys,
-                         sortingBy,
-                         setSortingBy,
                          relatedFieldDisplaySelect
                      }: TableHeaderProps) => {
+    const sortField = useConnectionStore((state) => state.getActiveTab()?.filter.sortField);
+    const sortAsc = useConnectionStore((state) => state.getActiveTab()?.filter.sortAsc);
+    const setSortingBy = useConnectionStore((state) => state.setSortingBy);
+
     return <thead>
     <tr>
         <th>Actions</th>
@@ -343,7 +316,7 @@ const TableHeader = ({
                             <button
                                 className={
                                     `${style.sortButton}
-                                    ${sortingBy.field === k && sortingBy.asc
+                                    ${sortField === k && sortAsc
                                         ? style.activeSort : ''}`}
                                 onClick={() => setSortingBy(k, true)}
                                 title={`Sort by ${k}, ascending`}>
@@ -352,7 +325,7 @@ const TableHeader = ({
                             <button
                                 className={
                                     `${style.sortButton}
-                                    ${sortingBy.field === k && !sortingBy.asc
+                                    ${sortField === k && !sortAsc
                                         ? style.activeSort : ''}`}
                                 onClick={() => setSortingBy(k, false)}
                                 title={`Sort by ${k}, descending`}>

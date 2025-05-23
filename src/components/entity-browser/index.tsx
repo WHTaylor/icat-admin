@@ -1,21 +1,18 @@
-import {Dispatch, useEffect, useState} from "preact/hooks";
+import {useEffect, useState} from "preact/hooks";
 
-import IcatClient  from '../../icat';
+import IcatClient from '../../icat';
 import {entityNames, IcatEntityName} from '../../icatEntityStructure';
 import {tableFilter,} from '../../utils';
 import EntityTable from '../entity-table/container';
 import TabWindow from '../tab-window';
 import OpenTabModal from "../open-tab-modal";
-import {ConnectionStateAction} from "../../state/connection";
 import {useQueries} from "@tanstack/react-query";
-import {EntityTabState, OpenTabHandler, TableFilter} from "../../types";
+import {OpenTabHandler, TableFilter} from "../../types";
 import LeftColumnList from "../left-column-list";
 import {useConnectionStore} from "../../state/stores";
 
 type Props = {
     icatClient: IcatClient
-    entityTabs: EntityTabState[];
-    dispatch: Dispatch<ConnectionStateAction>
     key: string;
 }
 
@@ -29,15 +26,16 @@ type Props = {
 const EntityBrowser = (
     {
         icatClient,
-        entityTabs,
-        dispatch
     }: Props) => {
     const [isOpenTabModalOpen, setIsOpenTabModalOpen] = useState(false);
     const activeTabIdx = useConnectionStore((state) => state.activeTab);
     const createEntityTab = useConnectionStore((state) => state.createEntityTab);
-    const closeEntityTab = useConnectionStore((state) => state.closeEntityTab);
+    const tabs = useConnectionStore((state) => state.tabs)
+    const setTabData = useConnectionStore((state) => state.setTabData);
+    const setTabError = useConnectionStore((state) => state.setTabError);
+    const syncCreation = useConnectionStore((state) => state.syncCreation);
 
-    const queries = entityTabs.map(et => ({
+    const queries = tabs.map(et => ({
         queryKey: [icatClient, et.filter],
         queryFn: async ({signal}: { signal: AbortSignal }) =>
             await icatClient.getEntries(et.filter, signal),
@@ -50,26 +48,17 @@ const EntityBrowser = (
     results.map((res, i) => {
         const {data, error} = res;
 
-        const tab = entityTabs[i]
+        const tab = tabs[i]
         if (tab.data !== undefined || tab.errMsg !== undefined) return;
 
         if (data) {
-            dispatch({
-                type: "set_data",
-                data,
-                idx: i
-            });
+            setTabData(data, i)
         } else if (error) {
-            dispatch({
-                type: "set_error",
-                message: error.message,
-                idx: i
-            })
+            setTabError(error.message, i);
         }
     });
 
     const openTabForFilter = (f: TableFilter) => {
-        dispatch({type: "create_tab", filter: f})
         createEntityTab(f);
         // Timeout is used as a small hack to make sure scroll happens after component
         // rerenders (or at least, that's what it appears to do).
@@ -83,44 +72,13 @@ const EntityBrowser = (
     const openTab: OpenTabHandler = (entityName: IcatEntityName, where?: string) =>
         openTabForFilter(tableFilter(entityName, 0, 50, where));
 
-    const swapTabs = (a: number, b: number) => {
-        if (a === b) return;
-        dispatch({type: "swap", a, b});
-    };
-
-    const closeTab = (idx: number) => {
-        dispatch({type: "close_tab", idx});
-        closeEntityTab(idx);
-    }
-
-    const deleteEntities = (ids: number[]) => {
-        if (activeTabIdx === undefined) return;
-        const tab = entityTabs[activeTabIdx];
-        if ((tab.deletions ?? new Set()).size === 0) return;
-
-        icatClient.deleteEntities(tab.filter.table, ids)
-            .then(() => dispatch({
-                type: "sync_deletes", ids, idx: activeTabIdx
-            }));
-    }
     const insertCreation = async (i: number, id: number) => {
         if (activeTabIdx === undefined) return;
 
-        const activeTab = entityTabs[activeTabIdx];
+        const activeTab = tabs[activeTabIdx];
         const entity = await icatClient.getById(activeTab.filter.table, id);
-        dispatch({
-            type: "sync_creation", i, entity, idx: activeTabIdx
-        });
+        syncCreation(i, entity)
     }
-
-    const reloadEntity = async (id: number) => {
-        if (activeTabIdx === undefined) return;
-        const entity = await icatClient.getById(
-            entityTabs[activeTabIdx].filter.table, id);
-        dispatch({
-            type: "sync_modification", entity, idx: activeTabIdx
-        });
-    };
 
     useEffect(() => {
         // Could base this on the icat/properties.lifetimeMinutes, but this is simpler
@@ -153,27 +111,14 @@ const EntityBrowser = (
                 }
             </LeftColumnList>
 
-            {entityTabs.length > 0 &&
+            {tabs.length > 0 &&
               <div className="mainContentAndRightColumn">
-                <TabWindow
-                  activeTabIdx={activeTabIdx}
-                  closeTab={closeTab}
-                  swapTabs={swapTabs}
-                  tabs={entityTabs.map(tab =>
-                      [tab.filter.table, tab.key])}/>
-
+                  <TabWindow/>
                   {activeTabIdx !== undefined &&
                     <EntityTable
                       icatClient={icatClient}
-                      state={entityTabs[activeTabIdx]}
                       openTab={openTab}
                       insertCreation={insertCreation}
-                      reloadEntity={reloadEntity}
-                      deleteEntities={deleteEntities}
-                      dispatch={a => dispatch({
-                          ...a,
-                          idx: activeTabIdx
-                      })}
                     />
                   }
               </div>

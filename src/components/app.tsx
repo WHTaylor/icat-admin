@@ -1,4 +1,4 @@
-import {useLayoutEffect, useReducer} from 'preact/hooks';
+import {useLayoutEffect} from 'preact/hooks';
 
 import IcatClient, {isValidSession} from '../icat';
 import About from './about';
@@ -12,7 +12,6 @@ import {
     saveLogin
 } from '../connectioncache';
 import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
-import {appStateReducer} from "../state/app";
 import ServerConnection from "./server-connection";
 import {ConnectionStoreContext, useAppStore} from "../state/stores";
 
@@ -29,19 +28,9 @@ const queryClient = new QueryClient({
 const App = () => {
     const store = useAppStore((state) => state);
 
-    const [state, dispatch] = useReducer(
-        appStateReducer,
-        {
-            connections: []
-        });
-
     const createConnection = (login: Connection) => {
         saveLogin(login);
         store.createConnection(login);
-        dispatch({
-            type: "create_connection",
-            connectionInfo: login
-        });
     };
 
     const removeConnection = async (idx: number) => {
@@ -49,10 +38,6 @@ const App = () => {
         invalidateLogin(c.server, c.username);
         await new IcatClient(c.server, c.sessionId).logout();
         store.removeConnection(idx);
-        dispatch({
-            type: "close_connection",
-            idx
-        });
     }
 
     // If on the login page, and no servers are currently active, try to
@@ -78,13 +63,7 @@ const App = () => {
                 : <ConnectionStoreContext
                     value={store.connectionStores[store.activePage]}>
                     <ServerConnection
-                        connection={{
-                            ...state.connections[store.activePage],
-                            connectionInfo: store.connections[store.activePage]
-                        }}
-                        dispatch={a => dispatch({
-                            ...a, connectionIdx: store.activePage as number
-                        })}
+                        connection={store.connections[store.activePage]}
                     />
                 </ConnectionStoreContext>
 

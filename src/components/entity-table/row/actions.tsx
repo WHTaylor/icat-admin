@@ -4,6 +4,7 @@ import style from "./style.module.css";
 import {EntityModification} from "./index";
 import {IcatEntity} from "../../../types";
 import {serialize} from "../../../utils";
+import {useConnectionStore} from "../../../state/stores";
 
 type ActionButtonData = {
     title: string;
@@ -18,8 +19,6 @@ type RowActionsProps = {
     syncChanges: (id: number) => void,
     markedForDeletion: boolean,
     revertChanges: () => void,
-    markToDelete: (id: number) => void,
-    cancelDeletion: (id: number) => void,
     doDelete: (id: number) => void
 }
 
@@ -31,10 +30,10 @@ const RowActions = (
         syncChanges,
         markedForDeletion,
         revertChanges,
-        markToDelete,
-        cancelDeletion,
         doDelete
     }: RowActionsProps) => {
+    const markToDelete = useConnectionStore((state) => state.markToDelete);
+    const cancelDeletions = useConnectionStore((state) => state.cancelDeletions);
 
     const saveMutation = useMutation<number[], Error, void, unknown>({
         mutationFn: () => {
@@ -70,7 +69,7 @@ const RowActions = (
             icon: "💾"
         });
     } else if (markedForDeletion) {
-        actions.push({title: "Cancel deletion", clickEventHandler: () => cancelDeletion(entity.id as number), icon: "↩️"});
+        actions.push({title: "Cancel deletion", clickEventHandler: () => cancelDeletions([entity.id as number]), icon: "↩️"});
         actions.push({title: "Confirm deletion", clickEventHandler: () => doDelete(entity.id as number), icon: "✔️"});
     } else {
         actions.push({title: "Mark for deletion", clickEventHandler: () => markToDelete(entity.id as number), icon: "🗑"});

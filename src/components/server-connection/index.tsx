@@ -1,20 +1,18 @@
 import style from './style.module.css'
 import EntityBrowser from '../entity-browser';
-import {ConnectionState, ConnectionStateAction} from "../../state/connection";
-import {Dispatch, useEffect, useMemo} from "preact/hooks";
+import {useEffect, useMemo} from "preact/hooks";
 import ToolsUI from "../tools-ui";
 import IcatClient from "../../icat";
 import {useConnectionStore} from "../../state/stores";
+import {Connection} from "../../connectioncache";
 
 type Props = {
-    connection: ConnectionState
-    dispatch: Dispatch<ConnectionStateAction>
+    connection: Connection
 }
 
 const ServerConnection = (
     {
         connection,
-        dispatch,
     }: Props) => {
     const activeUI = useConnectionStore((state) => state.activeUI);
     const setActiveUI = useConnectionStore((state) => state.setActiveUI);
@@ -36,16 +34,14 @@ const ServerConnection = (
     }, [setActiveUI])
 
     const icatClient = useMemo(() => new IcatClient(
-            connection.connectionInfo.server,
-            connection.connectionInfo.sessionId),
-        [connection.connectionInfo.server, connection.connectionInfo.sessionId]);
+            connection.server,
+            connection.sessionId),
+        [connection.server, connection.sessionId]);
 
     const content = activeUI === "Browser"
         ? <EntityBrowser
             icatClient={icatClient}
-            entityTabs={connection.entityTabs}
-            dispatch={dispatch}
-            key={connection.connectionInfo.sessionId}/>
+            key={connection.sessionId}/>
         : <ToolsUI icatClient={icatClient}/>
 
     return <div class="page">

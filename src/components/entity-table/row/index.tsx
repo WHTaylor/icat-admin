@@ -52,8 +52,6 @@ type Props = {
     saveEntity: (e: IcatEntity) => Promise<number[]>;
     syncChanges: (id: number) => void;
     revertChanges: () => void;
-    markToDelete: (id: number) => void;
-    cancelDeletion: (id: number) => void;
     doDelete: (id: number) => void;
 }
 
@@ -76,8 +74,6 @@ const EntityRow = memo((
         saveEntity,
         syncChanges,
         revertChanges,
-        markToDelete,
-        cancelDeletion,
         doDelete,
     }: Props) => {
 
@@ -156,8 +152,6 @@ const EntityRow = memo((
                     syncChanges={syncChanges}
                     markedForDeletion={markedForDeletion}
                     revertChanges={revertChanges}
-                    markToDelete={markToDelete}
-                    cancelDeletion={cancelDeletion}
                     doDelete={doDelete}
                 />
             </td>

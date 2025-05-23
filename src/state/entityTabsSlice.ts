@@ -132,17 +132,11 @@ export const createEntityTabsSlice: StateCreator<EntityTabsSlice> = (set, get) =
                 idx)
         })),
         refresh: () => set(() => ({
-            tabs: withActiveTabModified(ets => ({
-                ...ets,
-                data: undefined,
-                errMsg: undefined
-            }))
+            tabs: withActiveTabModified(ets => cleared(ets))
         })),
         setFilter: (filter: TableFilter) => set(() => ({
-            tabs: withActiveTabModified(ets => ({
+            tabs: withActiveTabModified(ets => cleared({
                 ...ets,
-                data: undefined,
-                errMsg: undefined,
                 filter
             }))
         })),
@@ -152,25 +146,21 @@ export const createEntityTabsSlice: StateCreator<EntityTabsSlice> = (set, get) =
                 showAllColumns: !ets.showAllColumns
             }))
         })),
-        setSortingBy: (field: string | null, asc: boolean) => set(() => ({
-            tabs: withActiveTabModified(ets => {
-                const previousField = ets.filter.sortField;
-                const previousAsc = ets.filter.sortAsc;
-                // If the same sort is set, stop sorting
-                const unchanged = field === previousField && asc === previousAsc;
-                const newFilter = {
-                    ...ets.filter,
-                    sortField: unchanged ? null : field,
-                    sortAsc: asc
-                };
-                return {
-                    ...ets,
-                    filter: newFilter,
-                    data: undefined,
-                    errMsg: undefined
-                };
-            })
-        })),
+        setSortingBy: (field: string | null, asc: boolean) => {
+            const activeTab = get().activeTab;
+            if (activeTab === undefined) return;
+            const filter = get().tabs[activeTab].filter;
+            const previousField = filter.sortField;
+            const previousAsc = filter.sortAsc;
+            // If the same sort is set, stop sorting
+            const unchanged = field === previousField && asc === previousAsc;
+            const newFilter = {
+                ...filter,
+                sortField: unchanged ? null : field,
+                sortAsc: asc
+            };
+            get().setFilter(newFilter);
+        },
         addCreation: () => set(() => ({
             tabs: withActiveTabModified(ets => ({
                 ...ets,
@@ -231,11 +221,12 @@ export const createEntityTabsSlice: StateCreator<EntityTabsSlice> = (set, get) =
         })),
         syncModifications: (entity) => set(() => ({
             tabs: withActiveTabModified(ets => cancelModifications({
-                ...ets,
-                data: ets.data?.map(e => e.id === entity.id
-                    ? entity
-                    : e)
-            }, entity.id))
+                    ...ets,
+                    data: ets.data?.map(e => e.id === entity.id
+                        ? entity
+                        : e)
+                },
+                entity.id))
         })),
         editEntity: (id, k, v) => set(() => ({
             tabs: withActiveTabModified(ets => {
@@ -278,4 +269,13 @@ function cancelModifications(ets: EntityTabState, id: number): EntityTabState {
     const modifications = {...ets.modifications};
     delete modifications[id];
     return {...ets, modifications};
+}
+
+function cleared(ets: EntityTabState) {
+    return {
+        ...ets,
+        data: undefined,
+        errMsg: undefined,
+        modifications: {}
+    }
 }

@@ -13,8 +13,6 @@
   "devDependencies": {
     "@tanstack/eslint-plugin-query": "^5.28.1",
     "cypress": "^15.6.0",
-    "enzyme": "^3.10.0",
-    "enzyme-adapter-preact-pure": "^4.1.0",
     "eslint": "^9.25.1",
     "eslint-config-preact": "^1.4.0",
     "netlify-plugin-cypress": "^2.2.0",

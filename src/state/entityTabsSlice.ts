@@ -38,7 +38,10 @@ type EntityTabsActions = {
 
     cancelModifications: (id: number) => void
     syncModifications: (entity: ExistingIcatEntity) => void
-    editEntity: (id: number, k: string, v: string | number | { id: number }) => void
+    editEntity: (
+        id: number,
+        k: string,
+        v: string | number | { id: number }) => void
 }
 
 export type EntityTabsSlice = EntityTabsState & EntityTabsActions;

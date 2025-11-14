@@ -78,14 +78,11 @@ export const createEntityTabsSlice: StateCreator<EntityTabsSlice> = (set, get) =
             }));
         },
         closeEntityTab: (idx: number) => {
-            // If we're closing the last open tab, a tab to the left of
-            // the active tab, or the active tab, the active tab needs
-            // to change
             const activeTab = get().activeTab;
-            let newActiveTab = get().activeTab;
-            if (activeTab == undefined || get().tabs.length == 1) newActiveTab = undefined;
-            else if (activeTab > idx
-                || idx === get().tabs.length - 1) newActiveTab = activeTab - 1;
+            const numTabs = get().tabs.length;
+            const newActiveTab = activeTab === undefined
+                ? undefined
+                : calculateActiveTabAfterClosing(activeTab, idx, numTabs);
 
             set((state) => ({
                 tabs: [
@@ -281,4 +278,21 @@ function cleared(ets: EntityTabState) {
         errMsg: undefined,
         modifications: {}
     }
+}
+
+function calculateActiveTabAfterClosing(
+    activeIdx: number,
+    closingIdx: number,
+    numTabs: number) {
+    // Nothing active if closing the last tab
+    if (numTabs === 1) return undefined;
+
+    // Closing tab to the right does nothing
+    if (closingIdx > activeIdx) return activeIdx;
+    // Keep currently visible tab active if closing tab to the left
+    if (closingIdx < activeIdx) return activeIdx - 1;
+    // Closing active tab does nothing, unless it's the last tab
+    return activeIdx === numTabs - 1
+        ? activeIdx - 1
+        : activeIdx;
 }
